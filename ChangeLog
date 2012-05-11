@@ -1,0 +1,750 @@
+2012-04-21  Steven Munroe  <sjmunroe@us.ibm.com>
+
+	* doc/libshpde-doxygen-sph.doxy: Remove sasstringbtreenode.h.
+	* doc/sphmaindox.h: Improve description of sphtimer.h and
+	sphthread.h.
+	* src/sascompoundheap.h: Add todo.
+	* src/sasindex.cpp: Replace sasindex.h with sasindexpriv.h.
+	* src/sasindex.h: Add todo. Remove externs for; SASIndexAlloc,
+	SASIndexFree, SASIndexNearAlloc, SASIndexNearDealloc,
+	SASIndexGetRootNode.
+	* src/sasindexpriv.h: Fix includes, Fix field refs to structs.
+	Add extern for; SASIndexAlloc, SASIndexFree, SASIndexNearAlloc,
+	SASIndexNearDealloc, SASIndexGetRootNode.
+	* src/saslock.h: Add todo.
+	* src/sassim.h: Add todo.
+	* src/sasstringbtree.h: Remove todo, add another.
+	* src/sasstringbtreenode.h: Change note to warning.
+	* src/sasstringbtreepriv.h: Fix includes, Fix field refs to structs.
+	* src/sphcontext.cpp: Replace sphcontext.h with sphcontextpriv.h.
+	* src/sphcontext.h: Add todo and warnings. Remove externs for
+	SPHContextAlloc, SPHContextFree, SPHContextNearAlloc,
+	SPHContextNearDealloc.
+	* src/sphcontextpriv.h: New file.
+	* src/sphlfentry.h: Add warnings and notes.
+	* src/sphlflogentry.h: Add todos and notes.
+	* src/sphlflogger.h: Add warnings and notes.
+	* src/sphsinglepcqueue.h: Add warnings and todos.
+	* src/sphtimer.h: Change note to warning.
+	* src/tests/sasindex_t.c: Replace sasindex.h with sasindexpriv.h.
+	* src/tests/sasstringbtree_t.c: Replace sasstringbtree.h with
+	sasstringbtreepriv.h.
+	* src/tests/sphcontext_t.c (sassim_dump_block): Remove.
+	Replace sasstringbtree.h with sasstringbtreepriv.h.
+	* src/tests/sphlflogger_t.c: Fix format error.
+
+2012-04-18  Adhemerval Zanella  <azanella@linux.vnet.ibm.com>
+
+	* src/sasstname.c: Indentation and remove compiler warnings.
+	* src/sphsinglepcqueue.cpp: Likewise.
+	* src/sasindexkey.h: Likewise.
+	* src/sphlockfreeheap.cpp: Likewise.
+	* src/bitv.c: Likewise.
+	* src/sphlflogger.cpp: Likewise.
+	* src/sasshm.c: Likewise.
+	* src/sassim.cpp: Likewise.
+	* src/sassimplespace.cpp: Likewise.
+	* src/sassimplestack.cpp: Likewise.
+	* src/tests/sphlflogger_t.c: Likewise.
+	* src/tests/sphthread_t.c: Likewise.
+	* src/sasindexnode.cpp: Remove compiler warnings.
+	* src/sasstringbtreenode.cpp: Likewise.
+	* src/sphthread.c: Likewise.
+	* src/tests/sphcontext_t.c: Likewise.
+
+2012-04-18  Adhemerval Zanella  <azanella@linux.vnet.ibm.com>
+
+	* src/sasindexnode.cpp: Add compilation debug guards for Print functions.
+	* src/sasstringbtreenode.cpp: Likewise.
+	* src/sasindexnode.h: Remove Print function prototypes.
+
+2012-04-15  Adhemerval Zanella  <azanella@linux.vnet.ibm.com>
+
+	* src/sasindex.h: Indentation and moving internal functions to ...
+	* src/sasindexpriv.h: ... here.
+	* src/sasindexnode.cpp: Indentation.
+	* src/sasindexenum.cpp: Likewise.
+	* src/sasstringbtreeenum.cpp: Likewise.
+	* src/sasindexnode.h: Likewise.
+	* src/sastype.h: Likewise.
+	* src/sasstringbtreeenum.h: Likewise.
+	* src/tests/sasindex_t.c: Adding internal function to print index
+	key and values.
+	* src/sasindex.cpp: Removing SASIndexPrintXXX functions.
+	* doc/sphmaindox.h: Adjusting sphtimer.h and sphthread.h doc pointers.
+	* examples/example_sasindex.c: New file: SASIndex example.
+	* examples/Makefile.am: Add example_sasindex example.
+
+2012-04-09  Steven Munroe  <sjmunroe@us.ibm.com>
+
+	* doc/libshpde-doxygen-sph.doxy: Add sasindex.h, sasindexkey.h and
+	sasindexenum.h to doclist.
+	* doc/sphmaindox.h: Remove sasstringbtreenode.h reference. Add
+	sasindex.h and sasindexenum.h.
+	* src/sasindex.h: Complete doxygen comments.
+	* src/sasindexenum.h: Complete doxygen comments.
+	* src/sasindexkey.h: Complete doxygen comments.
+	* src/sassimpleheap.h: Minor comment fix.
+	* src/sasstringbtree.h: Complete doxygen comments.
+	* src/sasstringbtreeenum.cpp: Add SASStringBTreeEnumCreateStartAt. 
+	Fix SASStringBTreeEnumNext curcount.
+	* src/sasstringbtreeenum.h: Complete doxygen comments.
+	* src/sasstringbtreenode.h: Complete doxygen comments.
+	* src/sphlfentry.h: Minor comment fix.
+	* src/sphlflogger.h: Complete doxygen comments.
+	* src/tests/sasstringbtree_t.c: Add test of
+	SASStringBTreeEnumCreateStartAt.
+	* src/tests/sphlflogger_ttt.c: Correct printf data parms.
+
+2012-04-09  Adhemerval Zanella  <azanella@linux.vnet.ibm.com>
+
+	* src/sasstringbtreenode.h: [SASStringBTreeGetCountNodeCount] renamed
+	to SASStringBTreeNodeGetCount.	
+	* src/sasstringbtreenode.cpp: Likewise.
+	* examples/example_sph_3.c: Using SASStringBTreeNodeGetCount and add
+	proper indentation.
+	* src/tests/sasstringbtree_t.c: Likewise.
+
+2012-04-03  Steven Munroe  <sjmunroe@us.ibm.com>
+
+	* src/sasstringbtree.h: Update doxygen documentation.
+
+2012-04-02  Steven Munroe  <sjmunroe@us.ibm.com>
+
+	* src/sascompoundheap.h: Update doxygen documentation.
+
+2012-03-29  Adhemerval Zanella  <azanella@linux.vnet.ibm.com>
+
+	* src/sphtimer.h: Correct typo in x86-64 code.
+
+2012-03-29  Adhemerval Zanella  <azanella@linux.vnet.ibm.com>
+
+	* src/sphthread.h: Add doxygen documentation.
+	* src/sphthread.c: Proper indentation (GNU Style) and dead code
+	removal.
+	* doc/libshpde-doxygen-sph.doxy: Add sphthread.h.
+	* doc/sphmaindox.h: Likewise.
+
+2012-03-28  Adhemerval Zanella  <azanella@linux.vnet.ibm.com>
+
+	* src/sphtimer.h: Add doxygen documentation.
+	* src/sphtimer.c: Proper indentation (GNU Style).
+	* doc/libshpde-doxygen-sph.doxy: Add sphtimer.h entry.
+	* doc/sphmaindox.h: Likewise.
+	* examples/example_sphtimer.c: Add sphtimer.c example.
+	* examples/Makefile.am: Add example_sphtimer.c.
+
+2012-03-28  Adhemerval Zanella  <azanella@linux.vnet.ibm.com>
+
+	* src/sasstringbtreenode.h: Fix indentation.
+	* src/sasstringbtreenode.cpp: [SASStringBTreeGetCountNodeCount] Fix
+	internal test.
+	* examples/example_sph_3.c: [SASStringBTreeGetCountNodeCount] Use
+	correct function.
+
+2012-03-28  Adhemerval Zanella  <azanella@linux.vnet.ibm.com>
+
+	* src/sphtimer.h: Clean up time base macros.
+	* src/sphtimer.c: Properly indent (GNU Style).
+
+2012-03-27  Adhemerval Zanella  <azanella@linux.vnet.ibm.com>
+
+	* src/sasstringbtreenode.h: Added doxygen documentation and clean up
+	SBTnodePosRef definition.
+	* src/sasstringbtreenode.cpp: Properly indent (GNU Style).
+	* src/sasstringbtree.cpp: Using SBTnodePosRef instead of
+	__SBTnodePosRef.
+	* src/sasstringbtreeenum.cpp: Likewise.
+	* src/sasstringbtree.h: Update doxygen documentation.
+	* doc/libshpde-doxygen-sph.doxy: Add sasstringbtreenode.h.
+	* doc/sphmaindox.h: Likewise.
+
+2012-03-22  Adhemerval Zanella  <azanella@linux.vnet.ibm.com>
+
+	* src/sascompoundheap.h: Properly indent (GNU Style).
+	* src/sascompoundheap.cpp: Likewise.
+	* src/sasstringbtree.cpp: [SASStringBTreeGetRootNodeNoLock] Add
+	function, indentation, and warnings remove.
+	* src/sasstringbtree.h: Updated doxygen documentation. Removed Print
+	functions prototypes. 
+	* src/sasstringbtreenode.h: [ASStringBTreeGetCountNodeCount] Add 
+	function.
+	* src/sasstringbtreenode.cpp: Likewise.
+	* src/tests/sasstringbtree_t.c: Add print implementation since there
+	are no longer on sasstringbtree.h.
+	* doc/sphmaindox.h: Remove \ref tag (not really needed).
+	* examples/example_sph_3.c: New file: SAS String examples.
+	* examples/Makefile.am: [example_sph_3.c] Add example.
+
+2012-03-21  Adhemerval Zanella  <azanella@linux.vnet.ibm.com>
+
+	* src/sascompoundheap.h: Update doxygen documentation.
+
+2012-03-21  Adhemerval Zanella  <azanella@linux.vnet.ibm.com>
+
+	* src/sascompoundheap.h: Documentation typos and spelling corrections.
+	* src/sasstringbtree.h: Add doxygen documentation.
+	* doc/libshpde-doxygen-sph.doxy: Add sasstringbtree.h.
+	* doc/sphmaindox.h: Add sasstringbtree.h description.
+	* src/sasstringbtree.cpp: Properly indent (GNU Style).
+
+2012-03-19  Steven Munroe  <sjmunroe@us.ibm.com>
+
+	* doc/sphmaindox.h: Add links from main page to utility objects.
+	* src/sphlfentry.h: Correct naming for struct macros.
+	* src/sphsinglepcqueue.cpp: [SPHSinglePCQueueSetCachePrefetch] Add
+	function. [SPHSinglePCQueueSetCachePrefetch] Add function.
+	* src/sphsinglepcqueue.h: Add producer/consumer examples.
+
+2012-03-16  Adhemerval Zanella  <azanella@linux.vnet.ibm.com>
+
+	* src/sascompoundheap.h: Add doxygen documentation.
+	* src/sassimpleheap.h: Update and correct documentation.
+	* doc/libshpde-doxygen-sph.doxy: Add sascompoundheap.h.
+
+2012-03-15  Adhemerval Zanella  <azanella@linux.vnet.ibm.com>
+
+	* doc/libshpde-doxygen-sph.doxy: Add sassimpleheap.h.
+	* src/sassimpleheap.h: Add doxygen documentaion.
+
+2012-03-12  Steven Munroe  <sjmunroe@us.ibm.com>
+
+	* doc/libshpde-doxygen-sph.doxy: Add sasmsync.h, saslock.h,
+	sassimplespace.h, sassimplestack.h,
+	* doc/sphmaindox.h: Fix \mainpage. Add some text.
+	* src/saslock.h: Add doxygen documentation.
+	* src/sasmsync.h: Likewise.
+	* src/sassimplespace.h: Likewise.
+	* src/sassimplestack.h: likewise.
+	* src/sphcontext.h: Correct doxygen text.
+	* src/sphsinglepcqueue.h: Likewise.
+	* src/tests/sphsinglepcqueue_t.c: (lfpcqueue_stride_timestamp_test) 
+	Added test.
+
+2012-03-08  Adhemerval Zanella  <azanella@linux.vnet.ibm.com>
+
+	* configure.ac: Fixed a configure error when doxygen is not installed.
+	* src/sasatom.h: Added doxygen documentation, cleanup atomic barrier macro
+	names, and removed ununsed and redundant functions.
+	* src/sasatom_generic.h: Likewise.
+	* src/sasatom_i386.h: Likewise.
+	* src/sasatom_powerpc.h: Likewise.
+	* src/sasatom_x86_64.h: Likewise.
+	* src/sphlflogger.cpp: Using sas_write_barrier instead of
+	atomic_write_barrier.
+	* src/tests/sasatom_t.c: Replacing SASAtomicXXX function with sasatom.h
+	functions.
+	* doc/libshpde-doxygen-sph.doxy: Added sasatom.h documentation.
+	* m4/ltsugar.m4: Regenerated using SLES10.4 autotools.
+	* m4/libtool.m4: Likewise.
+	* m4/ltversion.m4: Likewise.
+	* m4/ltoptions.m4: Likewise.
+	* configure: Likewise.
+	* Makefile.in: Likewise.
+	* depcomp: Likewise.
+	* src/Makefile.in: Likewise.
+	* config.guess: Likewise.
+	* ltmain.sh: Likewise.
+	* config.sub: Likewise.
+	* aclocal.m4: Likewise.
+	* examples/Makefile.in: Likewise.
+	* install-sh: Likewise.
+
+2012-03-06  Adhemerval Zanella  <azanella@linux.vnet.ibm.com>
+
+	* aminclude.am: Fixed a issue that issuing 'make doc' forced the 
+	remove of 'doc' folder.
+
+2012-03-06  Adhemerval Zanella  <azanella@linux.vnet.ibm.com>
+
+	* src/Makefile.am: Added headers to install.
+	* src/Makefile.in: Autogenerated from src/Makefile.am.
+
+2012-03-05  Adhemerval Zanella  <azanella@linux.vnet.ibm.com>
+
+	* configure: Autogenerated: update for latests build modifications.
+	* Makefile.in: Likewise.
+	* depcomp: Likewise.
+	* config.guess: Likewise.
+	* ltmain.sh: Likewise.
+	* config.sub: Likewise.
+	* missing: Likewise.
+	* aclocal.m4: Likewise.
+	* examples/Makefile.in: Likewise.
+	* install-sh: Likewise.
+	* m4/libtool.m4: Likewise.
+	* m4/ltversion.m4: Likewise.
+	* src/Makefile.am: Added some headers to install.
+	* src/Makefile.in: Autogenerated from src/Makefile.am.
+
+2012-02-21  Adhemerval Zanella  <azanella@linux.vnet.ibm.com>
+
+	* aminclude.am: Added support to multiple doxygen files.
+	* configure.ac: Fixed the way define multiple doxygen files.
+	* doc/libshpde-doxygen-sph.doxy: Removed unused tags and fixed 
+	file location.
+
+2012-02-21  Adhemerval Zanella  <azanella@linux.vnet.ibm.com>
+
+	* acinclude.m4: Doxygen configuration for configure.ac.
+	* aminclude.am: Doxygen configuration for Makefile.am.
+	* configure.ac: Changed doxygen doc generation.
+	* Makefile.am: Changed doxygen doc generation.
+	* Makefile.in: Autogenerated from Makefile.am.
+	* doc/libshpde-doxygen-sph.doxy: Make relative patch build
+	work properly with doxygen generation.
+	* doc/libshpde-doxygen-sasutil.doxy: Likewise.
+	* doc/Makefile.am: Commented ununsed commands.
+	* doc/Makefile.in: Autogenerated from doc/Makefile.am.
+
+2012-02-20  Steven Munroe  <sjmunroe@us.ibm.com>
+
+	* src/Makefile.am: Added new single producer single consumer code.
+	* src/Makefile.in: Autogenerated from src/Makefile.am.
+	* src/sphlfentry.h: New file: SPH Lock Free Single Producer/Single 
+	Consumer Queue.
+	* src/sphsinglepcqueue.cpp: Likewise.
+	* src/sphsinglepcqueue.h: Likewise.
+	* src/tests/sphsinglepcqueue_t.c: New file: SPH Lock Free Single 
+	Producer/Single Consumer Queue test.
+	* src/sphlflogger.h: New file: functions to use with SPHLogger.
+	* src/sastype.h: Added SAS_PCQUEUE_TYPE.
+	* src/sphlflogger.cpp: Added SPHLFLoggerAllocTimeStampedNoLock and
+	SPHLFLoggerAllocStrideTimeStampedNoLock tests.
+	* src/tests/sphlflogger_t.c: Fix compiler warning.
+	* src/tests/sphcontext_t.c: Likewise.
+	* src/tests/sphlflogger_tt.c: Added lflogentry_fasttestnolockweak, 
+	and lflogentry_stridetestnolock tests.
+	* src/tests/sphlogportal_tt.c: New file: SPHLogPortal functions test.
+	* src/tests/sphlflogger_ttt.c: Added fill_test_parallel_thread,
+	lflogentry_stridetest_nolock, test_thread_wraplog_fill_nolock, and
+	test_thread_wraplog_parallel_xxx tests.
+	* doc/libshpde-doxygen-sph.doxy: Updated documentation.
+	* doc/Makefile.am: Likewise.
+	* doc/Makefile.am: Autogenerated from doc/Makefile.am.
+
+2012-02-07  Ryan S. Arnold  <rsa@linux.vnet.ibm.com>
+
+	* doc/sphmaindox.h: Revised documentation.
+	* src/ultree.cpp: Corrected tab usage.
+	* src/ultree.h: Likewise.
+	* configure.ac: Corrected misspelling.
+	* examples/example_sph_1.c: Tab, space, and grammar correction.
+	* examples/example_sph_2_1.c: Likewise.
+	* examples/example_sph_2_2.c: Likewise.
+
+2011-12-30  Steven Munroe  <sjmunroe@us.ibm.com>
+
+	* src/sphlflogentry.h: Added  SPHLFlogEntryGetStructPtr and
+	SPHLFlogEntryAllocStruct APIs.
+	* src/tests/sphlflogger_t.c: Added lflogger_struct_alloc_test testcases.
+
+2011-12-29  Steven Munroe  <sjmunroe@us.ibm.com>
+
+	* src/sphcontext.h: Added Project Context API.
+	* src/sphcontext.cpp: Likewise.
+	* src/tests/sphcontext_t.c: Added Project Context API testcases.
+	* src/Makefile.in: Removed PACKAGE_URL.
+	* src/sasstringbtreeenum.h: Updated documentation.
+	* doc/libshpde-doxygen-sph.doxy: Added src/sasstringbtreeenum.h.
+	* doc/Makefile.am: Likewise.
+	* doc/Makefile.in: Autogenerated from doc/Makefile.am.
+
+2011-12-28  Steven Munroe  <sjmunroe@us.ibm.com>
+
+	* src/sphcontext.cpp: Fixed a bug in SPHContextAddNameNoLock and
+	SPHContextRename.
+	* src/sasindexnode.cpp: Added debug directive.
+	* src/sasstringbtreenode.cpp: Fixed a bug in SASStringBTreeNodeFreeNoLock.
+	* src/tests/sasindex_t.c: New file: testcase for SASIndex functions.
+	* src/tests/sasstringbtree_t.c: New file: testcase for SASStringBTree 
+	functions.
+	* src/tests/sphcontext_t.c: New file: testcase for SPHContext functions.
+	* src/tests/sassim_t.c: Split SASStringBTree, SASIndex, and SPHContext
+	testcases in additional external tests.
+	* src/Makefile.am: Added sphcontext_t, sasindex_t, and sasstringbtree_t
+	tests.
+	* src/Makefile.in: Autogenerated from src/Makefile.am.
+	* src/sphcontext.h: Updated documentation.
+	* src/freenode.h: Compilation fix.
+
+2011-11-29  Steven Munroe  <sjmunroe@us.ibm.com>
+
+	* src/sphlogportal.h: Added documentation.
+	* src/sphlflogger.h: Likewise.
+	* doc/sphmaindox.h: Likewise.
+
+2011-11-29  Steven Munroe  <sjmunroe@us.ibm.com>
+
+	* src/sphcontext.cpp: Adjusted functions SPHContextAllocNoLock and
+	SPHContextFreeNoLock.
+	* src/sphlogportal.h: Adjusted Documentation.
+	* src/sphlockfreeheap.h: Likewise.
+	* src/sassim.h: Likewise.
+	* src/sphlflogentry.h: Likewise.
+	* src/sphcontext.h: Likewise.
+	* src/sphlflogger.h: Likewise.
+	* src/sphlflogger.cpp: Fixed some potential issues for PPC and added
+	some prefetch functions and directives.
+	* src/tests/sphlflogger_t.c: Added tests for SPHLFLoggerResetIfFullSync
+	function.
+	* src/tests/sphlflogger_tt.c: Added tests for 
+	SPHLFLogEntryStrongComplete and SPHLFLogEntryWeakComplete functions.
+	* src/tests/sphlflogger_ttt.c: Likewise.
+	* src/sphthread.h: Added tls_model ("initial-exec") to thread id.
+	* doc/sphmaindox.h: New file: general documentation for libsphde.
+	* doc/libshpde-doxygen-sph.doxy: Added new file to check for
+	documentation.
+	* doc/Makefile.am: Likewise.
+	* doc/Makefile.in: Autogenerated from doc/Makefile.am.
+
+2011-10-21  Steven Munroe  <sjmunroe@us.ibm.com>
+
+	* doc/libshpde-doxygen-sph.doxy: Newfile: doxygen file for libsphde
+	documentation.
+	* doc/Makefile.in: Autogenerated from doc/Makefile.am.
+
+2011-10-03  Steven Munroe  <sjmunroe@us.ibm.com>
+
+	* src/sasconf.h: Fixed RegionSize and SegmentSize for PPC32.
+	* src/sphlogportal.h: Added doxygen comments for library documentation.
+	* src/sphlockfreeheap.h: Likewise.
+	* src/sphlflogger.h: Likewise.
+	* src/sphlflogger.cpp: Fixed a race condition.
+	* src/sphlogportal.cpp: Added SPHLFPortalCreateIterator and 
+	SPHLFPortalIteratorNext function.
+	* src/tests/sassim_t.c: Printing some sasconf.h constants.
+	* src/tests/sphlogportal_t.c: Modified logportal_basic_test testcase to
+	add iterator tests (from function added in src/sphlogportal.cpp).
+	* doc/Makefile.am: Added doxygen generation for library documentation.
+
+2011-09-15  Adhemerval Zanella  <azanella@linux.vnet.ibm.com>
+
+	* src/sasconf.h: The defines __SAS_TEMP_ADDRESS and __SAS_TEMP_FREE now
+	have the same value for all platforms.
+
+2011-08-30  Adhemerval Zanella  <azanella@linux.vnet.ibm.com>
+
+	* src/Makefile.am: Remove sasatom.c from library source list.
+	* src/Makefile.in: Autogenerated from src/Makefile.am.
+	* src/sasatom.h: Subdivided in multiple architecture headers. This
+	header only contains generic code.
+	* src/sasatom_powerpc.h: PPC32/PPC64 specific code for atomic
+	operations.
+	* src/sasatom_i386.h: IA32 specific code for atomic operations.
+	* src/sasatom_x86_64.h: X86_64 specific code for atomic operations.
+	* src/sasatom_generic.h: Generic implementation for atomic operations.
+	* src/tests/sasatom_t.c: Using sas_lock_ptr_t.
+
+2011-08-30  Adhemerval Zanella  <azanella@linux.vnet.ibm.com>
+
+	* doc/Makefile.am: Fixed documentation generation to be able to build
+	in a different folder than source.
+	* doc/Makefile.in: Autogenerated from doc/Makefile.am.
+
+2011-08-27  Adhemerval Zanella  <azanella@linux.vnet.ibm.com>
+
+	* src/Makefile.am: Removed sassimt from programs and added sassim_t 
+	testcase.
+	* src/Makefile.in: Autogenerated from src/Makefile.am.
+	* src/bitv_priv.h: added inline to two function
+	to avoid compilation warnings.
+	* src/sasstringbtreenode.cpp: fixed a bug when removing nodes from
+	string btree structures.
+	* src/sassimt.cpp: Removed in favor of sasutil and sassim_t testcase.
+	* src/tests/sassim_t.c: New testcase to test multiple APIs from 
+	libsphde.
+	* examples/Makefile.in: Autogenerated from examples/Makefile.am.
+
+2011-08-26  Adhemerval Zanella  <azanella@linux.vnet.ibm.com>
+
+	* src/sasindexnode.h: Adjustment for include in a C-only source file.
+	* src/saslock.cpp: Reset now just recreates the master lock object
+	since it uses place new and the destructor itselt can lead to a
+	 deadlock state.
+	* src/sasalloc.h: Exporting symbols using "extern C".
+	* src/saslockl.cpp: Removing debug output.
+	* src/sasshm.c: Likewise.
+	* src/sassim.cpp: Likewise.
+	* src/sasmsync.c: All functions now have returning codes.
+	* src/sasmsync.h: Likewise.
+	* src/sasutil.c: The sphde joining is only called with certain 
+	commands.
+	* src/freenode.c: Avoid create a circular list in freeNode_insertNode
+	function.
+
+2011-08-22  Adhemerval Zanella  <azanella@linux.vnet.ibm.com>
+
+	* configure.ac: Added doxygen check and doc folder handling.
+	* configure: Autogenerated from configure.ac.
+	* aclocal.m4: Likewise.
+	* Makefile.am: Added doc to SUBDIR, so doc generation will be created
+	when make is issued.
+	* Makefile.in: Autogenerated from Makefile.in.
+	* src/Makefile.am: Replaced src/sasutil.cpp by src/sasutil.c.
+	* src/Makefile.in: Autogenerated from src/Makefile.am.
+	* src/sasutil.c: Unix command line version for src/sasutil.cpp.
+	* doc/Makefile.am: Makefile to generate the doxyfile documentation.
+	* doc/Makefile.in: Autogenerated from doc/Makefile.am.
+	* doc/libshpde-doxygen-sasutil.doxy: Doxygen file for sasutil man page.
+
+2011-08-18  Adhemerval Zanella  <azanella@linux.vnet.ibm.com>
+
+	* src/sassim.h: Added SASResetSem function prototype.
+	* src/sassim.cpp: Added SASResetSem function implementation. This
+	function resets the anchor semaphore. Also created functions to 
+	create/destroy this semaphores.
+	* src/saslock.cpp: Changes its internals: removed SASLockInternalInit
+	function and SASLockReset now deletes and recreates the SasMasterLock 
+	class.
+	* src/sasutil.cpp: The Reset option now resets the anchor semaphore
+	by calling SASResetSem.
+
+2011-08-18  Adhemerval Zanella  <azanella@linux.vnet.ibm.com>
+
+	* examples/example_sph_2_1.c: Fixed how to use SASSimpleHeap_t 
+	objects.
+	* examples/example_sph_2_2.c: Likewise.
+
+2011-08-17  Adhemerval Zanella  <azanella@linux.vnet.ibm.com>
+
+	* src/Makefile.am: Added sassimpleheap.h in install headers.
+	* src/Makefile.in: Autogenerated from Makefile.am.
+	* src/sasalloc.h: Added common definions for some modules (heap_offset,
+	default_page, default_max).
+	* src/sphcontext.cpp: Moved common definitions to sasalloc.h.
+	* src/sasstringbtreepriv.h: Likewise.
+	* src/sascompoundheap.cpp: Likewise.
+	* src/sassimpleheap.cpp: Likewise.
+	* src/sasstringbtreenodepriv.h: Likewise.
+	* src/sasindexpriv.h: Likewise.
+	* src/sphlockfreeheap.cpp: Likewise.
+	* src/sasindexnodepriv.h: Likewise.
+	* examples/example_sph_2_1.c: Used the heap_offset definition from 
+	sasalloc.h.
+	* examples/example_sph_2_2.c: Likewise.
+
+2011-08-16  Adhemerval Zanella  <azanella@linux.vnet.ibm.com>
+
+	* Makefile.am: Added two more examples.
+	* Makefile.in: Autogenerated from Makefile.am.
+	* example_sph_1.c: Added license header and internal documentation.
+	* example_sph_2_1.c: Example showing how to use SASSimpleHeap 
+	functions.
+	* example_sph_2_2.c: Example showing how to use SASSimpleHeap
+	functions plus SPHContext functionalities for persistence.
+
+2011-08-11  Adhemerval Zanella  <azanella@linux.vnet.ibm.com>
+
+	* configure.ac: Added the example directory for Makefile generation.
+	* configure: Autogenerated from configure.ac.
+	* examples/Makefile.am: Makefile for example, currently only with
+	example_sph_1.
+	* examples/Makefile.in: Autogenerated from examples/Makefile.am.
+	* examples/example_sph_1.c: Simple example showing how to use
+	SPHContextCreate, SPHContextFindByName, SASBlockAlloc and
+	SPHContextAddName functions.
+
+2011-08-08  Adhemerval Zanella  <azanella@linux.vnet.ibm.com>
+
+	* src/Makefile.am: Addded libsphde include files on make install, 
+	library is now linking against librt (for POSIX semaphore functions),
+	and sources/includes files definition are on one line each (to
+	make diff easier to read).
+	* src/Makefile.in: Autogenerated from src/Makefile.am.
+
+2011-07-26  Adhemerval Zanella  <azanella@linux.vnet.ibm.com>
+
+	* src/sasconf.h: Fixed __SAS_TEMP_FREE for PPC64. Old value forced 
+	some internal allocation to be done on local heap instead of on
+	shared memory.
+
+2011-07-26  Adhemerval Zanella  <azanella@linux.vnet.ibm.com>
+
+	* src/sasalloc.h: Changed SASBlockHeader definition to be C friendly.
+
+2011-07-26  Adhemerval Zanella  <azanella@linux.vnet.ibm.com>
+
+	* src/freenode.c: New file: converted to C code form src/freenode.cpp.
+	* src/freenode.h: Likewise.
+	* src/freenode.cpp: Deleted: replaced by src/freenode.c.
+	* src/Makefile.am: Replace src/freenode.cpp for src/freenode.c.
+	* src/Makefile.in: Autogenerated from Makefile.am.
+	* src/sasstringbtree.cpp: Adjusments for replacement of C++ code to C 
+	code in src/freenode.h.
+	* src/sphcontext.cpp: Likewise.
+	* src/sasindexnode.cpp: Likewise.
+	* src/sascompoundheap.cpp: Likewise.
+	* src/sassimpleheap.cpp: Likewise.
+	* src/sasstringbtreenode.cpp: Likewise.
+	* src/sphlflogger.cpp: Likewise.
+	* src/sassim.cpp: Likewise.
+	* src/sasalloc.cpp: Likewise.
+	* src/sassimplespace.cpp: Likewise.
+	* src/sasindex.cpp: Likewise.
+	* src/sphlogportal.cpp: Likewise.
+	* src/sassimplestack.cpp: Likewise.
+
+2011-07-22  Adhemerval Zanella  <azanella@linux.vnet.ibm.com>
+
+	* src/sasconf.h: Fixed buffer overrun issue when shared memory ID 
+	is created using defined path.
+
+2011-07-22  Adhemerval Zanella  <azanella@linux.vnet.ibm.com>
+
+	* src/sphtimer.c: Removed compilation warnings when built in 32-bits
+	mode on ia32 machine.
+	* src/tests/sphlflogger_tt.c: Likewise.
+	* src/tests/sphlflogger_ttt.c: Likewise.
+	* src/sasatom.h: Likewise.
+
+2011-07-22  Adhemerval Zanella  <azanella@linux.vnet.ibm.com>
+
+	* src/tests/sphlflogger_t.c: Fix unittest when built in 32-bits
+	mode.
+
+2011-07-22  Adhemerval Zanella  <azanella@linux.vnet.ibm.com>
+
+	* src/bitv.c: Removed compilation warnings when built in 32-bits
+	mode.
+	* src/tests/bitvec_t.c: Likewise.
+	* src/tests/sphlflogger_t.c: Likewise.
+	* src/tests/sphlogportal_t.c: Likewise.
+	* src/tests/sphlockfreeheap_t.c: Likewise.
+	* src/sassimt.cpp: Likewise.
+
+2011-07-21  Adhemerval Zanella  <azanella@linux.vnet.ibm.com>
+
+	* src/sphcontext.cpp: Fixed compiling warning when built with 
+	--enable-debug.
+	* src/sasstringbtree.cpp: Likewise.
+	* src/sasindexnode.cpp: Likewise.
+	* src/sassimpleheap.cpp: Likewise.
+	* src/sasstringbtreenode.cpp: Likewise.
+	* src/sphlockfreeheap.cpp: Likewise.
+	* src/sphlflogger.cpp: Likewise.
+	* src/sassim.cpp: Likewise.
+	* src/sasalloc.cpp: Likewise.
+	* src/sasindex.cpp: Likewise.
+	* src/sphlogportal.cpp: Likewise.
+
+2011-07-21  Adhemerval Zanella  <azanella@linux.vnet.ibm.com>
+
+	* src/tests/sphlflogger_tt.cpp: Replaced by sphlflogger_tt.c.
+	* src/tests/sphlflogger_tt.c: Fixed includes so it can be C code.
+	* src/tests/sphlflogger_ttt.cpp: Replaced by sphlflogger_ttt.c.
+	* src/tests/sphlflogger_ttt.c: Fixed includes so it can be C code.
+	* src/Makefile.am: Changed the unittest files sphlflogger_tt.cpp to 
+	sphlflogger_tt.c and sphlflogger_ttt.cpp to sphlflogger_ttt.c.
+	* Makefile.in: Automatically generated.
+	* src/Makefile.in: Likewise.
+
+2011-07-21  Adhemerval Zanella  <azanella@linux.vnet.ibm.com>
+
+	* m4/ltsugar.m4: New file.
+	* m4/acx_pthread.m4: Likewise.
+	* m4/libtool.m4: Likewise.
+	* m4/ltversion.m4: Likewise.
+	* m4/lt~obsolete.m4: Likewise.
+	* m4/ltoptions.m4: Likewise.
+	* configure: Likewise.
+	* Makefile.in: Likewise.
+	* src/sascompoundheap.h: Likewise.
+	* src/sasstname.c: Likewise.
+	* src/sphcontext.cpp: Likewise.
+	* src/sasstringbtree.cpp: Likewise.
+	* src/Makefile.in: Likewise.
+	* src/sasconf.h: Likewise.
+	* src/sasstname.h: Likewise.
+	* src/sasstringbtreepriv.h: Likewise.
+	* src/sasindexenum.h: Likewise.
+	* src/sasstringbtreenode.h: Likewise.
+	* src/sassimplespace.h: Likewise.
+	* src/sphlogportal.h: Likewise.
+	* src/sasindex.h: Likewise.
+	* src/sasindexnode.cpp: Likewise.
+	* src/freenode.cpp: Likewise.
+	* src/sascompoundheap.cpp: Likewise.
+	* src/sphtimer.c: Likewise.
+	* src/sassimplestack.h: Likewise.
+	* src/sasindexkey.h: Likewise.
+	* src/sasstdio.h: Likewise.
+	* src/sassimpleheap.cpp: Likewise.
+	* src/sphtimer.h: Likewise.
+	* src/sasiodef.h: Likewise.
+	* src/sasindexenum.cpp: Likewise.
+	* src/sasstringbtreenode.cpp: Likewise.
+	* src/sasanchr.h: Likewise.
+	* src/sphlockfreeheap.h: Likewise.
+	* src/bitv_priv.h: Likewise.
+	* src/sasstringbtreenodepriv.h: Likewise.
+	* src/sasmlock.cpp: Likewise.
+	* src/saslockl.h: Likewise.
+	* src/sasstringbtreeenum.cpp: Likewise.
+	* src/sasulock.cpp: Likewise.: Likewise.
+	* src/sasindexpriv.h: Likewise.
+	* src/sasindexnode.h: Likewise.
+	* src/sastype.h: Likewise.
+	* src/ultree.cpp: Likewise.
+	* src/sassimpleheap.h: Likewise.
+	* src/sphlockfreeheap.cpp: Likewise.
+	* src/saslock.h: Likewise.
+	* src/sassim.h: Likewise.
+	* src/bitv.c: Likewise.
+	* src/sphlflogentry.h: Likewise.
+	* src/sasalloc.h: Likewise.
+	* src/bitv.h: Likewise.
+	* src/saslockl.cpp: Likewise.
+	* src/sphlflogger.cpp: Likewise.
+	* src/tests: Likewise.
+	* src/tests/sphlflogger_t.c: Likewise.
+	* src/tests/bitvec_t.c: Likewise.
+	* src/tests/sphlogportal_t.c: Likewise.
+	* src/tests/sphlflogger_tt.cpp: Likewise.
+	* src/tests/sphthread_t.c: Likewise.
+	* src/tests/sphlockfreeheap_t.c: Likewise.
+	* src/tests/sphlflogger_ttt.cpp: Likewise.
+	* src/tests/sasatom_t.c: Likewise.
+	* src/sasmlock.h: Likewise.
+	* src/sassimt.cpp: Likewise.
+	* src/sasutil.cpp: Likewise.
+	* src/sasulock.h: Likewise.
+	* src/sasstringbtreeenum.h: Likewise.
+	* src/sasindexnodepriv.h: Likewise.
+	* src/sasshm.c: Likewise.
+	* src/saslock.cpp: Likewise.
+	* src/sassim.cpp: Likewise.
+	* src/sasmsync.c: Likewise.
+	* src/sasalloc.cpp: Likewise.
+	* src/sasshm.h: Likewise.
+	* src/sasstringbtree.h: Likewise.
+	* src/sphcontext.h: Likewise.
+	* src/sasmsync.h: Likewise.
+	* src/ultree.h: Likewise.
+	* src/sasatom.c: Likewise.
+	* src/sassimplespace.cpp: Likewise.
+	* src/sasatom.h: Likewise.
+	* src/sasindex.cpp: Likewise.
+	* src/sasio.c: Likewise.
+	* src/sphlogportal.cpp: Likewise.
+	* src/sasostrm.h: Likewise.
+	* src/sphlflogger.h: Likewise.
+	* src/sphthread.c: Likewise.
+	* src/sasio.h: Likewise.
+	* src/sassimplestack.cpp: Likewise.
+	* src/sphthread.h: Likewise.
+	* src/Makefile.am: Likewise.
+	* src/freenode.h: Likewise.
+	* depcomp: Likewise.
+	* ChangeLog: Likewise.
+	* config.guess: Likewise.
+	* ltmain.sh: Likewise.
+	* config.sub: Likewise.
+	* configure.ac: Likewise.
+	* doc: Likewise.
+	* doc/sas-readme.pdf: Likewise.
+	* COPYING: Likewise.
+	* missing: Likewise.
+	* Makefile.am: Likewise.
+	* aclocal.m4: Likewise.
+	* install-sh: Likewise.
