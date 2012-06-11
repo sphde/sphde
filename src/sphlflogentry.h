@@ -43,6 +43,8 @@
 *	the API provides a completion functions (SPHLFLogEntryComplete)
 *	which provides and memory barriers required by the platform and
 *	marks the entry complete.
+*
+*	\todo This API should be migrated to use the common sphlfentry.h API.
 */
 
 
@@ -267,12 +269,13 @@ SPHLFLogEntrySubcat (SPHLFLoggerHandle_t *handlespace)
 /** \brief Return the address first free byte for the entry specified by
 *   the entry handle.
 *
-*   \note This function should be used carefully. It is not safe to use
+*   \warning This function should be used carefully. It is not safe to use
 *   if other application functions may need to update the same entry.
 *   It is also not safe to use for software that needs to cross platform
 *   because it does not handle platform specific size and alignment
 *   requirements.
-*   The SPHLOGENTRYALLOCSTRUCT/SPHLFlogEntryAllocStruct API is recommended
+*
+*   \note The SPHLOGENTRYALLOCSTRUCT/SPHLFlogEntryAllocStruct API is recommended
 *   for code that needs to operate cross platform.
 *
 *   @param handle Logger Entry Handle for an allocated entry.
@@ -296,7 +299,8 @@ SPHLFLogEntryGetFreePtr (SPHLFLoggerHandle_t *handle)
 *   The entries next pointer is adjusted for alignment and returned.
 *   The entries next pointer and remaining fields are updated for the
 *   next field following the struct/array.
-*   The SPHLOGENTRYGETSTRUCTPTR can be used to insure the correct usage
+*
+*   \note The SPHLOGENTRYGETSTRUCTPTR can be used to insure the correct usage
 *   sizeof and __alignof__ to provide values for the __size and __align
 *   parameters.
 *

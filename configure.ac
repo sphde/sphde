@@ -24,6 +24,10 @@ if test "x$enable_debug" = "xyes" ; then
   CXXFLAGS="$CXXFLAGS -D__SOMDebugPrint__ -Dmylockdebug -DcoherenceCheck -D__SASDebugPrint__"
 fi
 
+# This directive is to avoid buggy libtool that don't add the -Wl,--no-as-needed
+# directive in the correct position of LDFLAGS
+LDFLAGS="-Wl,--no-as-needed -lrt"
+
 # Check for programs.
 AC_PROG_CC
 AC_PROG_CPP

@@ -20,7 +20,7 @@
  * \file  sasstringbtreenode.h
  * \brief Shared Address Space B-tree node and element operations.
  *
- * \note SASStringBTreeNode_t are the internal data structures of the
+ * \warning SASStringBTreeNode_t are the internal data structures of the
  * SASStringBTree_t and should not be accessed directly by applications.
  *
  * The basic function to allocate entries is ::SASStringBTreeAlloc and it

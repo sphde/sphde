@@ -1,3 +1,13 @@
+2012-06-11  Adhemerval Zanella  <azanella@linux.vnet.ibm.com>
+
+	* configure.ac: Add -Wl,--no-as-needed,-lrt to LDFLAGS to fix buggy
+	libtool that do not add the directive in the correct position.
+	* configure: Regenerated from configure.ac.
+	* src/sasstringbtreenode.h: Replace \note doxygen directive by
+	\warning.
+	* src/sphlflogentry.h: Add \todo, \note, and \warning doxygen
+	directives.
+
 2012-04-21  Steven Munroe  <sjmunroe@us.ibm.com>
 
 	* doc/libshpde-doxygen-sph.doxy: Remove sasstringbtreenode.h.
