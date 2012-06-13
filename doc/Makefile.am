@@ -5,11 +5,11 @@ if HAVE_DOXYGEN
 #$(directory)/sasutil.1: sasutil.1.stamp
 
 #sasutil.1.stamp: ../src/sasutil.c
-#	$(DOXYGEN) $(top_srcdir)/doc/libshpde-doxygen-sasutil.doxy
+#	$(DOXYGEN) $(top_srcdir)/doc/libsphde-doxygen-sasutil.doxy
 #	echo Timestamp > sasutil.1.stamp
 
 #sph.1.stamp:
-#	$(DOXYGEN) $(top_srcdir)/doc/libshpde-doxygen-sph.doxy
+#	$(DOXYGEN) $(top_srcdir)/doc/libsphde-doxygen-sph.doxy
 #	echo Timestamp > sph.1.stamp
 
 #CLEANFILES = sasutil.1.stamp sph.1.stamp

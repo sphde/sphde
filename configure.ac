@@ -60,8 +60,8 @@ DX_HTML_FEATURE(ON)
 DX_MAN_FEATURE(ON)
 DX_PDF_FEATURE(OFF)
 DX_INIT_DOXYGEN($PACKAGE_NAME, [ \
-  doc/libshpde-doxygen-sasutil.doxy \
-  doc/libshpde-doxygen-sph.doxy
+  doc/libsphde-doxygen-sasutil.doxy \
+  doc/libsphde-doxygen-sph.doxy
 ])
 
 AC_CONFIG_FILES([

@@ -1,5 +1,22 @@
 2012-06-13  Ryan S. Arnold  <rsa@linux.vnet.ibm.com>
 
+	* doc/libshpde-doxygen-sasutil.doxy: Renamed
+	libsphde-doxygen-sasutil.doxy.
+	* doc/libshpde-doxygen-sph.doxy: Renamed libsphde-doxygen-sph.doxy.
+	* src/sasindexkey.h: Fixed typo.
+	* src/Makefile.in: Regenerated.
+	* configure.ac: Changed libshpde* to libsphde*.
+	* doc/Makefile.am: Likewise.
+	* doc/Makefile.in: Regenerated.
+	* Makefile.in: Regenerated.
+	* aclocal.m4: Regenrated.
+	* configure: Regenerated.
+	* ltmain.sh: Regenerated.
+	* m4/ltsugar.m4: Regenerated.
+	* m4/ltversion.m4: Regenerated.
+
+2012-06-13  Ryan S. Arnold  <rsa@linux.vnet.ibm.com>
+
 	* doc/libshpde-doxygen-sph.doxy: Update the title for the manual.
 	* doc/sphmaindox.h: Typo update of "mmaping" to "memory mapping".	
 

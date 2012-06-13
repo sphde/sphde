@@ -445,11 +445,11 @@ uninstall-man: uninstall-man1
 @HAVE_DOXYGEN_TRUE@$(directory)/sasutil.1: sasutil.1.stamp
 
 @HAVE_DOXYGEN_TRUE@sasutil.1.stamp: ../src/sasutil.c
-@HAVE_DOXYGEN_TRUE@	$(DOXYGEN) $(top_srcdir)/doc/libshpde-doxygen-sasutil.doxy
+@HAVE_DOXYGEN_TRUE@	$(DOXYGEN) $(top_srcdir)/doc/libsphde-doxygen-sasutil.doxy
 @HAVE_DOXYGEN_TRUE@	echo Timestamp > sasutil.1.stamp
 
 @HAVE_DOXYGEN_TRUE@sph.1.stamp:
-@HAVE_DOXYGEN_TRUE@	$(DOXYGEN) $(top_srcdir)/doc/libshpde-doxygen-sph.doxy
+@HAVE_DOXYGEN_TRUE@	$(DOXYGEN) $(top_srcdir)/doc/libsphde-doxygen-sph.doxy
 @HAVE_DOXYGEN_TRUE@	echo Timestamp > sph.1.stamp
 
 @HAVE_DOXYGEN_TRUE@all-local: sasutil.1.stamp sph.1.stamp

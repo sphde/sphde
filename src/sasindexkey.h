@@ -20,7 +20,7 @@
  * Intialize the SASIndexKey_t structure with a sequence of values to
  * be used as keys for SASIndex_t BTrees.
  *
- * \todo enhanse this API to build larger (multi-part) keys via a
+ * \todo Enhance this API to build larger (multi-part) keys via a
  * streams interface similar to interface in sphlfentry.h.
  * We have enough to here to implement SPHContext_t but a generalized
  * API would make SASIndex_t more useful.
