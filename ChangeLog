@@ -1,3 +1,8 @@
+2012-06-13  Ryan S. Arnold  <rsa@linux.vnet.ibm.com>
+
+	* doc/libshpde-doxygen-sph.doxy: Update the title for the manual.
+	* doc/sphmaindox.h: Typo update of "mmaping" to "memory mapping".	
+
 2012-06-11  Adhemerval Zanella  <azanella@linux.vnet.ibm.com>
 
 	* configure.ac: Add -Wl,--no-as-needed,-lrt to LDFLAGS to fix buggy

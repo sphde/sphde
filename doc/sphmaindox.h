@@ -59,8 +59,8 @@
 *  \section sasSection SAS Overview
 *  The SAS layer manages a "region" of process address space to provide:
 *   \li Sharing and transparent storage persistence of data within that
-*   region by providing and managing backing file space and mmaping the
-*   backing files for the process.
+*   region by providing and managing backing file space and memory mapping
+*   the backing files for the process.
 *   \li Sharing of data within that region between cooperating processes.
 *   \li Locking primitives to provide synchronization of use/update
 *   between cooperating processes and threads.
