@@ -173,7 +173,7 @@ extern __C__ int SASJoinRegion();
 *   @param store_name C string containing the path to this SAS store directory.
 *	@return a 0 value indicates success, otherwise failure.
 */
-extern __C__ int SASJoinRegionByName (char * store_name);
+extern __C__ int SASJoinRegionByName (const char * store_name);
 
 /** \brief Allocate a block of memory within SAS Storage.
 *

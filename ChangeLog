@@ -1,3 +1,8 @@
+2012-06-19  Adhemerval Zanella  <azanella@linux.vnet.ibm.com>
+
+	* src/sassim.h (SASJoinRegionByName): Use const for argument.
+	* src/sassim.cpp: Add static on local functions.
+
 2012-06-13  Ryan S. Arnold  <rsa@linux.vnet.ibm.com>
 
 	* doc/libshpde-doxygen-sasutil.doxy: Renamed

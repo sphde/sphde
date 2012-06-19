@@ -9,6 +9,7 @@
  *     IBM Corporation, Steven Munroe - initial API and implementation
  */
 
+//#define __SASDebugPrint__
 
 // test for storage allocation
 #include <sys/types.h>
@@ -137,7 +138,7 @@ typedef union
   unsigned long val;
 } longNodeType;
 
-unsigned long
+static unsigned long
 nodeToLong (unsigned long offset, unsigned int size)
 {
   longNodeType temp;
@@ -146,7 +147,7 @@ nodeToLong (unsigned long offset, unsigned int size)
   return temp.val;
 }
 
-unsigned long
+static unsigned long
 longToOffset (unsigned long val)
 {
   longNodeType temp;
@@ -154,7 +155,7 @@ longToOffset (unsigned long val)
   return (temp.node.offset) << 8;
 }
 
-unsigned int
+static unsigned int
 longToSize (unsigned long val)
 {
   longNodeType temp;
@@ -162,7 +163,7 @@ longToSize (unsigned long val)
   return temp.node.size;
 }
 
-unsigned int
+static unsigned int
 SizeToLog2 (unsigned long size)
 {
   unsigned int result = 0;
@@ -185,7 +186,7 @@ SizeToLog2 (unsigned long size)
   return result;
 }
 
-void
+static void
 p2AddUsed (uLongTreeNode ** root, unsigned long size, void *loc)
 {
   uLongTreeNode *n;
@@ -198,7 +199,7 @@ p2AddUsed (uLongTreeNode ** root, unsigned long size, void *loc)
   (*root)->insertNode (root, n);
 }
 
-void
+static void
 p2RemUsed (uLongTreeNode ** root, unsigned long size, void *loc)
 {
   uLongTreeNode *n;
@@ -235,7 +236,7 @@ p2RemUsed (uLongTreeNode ** root, unsigned long size, void *loc)
     }
 }
 
-void *
+static void *
 p2Alloc (uLongTreeNode ** root, unsigned long size)
 {
   uLongTreeNode *n;
@@ -323,7 +324,7 @@ p2Alloc (uLongTreeNode ** root, unsigned long size)
 }
 
 
-void
+static void
 p2Dealloc (uLongTreeNode ** root, unsigned long size, void *loc)
 {
   uLongTreeNode *n;
@@ -470,7 +471,7 @@ destroySASSem (SASAnchor_t * anchor)
 #endif
 }
 
-void
+static void
 initRegion ()
 {
   SASBlockHeader *anchorBlock;
@@ -1023,7 +1024,7 @@ SASCreateAnchorSeg (void *regionBase, size_t regionSize, size_t segmentSize)
 }
 
 /* Obtain a backtrace and print it to stdout. */
-void
+static void
 print_trace (void)
 {
   void *array[32];
@@ -1092,7 +1093,7 @@ SASDisableSigSegv ()
 }
 
 int
-SASJoinRegionByName (char *store_name)
+SASJoinRegionByName (const char *store_name)
 {
   int segs = (int) (RegionSize / SegmentSize);
   size_t memIDsize = (RegionSize / SegmentSize) * sizeof (*mem_IDs);
