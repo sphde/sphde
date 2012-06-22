@@ -88,12 +88,22 @@ SPHSinglePCQueueInitInternal (void *buf_seg, sas_type_t sasType,
       /* insure stride keep minimal alignment */
       stride = (stride + round) & ~round;
       /* round buf_size to be an integral number of strides */
+      buf_size = buf_size - DEFAULT_PAGE;
       buf_size = buf_size / stride;
       buf_size = buf_size * stride;
+#ifdef __SASDebugPrint__
+      sas_printf ("SPHSinglePCQueueInitInternal() stride=%d, buf_size=%ld\n",
+		  stride, buf_size);
+#endif
     }
 
   qStart = (char *) heapBlock + DEFAULT_PAGE;
-  qEnd = (char *) heapBlock + buf_size;
+  qEnd = qStart + buf_size;
+
+#ifdef __SASDebugPrint__
+  sas_printf ("SPHSinglePCQueueInitInternal() qStart=%p, qEnd=%p\n",
+	      qStart, qEnd);
+#endif
   heapBlock->qhead = (longPtr_t) qStart;
   heapBlock->qtail = (longPtr_t) qStart;
   heapBlock->startq = (longPtr_t) qStart;
@@ -280,7 +290,6 @@ SPHSinglePCQueueFreeSpace (SPHSinglePCQueue_t queue)
 		("SPHSinglePCQueueFreeSpace(%p) head=%lx, tail=%lx, rc=%lx\n",
 		 queue, headerBlock->qhead, headerBlock->qtail, rc);
 #endif
-
 	    }
 	}
 
@@ -288,7 +297,7 @@ SPHSinglePCQueueFreeSpace (SPHSinglePCQueue_t queue)
   else
     {
 #ifdef __SASDebugPrint__
-      sas_printf ("SPHSinglePCQueueFreeSpace(%p) type check failed\n", log);
+      sas_printf ("SPHSinglePCQueueFreeSpace(%p) type check failed\n", queue);
 #endif
     }
   return rc;
