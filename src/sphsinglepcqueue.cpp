@@ -178,6 +178,30 @@ SPHSinglePCQueueCreateWithStride (block_size_t buf_size,
 }
 
 int
+SPHSinglePCQueueResetAsync (SPHSinglePCQueue_t queue)
+{
+  SPHPCQueueHeader *headerBlock = (SPHPCQueueHeader *) queue;
+  int rc = 0;
+
+  if (SOMSASCheckBlockSigAndType ((SASBlockHeader *) headerBlock,
+				  SAS_RUNTIME_PCQUEUE))
+	{
+	  sas_read_barrier ();
+	  headerBlock->qhead = headerBlock->startq;
+	  headerBlock->qtail = headerBlock->startq;
+	}
+  else
+	{
+	  rc = 1;
+#ifdef __SASDebugPrint__
+	  sas_printf ("SPHSinglePCQueueResetAsync(%p) type check failed\n", queue);
+#endif
+	}
+  return rc;
+
+}
+
+int
 SPHSinglePCQueueEmpty (SPHSinglePCQueue_t queue)
 {
   SPHPCQueueHeader *headerBlock = (SPHPCQueueHeader *) queue;
@@ -188,18 +212,26 @@ SPHSinglePCQueueEmpty (SPHSinglePCQueue_t queue)
     {
       sas_read_barrier ();
       if (headerBlock->qhead == headerBlock->qtail)
-	{
-	  rc = 1;
-#ifdef __SASDebugPrint__
-	  sas_printf ("SPHSinglePCQueueEmpty(%p) next=%lx, end=%lx\n", queue,
-		      headerBlock->qhead, headerBlock->endq);
-#endif
-	}
+		{
+		  rc = 1;
+	#ifdef __SASDebugPrint__
+		  sas_printf ("SPHSinglePCQueueEmpty(%p) next=%lx, end=%lx\n", queue,
+				  headerBlock->qhead, headerBlock->endq);
+	#endif
+		} else {
+		  SPHLFEntryHeader_t *entryPtr;
+
+		  entryPtr = (SPHLFEntryHeader_t *) headerBlock->qtail;
+		  if (!entryPtr->entryID.detail.valid)
+			{
+			  rc = 1;
+			}
+		}
 #ifdef __SASDebugPrint__
     }
   else
     {
-      sas_printf ("SPHSinglePCQueueEmpty(%p) type check failed\n", log);
+      sas_printf ("SPHSinglePCQueueEmpty(%p) type check failed\n", queue);
 #endif
     }
   return rc;
@@ -233,7 +265,7 @@ SPHSinglePCQueueFull (SPHSinglePCQueue_t queue)
     {
       rc = 1;
 #ifdef __SASDebugPrint__
-      sas_printf ("SPHSinglePCQueueFull(%p) type check failed\n", log);
+      sas_printf ("SPHSinglePCQueueFull(%p) type check failed\n", queue);
 #endif
     }
   return rc;
@@ -290,6 +322,7 @@ SPHSinglePCQueueFreeSpace (SPHSinglePCQueue_t queue)
 		("SPHSinglePCQueueFreeSpace(%p) head=%lx, tail=%lx, rc=%lx\n",
 		 queue, headerBlock->qhead, headerBlock->qtail, rc);
 #endif
+
 	    }
 	}
 
@@ -297,7 +330,8 @@ SPHSinglePCQueueFreeSpace (SPHSinglePCQueue_t queue)
   else
     {
 #ifdef __SASDebugPrint__
-      sas_printf ("SPHSinglePCQueueFreeSpace(%p) type check failed\n", queue);
+    	sas_printf("SPHSinglePCQueueFreeSpace(%p) type check failed\n",
+    			queue);
 #endif
     }
   return rc;
@@ -612,8 +646,8 @@ SPHSinglePCQueueFreeNextEntry (SPHSinglePCQueue_t queue)
   else
     {
       sas_printf
-	("SPHSinglePCQueueAllocStrideTimeStamped(%p, %ld) type check failed\n",
-	 queue, alloc_round);
+	("SPHSinglePCQueueFreeNextEntry(%p) type check failed\n",
+	 queue);
 #endif
     }
   return rc;
@@ -650,7 +684,7 @@ SPHSinglePCQueueSetCachePrefetch (SPHSinglePCQueue_t queue, int prefetch)
     {
 #ifdef __SASDebugPrint__
       sas_printf ("SPHSinglePCQueueSetCachePrefetch(%p) type check failed\n",
-		  log);
+    		  queue);
 #endif
       rc = 1;
     }
@@ -685,7 +719,7 @@ SPHSinglePCQueueSetCachePrefetch (SPHSinglePCQueue_t queue)
     {
 #ifdef __SASDebugPrint__
       sas_printf ("SPHSinglePCQueueSetCachePrefetch(%p) type check failed\n",
-		  log);
+    		  queue);
 #endif
       rc = 1;
     }

@@ -170,4 +170,12 @@ TESTS                 += sphsinglepcqueue_t
 sphsinglepcqueue_t_SOURCES = tests/sphsinglepcqueue_t.c
 sphsinglepcqueue_t_LDADD   = libsphde.la
 
+TESTS                 += sphsinglepcqueue_tt
+sphsinglepcqueue_tt_SOURCES = tests/sphsinglepcqueue_tt.c
+sphsinglepcqueue_tt_LDADD   = libsphde.la
+
+TESTS                 += sphsinglepcqueue_ttt
+sphsinglepcqueue_ttt_SOURCES = tests/sphsinglepcqueue_ttt.c
+sphsinglepcqueue_ttt_LDADD   = libsphde.la
+
 noinst_PROGRAMS = $(TESTS)

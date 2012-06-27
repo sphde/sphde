@@ -3372,7 +3372,7 @@ lflogger_struct_alloc_test (char *x4k)
   SPHLFLoggerHandle_t *handle, handle0, handle1;
   struct data_s1 *sptr;
 
-  printf ("lflogger_struct_alloc_test(%p)  struct size=%zu, align=%u\n",
+  printf ("lflogger_struct_alloc_test(%p)  struct size=%zu, align=%zu\n",
 	  x4k, sizeof (struct data_s1), __alignof__ (struct data_s1));
 
   memset (x4k, 0, 4096);

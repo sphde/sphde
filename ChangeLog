@@ -1,3 +1,23 @@
+2012-06-27  Steven Munroe  <sjmunroe@us.ibm.com>
+
+	* src/Makefile.am: Add sphsinglepcqueue_tt and sphsinglepcqueue_ttt
+	tests.
+	* src/sphsinglepcqueue.cpp (SPHSinglePCQueueEmpty): Add test for valid
+	entry to close race in consumer polling.
+	* src/tests/sphsinglepcqueue_tt.c: New file.
+	* src/tests/sphsinglepcqueue_ttt.c: New file.
+	* src/tests/sphlflogger_t.c: Remove warnings.
+	* src/tests/sphsinglepcqueue_t.c: Likewise.
+	* src/tests/sphthread_t.c: Likewise.
+	* Makefile.in: Regenerated.
+	* aclocal.m4: Likewise.
+	* configure: Likewise.
+	* examples/Makefile.in: Likewise.
+	* ltmain.sh: Likewise.
+	* m4/ltsugar.m4: Likewise.
+	* m4/ltversion.m4: Likewise.
+	* src/Makefile.in: Likewise.
+
 2012-06-22  Steven Munroe  <sjmunroe@us.ibm.com>
 
 	* src/sphsinglepcqueue.cppi (SPHSinglePCQueueInitInternal): Fix

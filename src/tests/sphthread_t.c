@@ -43,7 +43,7 @@ tt1 (void *arg)
       sprintf (number, "tt1(%ld): sphdeGetPID=%d should be %d",
 	       (long) arg, th_pid, main_pid);
       puts (number);
-      __sync_fetch_and_add (&thread_rc, (int) 1);
+      (void)__sync_fetch_and_add (&thread_rc, (int) 1);
     }
 
   if (th_tid == main_tid)
@@ -51,7 +51,7 @@ tt1 (void *arg)
       sprintf (number, "tt1(%ld): sphdeGetTID=%d should be %d",
 	       (long) arg, th_tid, main_tid);
       puts (number);
-      __sync_fetch_and_add (&thread_rc, (int) 1);
+      (void)__sync_fetch_and_add (&thread_rc, (int) 1);
     }
 
   th_pid = sphFastGetPID ();
@@ -62,7 +62,7 @@ tt1 (void *arg)
       sprintf (number, "tt1(%ld): sphdeGetPID=%d should be %d",
 	       (long) arg, th_pid, main_pid);
       puts (number);
-      __sync_fetch_and_add (&thread_rc, (int) 1);
+      (void)__sync_fetch_and_add (&thread_rc, (int) 1);
     }
 
   if (th_tid == main_tid)
@@ -70,7 +70,7 @@ tt1 (void *arg)
       sprintf (number, "tt1(%ld): sphdeGetTID=%d should be %d",
 	       (long) arg, th_tid, main_tid);
       puts (number);
-      __sync_fetch_and_add (&thread_rc, (int) 1);
+      (void)__sync_fetch_and_add (&thread_rc, (int) 1);
     }
 
 
