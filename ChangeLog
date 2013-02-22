@@ -1,3 +1,10 @@
+2013-02-22  Steven Munroe  <sjmunroe@us.ibm.com>
+
+	* src/sasatom_powerpc.h (__arch_compare_and_swap): Use isync.
+	* src/tests/sphsinglepcqueue_tt.c (test_unit): Use SPH_TIMERTEST_VERIFY.
+	* src/tests/sphsinglepcqueue_ttt.c: Add tests for 2, 3, 4 thread cascade.
+	Add examples of hysteresis based on queue depth.
+
 2012-06-27  Steven Munroe  <sjmunroe@us.ibm.com>
 
 	* src/Makefile.am: Add sphsinglepcqueue_tt and sphsinglepcqueue_ttt

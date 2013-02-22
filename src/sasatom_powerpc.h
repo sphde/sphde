@@ -78,7 +78,7 @@ __arch_compare_and_swap (volatile long int *p, long int oldval,
     "      bne 1f;"
     "     "STPCX" %2,0,%1;"
     "      bne- 0b;"
-    "1:    sync"
+    "1:    isync"
    : "=&r"(ret)
    : "r"(p), "r"(newval), "r"(oldval)
    : "cr0", "memory"

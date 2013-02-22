@@ -222,6 +222,12 @@ test_unit (block_size_t aSize)
   int i, rc;
   SPHSinglePCQueue_t pcqueue;
   block_size_t cap, units;
+#ifdef SPH_TIMERTEST_VERIFY
+  int j, k;
+  sphtimer_t	tempt, startt, endt, freqt;
+  double clock, nano, rate;
+  long int p10;
+#endif
 
   pcqueue = SPHSinglePCQueueCreateWithStride (4096, aSize);
   if ((pcqueue != NULL))
@@ -440,6 +446,12 @@ test_unitfast (block_size_t aSize)
   int i, rc;
   SPHSinglePCQueue_t pcqueue;
   block_size_t cap, units;
+#ifdef SPH_TIMERTEST_VERIFY
+  int j, k;
+  sphtimer_t	tempt, startt, endt, freqt;
+  double clock, nano, rate;
+  long int p10;
+#endif
 
   pcqueue = SPHSinglePCQueueCreateWithStride (4096, aSize);
   if ((pcqueue != NULL))
