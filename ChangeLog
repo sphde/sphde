@@ -1,6 +1,10 @@
 2013-03-01  Ryan S. Arnold  <rsa@linux.vnet.ibm.com>
 
-	 * src/sphgtod.c: Remove unecessary optional clobber list in inline
+	* src/sphgtod.c: Remove unnecessary line breaks '\' from inline asm.
+
+2013-03-01  Ryan S. Arnold  <rsa@linux.vnet.ibm.com>
+
+	 * src/sphgtod.c: Remove unnecessary optional clobber list in inline
 	 asm that was preventing compilation on some systems.
 	 * src/Makefile.in: Regenerated.
 

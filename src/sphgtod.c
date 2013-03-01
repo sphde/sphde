@@ -79,7 +79,7 @@ int sphgtod (struct timeval *tv, struct timezone *tz)
 #if __WORDSIZE == 64
   __asm__ volatile ("mfspr %0, 268" : "=r" (tb));
 #else
-  uint32_t __tbu, __tbl, __tmp; \
+  uint32_t __tbu, __tbl, __tmp;
   __asm__ volatile (
     "0:\n\t"
     "mftbu %0\n\t"
@@ -94,19 +94,15 @@ int sphgtod (struct timeval *tv, struct timezone *tz)
   tb2 = tb + tb2gtod;
 
 #if __WORDSIZE == 64
-  __asm__ volatile ( \
-    "mulld %0, %4, %5\n\t" \
-    "mulhdu %1, %4, %5\n\t" \
-    "srdi %2, %1, 24\n\t" \
-    "insrdi %0, %1, 24, 40\n\t" \
-    "rotrdi %3, %0, 24\n\t" \
-    "mulhdu %3, %3, %6\n\t" \
-    : "=&r" (frac_secs), \
-      "=&r" (tmp1), \
-      "=&r" (tv->tv_sec), \
-      "=&r" (tv->tv_usec) \
-    : "r" (tb2), "r" (tb_freq_shifted_recip), "r" (usec_conv) \
-    );
+  __asm__ volatile (
+    "mulld %0, %4, %5\n\t"
+    "mulhdu %1, %4, %5\n\t"
+    "srdi %2, %1, 24\n\t"
+    "insrdi %0, %1, 24, 40\n\t"
+    "rotrdi %3, %0, 24\n\t"
+    "mulhdu %3, %3, %6\n\t"
+    : "=&r" (frac_secs), "=&r" (tmp1), "=&r" (tv->tv_sec), "=&r" (tv->tv_usec)
+    : "r" (tb2), "r" (tb_freq_shifted_recip), "r" (usec_conv));
 #else
   tb2_sec = tb2 / tb_freq;
 
@@ -153,10 +149,9 @@ __sphgtod_init (void)
     /* This is '1' left shifted 24 bits.  */
     const unsigned long long int one = 0x1000000ULL;
     __asm__ volatile (
-      "divdeu %0, %1, %2\n\t" \
-      : "=r" (tb_freq_shifted_recip) \
-      : "r" (one), "r" (tb_freq) \
-      : );
+      "divdeu %0, %1, %2\n\t"
+      : "=r" (tb_freq_shifted_recip)
+      : "r" (one), "r" (tb_freq));
   }
 # else
   /* Do it the slow way using long double fp math on systems that precede
