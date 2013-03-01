@@ -1,3 +1,13 @@
+2013-03-01  Ryan S. Arnold  <rsa@linux.vnet.ibm.com>
+
+	 * src/Makefile.am: Added rules for sphgtod to be built into a
+	 static-only library, libsphgtod.a.
+	 * src/sphgtod.c: New file. Implement libsphgtod.a.
+	 * src/sphgtod.h: New file.
+	 * src/sphtimer.h (sphfastcpufreq): Declare static so that
+	 libsphgtod.a can use this symbol but still link against libsphde.
+	 * src/tests/sphgtod_t.c: Test sphgtod.
+
 2013-02-22  Steven Munroe  <sjmunroe@us.ibm.com>
 
 	* src/sasatom_powerpc.h (__arch_compare_and_swap): Use isync.

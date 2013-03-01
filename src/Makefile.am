@@ -3,12 +3,18 @@
 AM_CFLAGS   = -Wall -Wwrite-strings $(PTHREAD_CFLAGS)
 AM_CXXFLAGS = -Wall -Wwrite-strings -Woverloaded-virtual $(PTHREAD_CFLAGS)
 
-lib_LTLIBRARIES = libsphde.la
+lib_LTLIBRARIES = libsphde.la libsphgtod.la
 bin_PROGRAMS    = sasutil
 EXTRA_DIST      =
 
+# This rule is necessary because sphgtod_t needs to statically link
+# .libs/libsphgtod.a and if make is executed in parallel (-jN) the sphgtod_t
+# rule may be run before .libs/lisphgtod.a is built.
+.libs/libsphgtod.a: libsphgtod.la
+
 # libsphde definitions
 libsphdeincludedir = $(includedir)/sphde
+libsphgtodincludedir = $(includedir)/sphde
 
 # The headers in 'libsphdeinclude_HEADERS' are meant to be the ones installed
 # on 'make install'
@@ -45,6 +51,9 @@ libsphdeinclude_HEADERS = \
 	sphlogportal.h \
 	sphthread.h \
 	sphtimer.h
+
+libsphgtodinclude_HEADERS = sphgtod.h
+
 libsphde_la_INCLUDES = \
 	$(libsphdeinclude_HEADERS) \
 	bitv.h \
@@ -65,6 +74,9 @@ libsphde_la_INCLUDES = \
 	sasindexpriv.h \
 	sasostrm.h \
 	sasstdio.h 
+
+libsphgtod_la_SOURCES = sphgtod.c
+
 libsphde_la_SOURCES = \
 	sasshm.c \
 	sasmsync.c \
@@ -99,6 +111,14 @@ libsphde_la_SOURCES = \
 libsphde_la_CFLAGS   = -D__SASSIM__ $(AM_CFLAGS)
 libsphde_la_CXXFLAGS = -D__SASSIM__ $(AM_CXXFLAGS)
 
+libsphgtod_la_CFLAGS   = $(AM_CFLAGS)
+libsphgtod_la_CXXFLAGS = $(AM_CXXFLAGS)
+
+# libsphgtod.a is ONLY to be a static archive in order to benefit from
+# the performance aspects of inlining the emulated gettimeofday code.
+libsphgtod_la_LDFLAGS = -all-static
+libsphgtod_la_LIBADD = -lrt
+
 libsphde_la_LDFLAGS  = 
 libsphde_la_LIBADD   = $(PTHREAD_LIBS) -lrt
 
@@ -111,6 +131,9 @@ sasutil_LDADD        = libsphde.la
 
 # Test programs invoked with 'make check'
 TESTS = 
+TESTS            += sphgtod_t
+sphgtod_t_SOURCES = tests/sphgtod_t.c
+sphgtod_t_LDADD   = libsphde.la .libs/libsphgtod.a 
 
 TESTS            += sasatom_t
 sasatom_t_SOURCES = tests/sasatom_t.c

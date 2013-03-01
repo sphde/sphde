@@ -137,12 +137,12 @@ sphgetcpufreq (void);
 /*!
  * \brief Return the TB/TSC frequency update (fast version).
  *
- * Do no update the TB/TSC if value was already read (the function
+ * Do not update the TB/TSC if value was already read (the function
  * ::sphgetcpufreq forces an update).
  *
  * @return The TB/TSC frequency update value.
  */
-inline sphtimer_t
+static inline sphtimer_t
 sphfastcpufreq (void)
 {
   sphtimer_t result = sph_cpu_frequency;
