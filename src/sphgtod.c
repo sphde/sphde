@@ -94,7 +94,7 @@ int sphgtod (struct timeval *tv, struct timezone *tz)
   tb2 = tb + tb2gtod;
 
 #if __WORDSIZE == 64
-  __asm__ volatile (
+  __asm__ volatile ( \
     "mulld %0, %4, %5\n\t" \
     "mulhdu %1, %4, %5\n\t" \
     "srdi %2, %1, 24\n\t" \
@@ -106,7 +106,7 @@ int sphgtod (struct timeval *tv, struct timezone *tz)
       "=&r" (tv->tv_sec), \
       "=&r" (tv->tv_usec) \
     : "r" (tb2), "r" (tb_freq_shifted_recip), "r" (usec_conv) \
-    : );
+    );
 #else
   tb2_sec = tb2 / tb_freq;
 

@@ -1,5 +1,11 @@
 2013-03-01  Ryan S. Arnold  <rsa@linux.vnet.ibm.com>
 
+	 * src/sphgtod.c: Remove unecessary optional clobber list in inline
+	 asm that was preventing compilation on some systems.
+	 * src/Makefile.in: Regenerated.
+
+2013-03-01  Ryan S. Arnold  <rsa@linux.vnet.ibm.com>
+
 	 * src/Makefile.am: Added rules for sphgtod to be built into a
 	 static-only library, libsphgtod.a.
 	 * src/sphgtod.c: New file. Implement libsphgtod.a.

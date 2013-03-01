@@ -35,18 +35,18 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 bin_PROGRAMS = sasutil$(EXEEXT)
-TESTS = sasatom_t$(EXEEXT) bitvec_t$(EXEEXT) sassim_t$(EXEEXT) \
-	sphlockfreeheap_t$(EXEEXT) sphlflogger_t$(EXEEXT) \
-	sphthread_t$(EXEEXT) sphlflogger_tt$(EXEEXT) \
-	sphlflogger_ttt$(EXEEXT) sphlogportal_t$(EXEEXT) \
-	sphlogportal_tt$(EXEEXT) sphcontext_t$(EXEEXT) \
-	sasindex_t$(EXEEXT) sasstringbtree_t$(EXEEXT) \
-	sphsinglepcqueue_t$(EXEEXT) sphsinglepcqueue_tt$(EXEEXT) \
-	sphsinglepcqueue_ttt$(EXEEXT)
+TESTS = sphgtod_t$(EXEEXT) sasatom_t$(EXEEXT) bitvec_t$(EXEEXT) \
+	sassim_t$(EXEEXT) sphlockfreeheap_t$(EXEEXT) \
+	sphlflogger_t$(EXEEXT) sphthread_t$(EXEEXT) \
+	sphlflogger_tt$(EXEEXT) sphlflogger_ttt$(EXEEXT) \
+	sphlogportal_t$(EXEEXT) sphlogportal_tt$(EXEEXT) \
+	sphcontext_t$(EXEEXT) sasindex_t$(EXEEXT) \
+	sasstringbtree_t$(EXEEXT) sphsinglepcqueue_t$(EXEEXT) \
+	sphsinglepcqueue_tt$(EXEEXT) sphsinglepcqueue_ttt$(EXEEXT)
 noinst_PROGRAMS = $(am__EXEEXT_1)
 subdir = src
-DIST_COMMON = $(libsphdeinclude_HEADERS) $(srcdir)/Makefile.am \
-	$(srcdir)/Makefile.in
+DIST_COMMON = $(libsphdeinclude_HEADERS) $(libsphgtodinclude_HEADERS) \
+	$(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/acx_pthread.m4 \
 	$(top_srcdir)/m4/libtool.m4 $(top_srcdir)/m4/ltoptions.m4 \
@@ -64,7 +64,8 @@ am__vpath_adj = case $$p in \
   esac;
 am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
 am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" \
-	"$(DESTDIR)$(libsphdeincludedir)"
+	"$(DESTDIR)$(libsphdeincludedir)" \
+	"$(DESTDIR)$(libsphgtodincludedir)"
 libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 am__DEPENDENCIES_1 =
@@ -88,15 +89,21 @@ libsphde_la_OBJECTS = $(am_libsphde_la_OBJECTS)
 libsphde_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(libsphde_la_CXXFLAGS) \
 	$(CXXFLAGS) $(libsphde_la_LDFLAGS) $(LDFLAGS) -o $@
+libsphgtod_la_DEPENDENCIES =
+am_libsphgtod_la_OBJECTS = libsphgtod_la-sphgtod.lo
+libsphgtod_la_OBJECTS = $(am_libsphgtod_la_OBJECTS)
+libsphgtod_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(libsphgtod_la_CFLAGS) \
+	$(CFLAGS) $(libsphgtod_la_LDFLAGS) $(LDFLAGS) -o $@
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
-am__EXEEXT_1 = sasatom_t$(EXEEXT) bitvec_t$(EXEEXT) sassim_t$(EXEEXT) \
-	sphlockfreeheap_t$(EXEEXT) sphlflogger_t$(EXEEXT) \
-	sphthread_t$(EXEEXT) sphlflogger_tt$(EXEEXT) \
-	sphlflogger_ttt$(EXEEXT) sphlogportal_t$(EXEEXT) \
-	sphlogportal_tt$(EXEEXT) sphcontext_t$(EXEEXT) \
-	sasindex_t$(EXEEXT) sasstringbtree_t$(EXEEXT) \
-	sphsinglepcqueue_t$(EXEEXT) sphsinglepcqueue_tt$(EXEEXT) \
-	sphsinglepcqueue_ttt$(EXEEXT)
+am__EXEEXT_1 = sphgtod_t$(EXEEXT) sasatom_t$(EXEEXT) bitvec_t$(EXEEXT) \
+	sassim_t$(EXEEXT) sphlockfreeheap_t$(EXEEXT) \
+	sphlflogger_t$(EXEEXT) sphthread_t$(EXEEXT) \
+	sphlflogger_tt$(EXEEXT) sphlflogger_ttt$(EXEEXT) \
+	sphlogportal_t$(EXEEXT) sphlogportal_tt$(EXEEXT) \
+	sphcontext_t$(EXEEXT) sasindex_t$(EXEEXT) \
+	sasstringbtree_t$(EXEEXT) sphsinglepcqueue_t$(EXEEXT) \
+	sphsinglepcqueue_tt$(EXEEXT) sphsinglepcqueue_ttt$(EXEEXT)
 PROGRAMS = $(bin_PROGRAMS) $(noinst_PROGRAMS)
 am_bitvec_t_OBJECTS = bitvec_t.$(OBJEXT)
 bitvec_t_OBJECTS = $(am_bitvec_t_OBJECTS)
@@ -119,6 +126,9 @@ sasutil_DEPENDENCIES = libsphde.la
 am_sphcontext_t_OBJECTS = sphcontext_t.$(OBJEXT)
 sphcontext_t_OBJECTS = $(am_sphcontext_t_OBJECTS)
 sphcontext_t_DEPENDENCIES = libsphde.la
+am_sphgtod_t_OBJECTS = sphgtod_t.$(OBJEXT)
+sphgtod_t_OBJECTS = $(am_sphgtod_t_OBJECTS)
+sphgtod_t_DEPENDENCIES = libsphde.la .libs/libsphgtod.a
 am_sphlflogger_t_OBJECTS = sphlflogger_t.$(OBJEXT)
 sphlflogger_t_OBJECTS = $(am_sphlflogger_t_OBJECTS)
 sphlflogger_t_DEPENDENCIES = libsphde.la
@@ -177,26 +187,29 @@ CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-SOURCES = $(libsphde_la_SOURCES) $(bitvec_t_SOURCES) \
-	$(sasatom_t_SOURCES) $(sasindex_t_SOURCES) $(sassim_t_SOURCES) \
-	$(sasstringbtree_t_SOURCES) $(sasutil_SOURCES) \
-	$(sphcontext_t_SOURCES) $(sphlflogger_t_SOURCES) \
+SOURCES = $(libsphde_la_SOURCES) $(libsphgtod_la_SOURCES) \
+	$(bitvec_t_SOURCES) $(sasatom_t_SOURCES) $(sasindex_t_SOURCES) \
+	$(sassim_t_SOURCES) $(sasstringbtree_t_SOURCES) \
+	$(sasutil_SOURCES) $(sphcontext_t_SOURCES) \
+	$(sphgtod_t_SOURCES) $(sphlflogger_t_SOURCES) \
 	$(sphlflogger_tt_SOURCES) $(sphlflogger_ttt_SOURCES) \
 	$(sphlockfreeheap_t_SOURCES) $(sphlogportal_t_SOURCES) \
 	$(sphlogportal_tt_SOURCES) $(sphsinglepcqueue_t_SOURCES) \
 	$(sphsinglepcqueue_tt_SOURCES) $(sphsinglepcqueue_ttt_SOURCES) \
 	$(sphthread_t_SOURCES)
-DIST_SOURCES = $(libsphde_la_SOURCES) $(bitvec_t_SOURCES) \
-	$(sasatom_t_SOURCES) $(sasindex_t_SOURCES) $(sassim_t_SOURCES) \
-	$(sasstringbtree_t_SOURCES) $(sasutil_SOURCES) \
-	$(sphcontext_t_SOURCES) $(sphlflogger_t_SOURCES) \
+DIST_SOURCES = $(libsphde_la_SOURCES) $(libsphgtod_la_SOURCES) \
+	$(bitvec_t_SOURCES) $(sasatom_t_SOURCES) $(sasindex_t_SOURCES) \
+	$(sassim_t_SOURCES) $(sasstringbtree_t_SOURCES) \
+	$(sasutil_SOURCES) $(sphcontext_t_SOURCES) \
+	$(sphgtod_t_SOURCES) $(sphlflogger_t_SOURCES) \
 	$(sphlflogger_tt_SOURCES) $(sphlflogger_ttt_SOURCES) \
 	$(sphlockfreeheap_t_SOURCES) $(sphlogportal_t_SOURCES) \
 	$(sphlogportal_tt_SOURCES) $(sphsinglepcqueue_t_SOURCES) \
 	$(sphsinglepcqueue_tt_SOURCES) $(sphsinglepcqueue_ttt_SOURCES) \
 	$(sphthread_t_SOURCES)
 libsphdeincludeHEADERS_INSTALL = $(INSTALL_HEADER)
-HEADERS = $(libsphdeinclude_HEADERS)
+libsphgtodincludeHEADERS_INSTALL = $(INSTALL_HEADER)
+HEADERS = $(libsphdeinclude_HEADERS) $(libsphgtodinclude_HEADERS)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -335,11 +348,12 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AM_CFLAGS = -Wall -Wwrite-strings $(PTHREAD_CFLAGS)
 AM_CXXFLAGS = -Wall -Wwrite-strings -Woverloaded-virtual $(PTHREAD_CFLAGS)
-lib_LTLIBRARIES = libsphde.la
+lib_LTLIBRARIES = libsphde.la libsphgtod.la
 EXTRA_DIST = $(libsphde_la_INCLUDES) saslockl.cpp
 
 # libsphde definitions
 libsphdeincludedir = $(includedir)/sphde
+libsphgtodincludedir = $(includedir)/sphde
 
 # The headers in 'libsphdeinclude_HEADERS' are meant to be the ones installed
 # on 'make install'
@@ -377,6 +391,7 @@ libsphdeinclude_HEADERS = \
 	sphthread.h \
 	sphtimer.h
 
+libsphgtodinclude_HEADERS = sphgtod.h
 libsphde_la_INCLUDES = \
 	$(libsphdeinclude_HEADERS) \
 	bitv.h \
@@ -398,6 +413,7 @@ libsphde_la_INCLUDES = \
 	sasostrm.h \
 	sasstdio.h 
 
+libsphgtod_la_SOURCES = sphgtod.c
 libsphde_la_SOURCES = \
 	sasshm.c \
 	sasmsync.c \
@@ -431,10 +447,19 @@ libsphde_la_SOURCES = \
 
 libsphde_la_CFLAGS = -D__SASSIM__ $(AM_CFLAGS)
 libsphde_la_CXXFLAGS = -D__SASSIM__ $(AM_CXXFLAGS)
+libsphgtod_la_CFLAGS = $(AM_CFLAGS)
+libsphgtod_la_CXXFLAGS = $(AM_CXXFLAGS)
+
+# libsphgtod.a is ONLY to be a static archive in order to benefit from
+# the performance aspects of inlining the emulated gettimeofday code.
+libsphgtod_la_LDFLAGS = -all-static
+libsphgtod_la_LIBADD = -lrt
 libsphde_la_LDFLAGS = 
 libsphde_la_LIBADD = $(PTHREAD_LIBS) -lrt
 sasutil_SOURCES = sasutil.c
 sasutil_LDADD = libsphde.la
+sphgtod_t_SOURCES = tests/sphgtod_t.c
+sphgtod_t_LDADD = libsphde.la .libs/libsphgtod.a
 sasatom_t_SOURCES = tests/sasatom_t.c
 sasatom_t_LDADD = libsphde.la
 bitvec_t_SOURCES = tests/bitvec_t.c
@@ -531,6 +556,8 @@ clean-libLTLIBRARIES:
 	done
 libsphde.la: $(libsphde_la_OBJECTS) $(libsphde_la_DEPENDENCIES) 
 	$(libsphde_la_LINK) -rpath $(libdir) $(libsphde_la_OBJECTS) $(libsphde_la_LIBADD) $(LIBS)
+libsphgtod.la: $(libsphgtod_la_OBJECTS) $(libsphgtod_la_DEPENDENCIES) 
+	$(libsphgtod_la_LINK) -rpath $(libdir) $(libsphgtod_la_OBJECTS) $(libsphgtod_la_LIBADD) $(LIBS)
 install-binPROGRAMS: $(bin_PROGRAMS)
 	@$(NORMAL_INSTALL)
 	test -z "$(bindir)" || $(MKDIR_P) "$(DESTDIR)$(bindir)"
@@ -587,6 +614,9 @@ sasutil$(EXEEXT): $(sasutil_OBJECTS) $(sasutil_DEPENDENCIES)
 sphcontext_t$(EXEEXT): $(sphcontext_t_OBJECTS) $(sphcontext_t_DEPENDENCIES) 
 	@rm -f sphcontext_t$(EXEEXT)
 	$(LINK) $(sphcontext_t_OBJECTS) $(sphcontext_t_LDADD) $(LIBS)
+sphgtod_t$(EXEEXT): $(sphgtod_t_OBJECTS) $(sphgtod_t_DEPENDENCIES) 
+	@rm -f sphgtod_t$(EXEEXT)
+	$(LINK) $(sphgtod_t_OBJECTS) $(sphgtod_t_LDADD) $(LIBS)
 sphlflogger_t$(EXEEXT): $(sphlflogger_t_OBJECTS) $(sphlflogger_t_DEPENDENCIES) 
 	@rm -f sphlflogger_t$(EXEEXT)
 	$(LINK) $(sphlflogger_t_OBJECTS) $(sphlflogger_t_LDADD) $(LIBS)
@@ -654,12 +684,14 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsphde_la-sphthread.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsphde_la-sphtimer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsphde_la-ultree.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsphgtod_la-sphgtod.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sasatom_t.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sasindex_t.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sassim_t.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sasstringbtree_t.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sasutil.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sphcontext_t.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sphgtod_t.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sphlflogger_t.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sphlflogger_tt-sphlflogger_tt.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sphlflogger_ttt-sphlflogger_ttt.Po@am__quote@
@@ -747,6 +779,13 @@ libsphde_la-sphthread.lo: sphthread.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsphde_la_CFLAGS) $(CFLAGS) -c -o libsphde_la-sphthread.lo `test -f 'sphthread.c' || echo '$(srcdir)/'`sphthread.c
 
+libsphgtod_la-sphgtod.lo: sphgtod.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsphgtod_la_CFLAGS) $(CFLAGS) -MT libsphgtod_la-sphgtod.lo -MD -MP -MF $(DEPDIR)/libsphgtod_la-sphgtod.Tpo -c -o libsphgtod_la-sphgtod.lo `test -f 'sphgtod.c' || echo '$(srcdir)/'`sphgtod.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsphgtod_la-sphgtod.Tpo $(DEPDIR)/libsphgtod_la-sphgtod.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='sphgtod.c' object='libsphgtod_la-sphgtod.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsphgtod_la_CFLAGS) $(CFLAGS) -c -o libsphgtod_la-sphgtod.lo `test -f 'sphgtod.c' || echo '$(srcdir)/'`sphgtod.c
+
 bitvec_t.o: tests/bitvec_t.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT bitvec_t.o -MD -MP -MF $(DEPDIR)/bitvec_t.Tpo -c -o bitvec_t.o `test -f 'tests/bitvec_t.c' || echo '$(srcdir)/'`tests/bitvec_t.c
 @am__fastdepCC_TRUE@	mv -f $(DEPDIR)/bitvec_t.Tpo $(DEPDIR)/bitvec_t.Po
@@ -830,6 +869,20 @@ sphcontext_t.obj: tests/sphcontext_t.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='tests/sphcontext_t.c' object='sphcontext_t.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o sphcontext_t.obj `if test -f 'tests/sphcontext_t.c'; then $(CYGPATH_W) 'tests/sphcontext_t.c'; else $(CYGPATH_W) '$(srcdir)/tests/sphcontext_t.c'; fi`
+
+sphgtod_t.o: tests/sphgtod_t.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT sphgtod_t.o -MD -MP -MF $(DEPDIR)/sphgtod_t.Tpo -c -o sphgtod_t.o `test -f 'tests/sphgtod_t.c' || echo '$(srcdir)/'`tests/sphgtod_t.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/sphgtod_t.Tpo $(DEPDIR)/sphgtod_t.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='tests/sphgtod_t.c' object='sphgtod_t.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o sphgtod_t.o `test -f 'tests/sphgtod_t.c' || echo '$(srcdir)/'`tests/sphgtod_t.c
+
+sphgtod_t.obj: tests/sphgtod_t.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT sphgtod_t.obj -MD -MP -MF $(DEPDIR)/sphgtod_t.Tpo -c -o sphgtod_t.obj `if test -f 'tests/sphgtod_t.c'; then $(CYGPATH_W) 'tests/sphgtod_t.c'; else $(CYGPATH_W) '$(srcdir)/tests/sphgtod_t.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/sphgtod_t.Tpo $(DEPDIR)/sphgtod_t.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='tests/sphgtod_t.c' object='sphgtod_t.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o sphgtod_t.obj `if test -f 'tests/sphgtod_t.c'; then $(CYGPATH_W) 'tests/sphgtod_t.c'; else $(CYGPATH_W) '$(srcdir)/tests/sphgtod_t.c'; fi`
 
 sphlflogger_t.o: tests/sphlflogger_t.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT sphlflogger_t.o -MD -MP -MF $(DEPDIR)/sphlflogger_t.Tpo -c -o sphlflogger_t.o `test -f 'tests/sphlflogger_t.c' || echo '$(srcdir)/'`tests/sphlflogger_t.c
@@ -1147,6 +1200,23 @@ uninstall-libsphdeincludeHEADERS:
 	  echo " rm -f '$(DESTDIR)$(libsphdeincludedir)/$$f'"; \
 	  rm -f "$(DESTDIR)$(libsphdeincludedir)/$$f"; \
 	done
+install-libsphgtodincludeHEADERS: $(libsphgtodinclude_HEADERS)
+	@$(NORMAL_INSTALL)
+	test -z "$(libsphgtodincludedir)" || $(MKDIR_P) "$(DESTDIR)$(libsphgtodincludedir)"
+	@list='$(libsphgtodinclude_HEADERS)'; for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  f=$(am__strip_dir) \
+	  echo " $(libsphgtodincludeHEADERS_INSTALL) '$$d$$p' '$(DESTDIR)$(libsphgtodincludedir)/$$f'"; \
+	  $(libsphgtodincludeHEADERS_INSTALL) "$$d$$p" "$(DESTDIR)$(libsphgtodincludedir)/$$f"; \
+	done
+
+uninstall-libsphgtodincludeHEADERS:
+	@$(NORMAL_UNINSTALL)
+	@list='$(libsphgtodinclude_HEADERS)'; for p in $$list; do \
+	  f=$(am__strip_dir) \
+	  echo " rm -f '$(DESTDIR)$(libsphgtodincludedir)/$$f'"; \
+	  rm -f "$(DESTDIR)$(libsphgtodincludedir)/$$f"; \
+	done
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	list='$(SOURCES) $(HEADERS) $(LISP) $(TAGS_FILES)'; \
@@ -1302,7 +1372,7 @@ all-am: Makefile $(LTLIBRARIES) $(PROGRAMS) $(HEADERS)
 install-binPROGRAMS: install-libLTLIBRARIES
 
 installdirs:
-	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" "$(DESTDIR)$(libsphdeincludedir)"; do \
+	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" "$(DESTDIR)$(libsphdeincludedir)" "$(DESTDIR)$(libsphgtodincludedir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
 	done
 install: install-am
@@ -1350,7 +1420,8 @@ info: info-am
 
 info-am:
 
-install-data-am: install-libsphdeincludeHEADERS
+install-data-am: install-libsphdeincludeHEADERS \
+	install-libsphgtodincludeHEADERS
 
 install-dvi: install-dvi-am
 
@@ -1387,7 +1458,8 @@ ps: ps-am
 ps-am:
 
 uninstall-am: uninstall-binPROGRAMS uninstall-libLTLIBRARIES \
-	uninstall-libsphdeincludeHEADERS
+	uninstall-libsphdeincludeHEADERS \
+	uninstall-libsphgtodincludeHEADERS
 
 .MAKE: install-am install-strip
 
@@ -1400,14 +1472,21 @@ uninstall-am: uninstall-binPROGRAMS uninstall-libLTLIBRARIES \
 	install-data-am install-dvi install-dvi-am install-exec \
 	install-exec-am install-html install-html-am install-info \
 	install-info-am install-libLTLIBRARIES \
-	install-libsphdeincludeHEADERS install-man install-pdf \
+	install-libsphdeincludeHEADERS \
+	install-libsphgtodincludeHEADERS install-man install-pdf \
 	install-pdf-am install-ps install-ps-am install-strip \
 	installcheck installcheck-am installdirs maintainer-clean \
 	maintainer-clean-generic mostlyclean mostlyclean-compile \
 	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
 	tags uninstall uninstall-am uninstall-binPROGRAMS \
-	uninstall-libLTLIBRARIES uninstall-libsphdeincludeHEADERS
+	uninstall-libLTLIBRARIES uninstall-libsphdeincludeHEADERS \
+	uninstall-libsphgtodincludeHEADERS
 
+
+# This rule is necessary because sphgtod_t needs to statically link
+# .libs/libsphgtod.a and if make is executed in parallel (-jN) the sphgtod_t
+# rule may be run before .libs/lisphgtod.a is built.
+.libs/libsphgtod.a: libsphgtod.la
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:
