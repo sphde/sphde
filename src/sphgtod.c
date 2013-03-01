@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     IBM Corporation, Steven Munroe - initial implementation
  *                      Ryan S. Arnold - Fast computation, framework impl
@@ -29,7 +29,7 @@ static sphtimer_t tb_freq;
 # if !defined _ARCH_PWR7
 # include <math.h>
 # endif
-/* This is a 2^64 scaled fractional representation shifted left 24 bits. 
+/* This is a 2^64 scaled fractional representation shifted left 24 bits.
    It is precalculated in the constructor.  */
 static uint64_t tb_freq_shifted_recip;
 #else
@@ -139,7 +139,7 @@ __sphgtod_init (void)
      it to precalculate 1/tb_freq in 128-bit fractional fixed-point math so
      that we can do reciprocal fixed-point multiplication in place of a divide
      when we do the timebase to gettimeofday computations.
-     
+
      We're relying on the fact that the timebase values, when added to the
      timebase epoch factor and divided by the frequency don't fill out the
      high order bits of the high doubleword used in 128-bit fractional math.
