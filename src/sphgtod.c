@@ -10,6 +10,11 @@
  *                      Ryan S. Arnold - Fast computation, framework impl
  */
 
+#ifdef __SASDebugPrint__
+#include <stdlib.h>
+#include <stdio.h>
+#endif
+
 #include <sys/time.h>
 #include <inttypes.h>
 #include "sphtimer.h"
@@ -23,17 +28,16 @@ static sphtimer_t tb2gtod;
    well (since this object file will be statically linked).  */
 static sphtimer_t tb_freq;
 
+#if __WORDSIZE == 64
 /* On PowerPC64 (Power7 and later) we can use special instructions to perform
    fast integer mathematics.  */
-#if __WORDSIZE == 64
 # if !defined _ARCH_PWR7
 # include <math.h>
 # endif
 /* This is a 2^64 scaled fractional representation shifted left 24 bits.
    It is precalculated in the constructor.  */
-static uint64_t tb_freq_shifted_recip;
+static sphtimer_t tb_freq_shifted_recip;
 #else
-static double tb_freq_recip;
 static unsigned long long half_tb_freq;
 #endif
 
@@ -70,30 +74,20 @@ int sphgtod (struct timeval *tv, struct timezone *tz)
   uint64_t tb2;
 #if __WORDSIZE == 64
   unsigned long long int frac_secs;
-  unsigned long long int tmp1;
   const unsigned long long int usec_conv = uS_P_S;
 #else
   uint64_t tb2_sec, tb2_rem, tb2_us;
 #endif
-
-#if __WORDSIZE == 64
-  __asm__ volatile ("mfspr %0, 268" : "=r" (tb));
-#else
-  uint32_t __tbu, __tbl, __tmp;
-  __asm__ volatile (
-    "0:\n\t"
-    "mftbu %0\n\t"
-    "mftbl %1\n\t"
-    "mftbu %2\n\t"
-    "cmpw %0, %2\n\t"
-    "bne- 0b"
-    : "=r" (__tbu), "=r" (__tbl), "=r" (__tmp));
-  tb = (((uint64_t) __tbu << 32) | __tbl);
+#ifdef __powerpc__
+  uint64_t tmp1;
 #endif
+
+  tb = sphgettimer();
 
   tb2 = tb + tb2gtod;
 
 #if __WORDSIZE == 64
+#if  defined __powerpc__
   __asm__ volatile (
     "mulld %0, %4, %5\n\t"
     "mulhdu %1, %4, %5\n\t"
@@ -103,6 +97,17 @@ int sphgtod (struct timeval *tv, struct timezone *tz)
     "mulhdu %3, %3, %6\n\t"
     : "=&r" (frac_secs), "=&r" (tmp1), "=&r" (tv->tv_sec), "=&r" (tv->tv_usec)
     : "r" (tb2), "r" (tb_freq_shifted_recip), "r" (usec_conv));
+#else
+  unsigned __int128 qtemp;
+
+  qtemp = (__int128)tb2 * (__int128)tb_freq_shifted_recip;
+  qtemp = qtemp >> 24;
+  tv->tv_sec = (unsigned long long int)(qtemp >> 64);
+  frac_secs = (unsigned long long int)qtemp;
+  qtemp = frac_secs;
+  qtemp = qtemp * (unsigned __int128)usec_conv;
+  tv->tv_usec = (unsigned long long int)(qtemp >> 64);
+#endif
 #else
   tb2_sec = tb2 / tb_freq;
 
@@ -151,6 +156,7 @@ __sphgtod_init (void)
     __asm__ volatile (
       "divdeu %0, %1, %2\n\t"
       : "=r" (tb_freq_shifted_recip)
+        printf ("Ending gettimeofday value is %"PRIu64" nanoseconds\n", gtod_ns);
       : "r" (one), "r" (tb_freq));
   }
 # else
@@ -158,13 +164,14 @@ __sphgtod_init (void)
      Power7.  */
   {
     long double tmp;
-    tmp = powl(2.0L,88.0L) / (long double) tb_freq;
+    tmp = (0x1.0p88L) / (long double) tb_freq;
     tb_freq_shifted_recip = (uint64_t) tmp;
   }
 # endif
 #else /* __WORDSIZE == 32  */
-  /* TODO: Take the time to provide a fast method for 32-bit.  */
-  tb_freq_recip = (double)1.0 / tb_freq;
-  half_tb_freq = tb_freq / 2UL;
+#endif
+#ifdef __SASDebugPrint__
+  printf ("__sphgtod_init tb_freq_shifted_recip=%llu, %llx\n",
+		  tb_freq_shifted_recip, tb_freq_shifted_recip);
 #endif
 }

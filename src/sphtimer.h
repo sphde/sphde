@@ -16,16 +16,25 @@
 
 /*!
  * \file  sphtimer.h
- * \brief Functions to access the Time Base (PPC) or Time Stamp Counter
- * (Intel) register to measure time at nanossecond level.
+ * \brief Functions to access the Time Base register (PPC) or
+ * clock_gettime(CLOCK_MONOTONIC) measure time at high resolution.
+ * The POWER timebase is safe to use because it is; separate from CPU
+ * clock, invariant, and synchronized across cores and sockets.
  *
- * The Time Base (TB) and Time Stamp Counter (TSC) are both 64-bits special
- * registers that are incremented periodically with an 
- * implementation-dependent frequency (not guaranteed to be constant). 
+ * The Intel (x86/x86_64) Time Stamp Counter is not invariant except on
+ * the latest processors. As we want to support earlier processors back
+ * to the initial Core2 design, we use clock_gettime (CLOCK_MONOTONIC)
+ * by default for Intel. On modern Linux kernels, clock_gettime is
+ * implemented as a VDSO function which provides reasonable performance.
+ *
+ * Where applications know they will be running on Intel processors with
+ * invariant TSC they can enable inlined rdtsc timers by
+ * defining __x86_64_INVARIANT_TSC and/or __x86_INVARIANT_TSC and
+ * rebuilding libsphde.
  * 
- * The TB/TSC value can be obtained using the function ::sphgettimer and the
- * update frequency by using the functions ::sphgetcpufreq or preferably 
- * sphfastcpufreq.
+ * The TB/CLOCK_MONOTONIC value can be obtained using the function
+ * ::sphgettimer and the update frequency by using the functions
+ * ::sphgetcpufreq or preferably sphfastcpufreq.
  *
  * For instance, to measure the time spend in some computation:
  *
@@ -79,10 +88,11 @@ typedef unsigned long long int sphtimer_t;
       : "=r" (__tbu), "=r" (__tbl), "=r" (__tmp) );	\
     __time_v = (( (sphtimer_t) __tbu << 32) | __tbl);	\
   } while (0) 
-#elif defined(__x86_64__)
+#elif defined(__x86_64__) && defined(__x86_64_INVARIANT_TSC)
 /* TODO: the accuracy might be susceptible to CPU clock throttling (mainly
- * due CPU scaling. Find a better way to get the time base by maybe using
- * HPET (although its interface uses syscall on Linux). */
+ * due to CPU scaling. So we disable rdtsc unless the user explicitly defines
+ * __x86_64_INVARIANT_TSC.
+ */
 #define __TIME_BASE(__time_v)				\
   do {							\
     unsigned int __t_hi, __t_lo;			\
@@ -92,7 +102,11 @@ typedef unsigned long long int sphtimer_t;
       "=d" (__t_hi));					\
     __time_v = ((sphtimer_t) __t_hi << 32) | __t_lo;	\
   } while (0)
-#elif defined(__i386__)
+#elif defined(__i386__) && defined(__x86_INVARIANT_TSC)
+/* TODO: the accuracy might be susceptible to CPU clock throttling (mainly
+ * due to CPU scaling. So we disable rdtsc unless the user explicitly defines
+ * __x86_INVARIANT_TSC.
+ */
 #define __TIME_BASE(__time_v)				\
   do {							\
     unsigned int __t;					\
@@ -101,12 +115,23 @@ typedef unsigned long long int sphtimer_t;
       : "=A" (__t));					\
     __time_v = __t;					\
   } while (0)
+#else
+#include <time.h>
+#define __TIME_BASE(__time_v)				\
+  do {							\
+    struct timespec __ts;					\
+    unsigned long long int __t;					\
+    clock_gettime (CLOCK_MONOTONIC, &__ts);	\
+    __t = (__ts.tv_sec * 1000000000L) + __ts.tv_nsec; \
+    __time_v = __t;					\
+  } while (0)
+
 #endif
     
 /*!
- * \brief Read and return the value of TB/TSC register.
+ * \brief Read and return the Timebase value.
  *
- * @return The TB/TSC value.
+ * @return The Timebase value.
  */
 static inline sphtimer_t
 sphgettimer (void)
@@ -117,30 +142,31 @@ sphgettimer (void)
 }
 
 /*!
- * \brief Frequency which TB/TSC is updated by system.
+ * \brief Frequency which Timebase is updated by system.
  * \warning  This variable should not be used directly, the function
- * ::sphfastcpufreq is the correct way since it issue a TB/TSC update on
- * first access.
+ * ::sphfastcpufreq is fastest since it uses the cached value after
+ * the first call.
  */
 extern sphtimer_t sph_cpu_frequency;
 
 /*!
- * \brief Return the TB/TSC frequency update.
+ * \brief Return the Timebase update frequency.
  *
- * Reads the TB/TSC value from system and update the ::sph_cpu_frequency.
+ * Reads the Timebase frequency and updates ::sph_cpu_frequency.
  *
- * @return The TB/TSC frequency update value.
+ * @return The Timebase update frequency update.
  */
 extern __C__ sphtimer_t
 sphgetcpufreq (void);
 
 /*!
- * \brief Return the TB/TSC frequency update (fast version).
+ * \brief Return the Timebase update frequency (fast version).
  *
- * Do not update the TB/TSC if value was already read (the function
- * ::sphgetcpufreq forces an update).
+ * Will not read the Timebase frequency if the value was already cached
+ * (the function ::sphgetcpufreq forces an read/update of
+ * sph_cpu_frequency).
  *
- * @return The TB/TSC frequency update value.
+ * @return The Timebase frequency value.
  */
 static inline sphtimer_t
 sphfastcpufreq (void)

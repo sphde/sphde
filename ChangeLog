@@ -1,3 +1,13 @@
+2013-03-22  Steven Munroe  <sjmunroe@us.ibm.com>
+
+	* src/sphgtod.c: Add documentation, fix Intel issues and optimize the
+	POWER implementation.
+	* src/sphgtod.h: Likewise.
+	* src/sphtimer.c: Likewise.
+	* src/sphtimer.h: Likewise.
+	* doc/libsphde-doxygen-sph.doxy: Add src/sphgtod.h.
+	* src/tests/sphgtod_t.c: Increase ALLOWABLE_DRIFT value.
+
 2013-03-01  Ryan S. Arnold  <rsa@linux.vnet.ibm.com>
 
 	* src/sphgtod.c: Remove unnecessary line breaks '\' from inline asm.

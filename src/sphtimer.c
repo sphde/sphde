@@ -79,7 +79,12 @@ get_cpu_freq_internal (void)
 
   return result;
 }
-#else
+#elif defined(__x86_64_INVARIANT_TSC) || defined(__x86_INVARIANT_TSC)
+/* TODO: the accuracy of TSC might be susceptible to CPU clock throttling
+ * (mainly due to CPU scaling). So we disable rdtsc and related support
+ * unless the user explicitly defines __x86_INVARIANT_TSC or
+ * __x86_64_INVARIANT_TSC.
+ */
 static sphtimer_t
 get_cpu_freq_internal (void)
 {
@@ -120,6 +125,13 @@ get_cpu_freq_internal (void)
     }
 
   return result;
+}
+#else
+static sphtimer_t
+get_cpu_freq_internal (void)
+{
+	/* default "resolution for clock_gettime(CLOCK_MONOTONIC).  */
+	  return 1000000000UL;
 }
 #endif
 
