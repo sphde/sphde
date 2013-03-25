@@ -30,10 +30,11 @@
 int
 main (int argc, char *argv[])
 {
-  struct timeval tv1, tv2, tv3;
+  struct timeval tv1, tv2, tv3, tv4;
   struct timespec ts1, ts2;
   uint64_t diff;
   double gtod_cost;
+  sphtimer_t factor, timestamp;
   int i;
   uint64_t gtod_ns, sphgtod_ns = 0;
 
@@ -67,10 +68,10 @@ main (int argc, char *argv[])
   gettimeofday (&tv3, NULL);
 
   sphgtod_ns = (uint64_t)tv2.tv_sec * NS_P_S + (uint64_t) tv2.tv_usec * NS_P_uS;
-  printf ("Ending sphgtod value is      %"PRIu64" nanoseconds\n", sphgtod_ns);
+  printf ("Ending sphgtod value is        %"PRIu64" nanoseconds\n", sphgtod_ns);
 
   gtod_ns = (uint64_t)tv3.tv_sec * NS_P_S + (uint64_t) tv3.tv_usec * NS_P_uS;
-  printf ("Ending gettimeofday value is %"PRIu64" nanoseconds\n", gtod_ns);
+  printf ("Ending gettimeofday value is   %"PRIu64" nanoseconds\n", gtod_ns);
 
   if (llabs(gtod_ns - sphgtod_ns) > ALLOWABLE_DRIFT)
     {
@@ -80,6 +81,26 @@ main (int argc, char *argv[])
 	ALLOWABLE_DRIFT);
       return 1;
     }
+
+ factor = sphget_gtod_conv_factor();
+ timestamp = sphgettimer();
+ gettimeofday (&tv3, NULL);
+ sphtb2gtod_withfactor (&tv4,timestamp, factor);
+
+ sphgtod_ns = (uint64_t)tv4.tv_sec * NS_P_S + (uint64_t) tv4.tv_usec * NS_P_uS;
+ printf ("sphtb2gtod_withfactor value is %"PRIu64" nanoseconds\n", sphgtod_ns);
+
+ gtod_ns = (uint64_t)tv3.tv_sec * NS_P_S + (uint64_t) tv3.tv_usec * NS_P_uS;
+ printf ("gettimeofday value is          %"PRIu64" nanoseconds\n", gtod_ns);
+
+ if (llabs(gtod_ns - sphgtod_ns) > ALLOWABLE_DRIFT)
+   {
+     printf ("The difference between gettimeofday and sphtb2gtod_withfactor (%"PRIu64"ns)\n",
+	      llabs(gtod_ns - sphgtod_ns));
+     printf ("exceeded the allowable drift of %"PRIu64" ns\n",
+	      ALLOWABLE_DRIFT);
+     return 1;
+   }
 
  return 0;
 }

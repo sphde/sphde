@@ -28,6 +28,7 @@
  */
 
 #include <sys/time.h>
+#include <sphtimer.h>
 
 #ifdef __cplusplus
 #define __C__ "C"
@@ -41,10 +42,53 @@
  * Returns a fast emulation of the values returned by gettimeofday computed
  * from a queried machine timebase register value.
  *
- * @return The timebase converted to gettimeofday struct timeval.
+ * The timezone is not currently honored in the conversion.
+ *
+ * @param address of the struct timeval buffer.
+ * @param address of the stuct timezone or NULL.
+ * @return The timebase converted to gettimeofday in struct timeval.
  */
 
 extern __C__ int
 sphgtod (struct timeval *tv, struct timezone *tz);
+
+/*!
+ * \brief Return the timebase-to-gettimeofday conversion factor.
+ *
+ * As the timebase (sphtimer_t) is a fast hardware timer or something
+ * similar to "uptime" we need to allow for logs that persist across
+ * reboot. By saving this conversion factor in the log we can use it
+ * during post processing of the log to get the corrected gettimeofday
+ * value for formated time values.
+ *
+ * This allow the logger to run as fast as possible by postponing the
+ * timebase to gettimeofday conversion until post processing.
+ *
+ * @return The timebase to gettimeofday conversion factor.
+ */
+
+extern __C__ sphtimer_t
+sphget_gtod_conv_factor (void);
+
+/*!
+ * \brief Return the timebase converted to gettimeofday struct timeval.
+ *
+ * As the timebase (sphtimer_t) is a fast hardware timer or something
+ * similar to "uptime" we need to allow for logs that persist across
+ * reboot. By saving the conversion factor (via sphget_gtod_conv_factor())
+ * in the log we can use it (via this API) during post processing of
+ * the log to get the corrected gettimeofday value for formated time
+ * values.
+ *
+ * @param address of the struct timeval buffer.
+ * @param timestamp value via sphgettimer().
+ * @param timebase to gettimeofday conversion factor.
+ * @return The timebase converted to gettimeofday in struct timeval.
+ */
+
+extern __C__ int
+sphtb2gtod_withfactor (struct timeval *tv,
+		sphtimer_t timestamp,
+		sphtimer_t tb2gtod_factor);
 
 #endif /* __SPH_GTOD_H */

@@ -1,5 +1,17 @@
 2013-03-25  Steven Munroe  <sjmunroe@us.ibm.com>
 
+	* src/sphgtod.c: include stdint.h.
+	(sphget_gtod_conv_factor): New API.
+	(sphtb2gtod_withfactor): New API.
+	(sphgtod): Use sphtb2gtod_withfactor.
+	* src/sphgtod.h (sphgtod): Update comment, include @param's.
+	(sphget_gtod_conv_factor): New API.
+	(sphtb2gtod_withfactor): New API.
+	* src/tests/sphgtod_t.c (main): Add test case for
+	sphget_gtod_conv_factor and sphtb2gtod_withfactor.
+
+2013-03-25  Steven Munroe  <sjmunroe@us.ibm.com>
+
 	* src/sphgtod.c (sphget_tb2gtod_factor): Correct rounding of
 	timebase.
 	(__SASDebugPrint__): fix debug printf.

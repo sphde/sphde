@@ -17,6 +17,7 @@
 
 #include <sys/time.h>
 #include <inttypes.h>
+#include <stdint.h>
 #include "sphtimer.h"
 #include <stddef.h>
 
@@ -81,7 +82,13 @@ sphget_tb2gtod_factor (void)
 #endif
 }
 
-int sphgtod (struct timeval *tv, struct timezone *tz)
+sphtimer_t
+sphget_gtod_conv_factor (void)
+{
+	return tb2gtod;
+}
+
+int sphtb2gtod_withfactor (struct timeval *tv, sphtimer_t timestamp, sphtimer_t tb2gtod_factor)
 {
   /* timezone is not used/honored.  */
   uint64_t tb;
@@ -96,9 +103,9 @@ int sphgtod (struct timeval *tv, struct timezone *tz)
   uint64_t tmp1;
 #endif
 
-  tb = sphgettimer();
+  tb = timestamp;
 
-  tb2 = tb + tb2gtod;
+  tb2 = tb + tb2gtod_factor;
 
 #if __WORDSIZE == 64
 #if  defined __powerpc__
@@ -138,6 +145,27 @@ int sphgtod (struct timeval *tv, struct timezone *tz)
   tv->tv_usec = tb2_us;
 #endif
 
+  return 0;
+}
+
+int sphgtod_withfactor (struct timeval *tv, sphtimer_t tb2gtod_factor)
+{
+  sphtimer_t tb;
+
+  tb = sphgettimer();
+  sphtb2gtod_withfactor (tv, tb, tb2gtod_factor);
+
+  return 0;
+}
+
+int sphgtod (struct timeval *tv, struct timezone *tz)
+{
+  /* timezone is not used/honored.  */
+  sphtimer_t tb;
+
+  tb = sphgettimer();
+  /* -O3 compile should inline this.  */
+  sphtb2gtod_withfactor (tv, tb, tb2gtod);
   return 0;
 }
 
