@@ -112,7 +112,6 @@ lfPCQentry_fastverify (SPHSinglePCQueue_t pcqueue, int val1, int val2,
 		       int val3)
 {
   int rc1, rc2, rc3, rc4;
-  int tv1, tv2, tv3;
   SPHLFEntryHandle_t *handle, handle0;
   int *array;
 
@@ -128,7 +127,7 @@ lfPCQentry_fastverify (SPHSinglePCQueue_t pcqueue, int val1, int val2,
 	{
 	  printf
 	    ("lfPCQentry_fastverify:: SPHLFEntryGetNextInt() = %d,%d,%d should be %d,%d,%d\n",
-	     tv1, tv2, tv3, val1, val2, val3);
+	     array[0], array[1], array[2], val1, val2, val3);
 	}
 
       if (SPHSinglePCQueueFreeNextEntry (pcqueue))

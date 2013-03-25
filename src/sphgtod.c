@@ -9,7 +9,7 @@
  *     IBM Corporation, Steven Munroe - initial implementation
  *                      Ryan S. Arnold - Fast computation, framework impl
  */
-
+//#define __SASDebugPrint__ 1
 #ifdef __SASDebugPrint__
 #include <stdlib.h>
 #include <stdio.h>
@@ -58,13 +58,27 @@ sphget_tb2gtod_factor (void)
 
   tb1 = sphgettimer ();
   gettimeofday(&gtod, NULL);
-#if 1
+
   tb2 = sphgettimer ();
-  tb1 = (tb1 + tb2) / 2UL;
-#endif
+/* compute average while avoiding overflow.  */
+  tb1 = tb1 >> 1;
+  tb2 = tb2 >> 1;
+  tb1 = (tb1 + tb2);
 
   gtod_tb = (gtod.tv_sec * tb_freq) + ((gtod.tv_usec * tb_freq) /  uS_P_S);
   tb2gtod = gtod_tb - tb1;
+#ifdef __SASDebugPrint__
+  printf ("sphget_tb2gtod_factor tb_freq=%llu, %llx\n",
+		  tb_freq, tb_freq);
+  printf ("sphget_tb2gtod_factor tb1=%llu, %llx\n",
+		  tb1, tb1);
+  printf ("sphget_tb2gtod_factor tb2=%llu, %llx\n",
+		  tb2, tb2);
+  printf ("sphget_tb2gtod_factor gtod_tb=%llu, %llx\n",
+		  gtod_tb, gtod_tb);
+  printf ("sphget_tb2gtod_factor tb2gtod=%llu, %llx\n",
+		  tb2gtod, tb2gtod);
+#endif
 }
 
 int sphgtod (struct timeval *tv, struct timezone *tz)
@@ -156,7 +170,6 @@ __sphgtod_init (void)
     __asm__ volatile (
       "divdeu %0, %1, %2\n\t"
       : "=r" (tb_freq_shifted_recip)
-        printf ("Ending gettimeofday value is %"PRIu64" nanoseconds\n", gtod_ns);
       : "r" (one), "r" (tb_freq));
   }
 # else
@@ -168,10 +181,10 @@ __sphgtod_init (void)
     tb_freq_shifted_recip = (uint64_t) tmp;
   }
 # endif
-#else /* __WORDSIZE == 32  */
-#endif
 #ifdef __SASDebugPrint__
   printf ("__sphgtod_init tb_freq_shifted_recip=%llu, %llx\n",
 		  tb_freq_shifted_recip, tb_freq_shifted_recip);
+#endif
+#else /* __WORDSIZE == 32  */
 #endif
 }

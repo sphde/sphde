@@ -120,9 +120,10 @@ typedef unsigned long long int sphtimer_t;
 #define __TIME_BASE(__time_v)				\
   do {							\
     struct timespec __ts;					\
-    unsigned long long int __t;					\
+    sphtimer_t __t;					\
     clock_gettime (CLOCK_MONOTONIC, &__ts);	\
-    __t = (__ts.tv_sec * 1000000000L) + __ts.tv_nsec; \
+    __t = ((sphtimer_t)__ts.tv_sec * 1000000000L)	\
+	+ (sphtimer_t)__ts.tv_nsec; \
     __time_v = __t;					\
   } while (0)
 
