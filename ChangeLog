@@ -1,5 +1,14 @@
 2013-08-19  Ryan S. Arnold  <rsa@linux.vnet.ibm.com>
 
+	* configure.ac (SPHDE_SO_VERSION): Export 0:1:0 to correspond to
+	package version 0.0.1 for use by libtool.
+	(AC_PREREQ): Update to version 2.63 since automake 1.10 requires at
+	least autoconf version 2.62.
+	* src/Makefile.am (libsphde_la_LDFLAGS): add -version-info
+	$(SPHDE_SO_VERSION) to mark library version properly.
+
+2013-08-19  Ryan S. Arnold  <rsa@linux.vnet.ibm.com>
+
 	* doc/sphmaindox.h: Updated documentation.
 	* examples/example_sph_2_1.c: Clarified comment.
 	* examples/example_sph_2_2.c: Likewise.

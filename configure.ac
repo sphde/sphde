@@ -1,13 +1,20 @@
 # -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_PREREQ(2.59)
+# The Automake init of 1.10 requires at least autoconf 2.62
+AC_PREREQ(2.63)
 
-AC_INIT(libsphde, 0.0.1, munroesj@us.ibm.com)
+#Autoconf versioning is A:C:B
+AC_INIT([libsphde], [0.0.1], munroesj@us.ibm.com)
 
 AC_CONFIG_SRCDIR([src/sassim.cpp])
 AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([1.10 no-define foreign])
+
+# Update this value for every release: (A:B:C will map to foo.so.(A-C).C.B)
+# http://www.gnu.org/software/libtool/manual/html_node/Updating-version-info.html
+SPHDE_SO_VERSION=0:1:0
+AC_SUBST(SPHDE_SO_VERSION)
 
 # Debug option
 AC_ARG_ENABLE([debug],

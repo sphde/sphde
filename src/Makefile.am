@@ -119,7 +119,7 @@ libsphgtod_la_CXXFLAGS = $(AM_CXXFLAGS)
 libsphgtod_la_LDFLAGS = -all-static
 libsphgtod_la_LIBADD = -lrt
 
-libsphde_la_LDFLAGS  = 
+libsphde_la_LDFLAGS  = -version-info $(SPHDE_SO_VERSION)
 libsphde_la_LIBADD   = $(PTHREAD_LIBS) -lrt
 
 EXTRA_DIST          += $(libsphde_la_INCLUDES) saslockl.cpp
