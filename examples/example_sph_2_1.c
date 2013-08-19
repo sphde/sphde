@@ -19,7 +19,7 @@
 
 /*
  * This example shows how to use the SimpleHeap object and how to allocate 
- * chuncks on memory within the object.
+ * chunks of memory within the object.
  * It first creates a simple heap, then allocates a vector to hold references
  * to multiple chunks of memory. 
  *
@@ -49,8 +49,12 @@ int main()
     exit(EXIT_FAILURE);
   }
 
-  /* Now it allocates a vector descriptor: the trick is SASSimpleHeap_t
-   * allocates a control header of size 'heap_offset':
+  /* Allocate a block of SAS storage for the vector descriptors that point to
+   * the heap allocations.  Since we'll be allocating 1MB of SimpleHeap and a
+   * SASSimpleHeap_t allocates a control header of size 'heap_offset' use the
+   * following to determine the necessary storage for the vector descriptor
+   * block:
+   * 
    * (1MB - heap_offset)/16KB == 63 entries
    *   32 bits -> 63*sizeof(void*) == 252 bytes 
    *   64 bits -> 63*sizeof(void*) == 504 bytes 
@@ -72,7 +76,8 @@ int main()
   printf("succeed: %p\n", heap);
 
   /* And finally allocates each memory chunk. */
-  blockDescriptorCount = (block__Size1M - heap_offset) / kBlockSize;
+  blockDescriptorCount = (block__Size1M - heap_offset) /
+			  (sizeof(void *) + kBlockSize);
   for (i=0; i<blockDescriptorCount; ++i) {
     blockDescriptor[i] = SASSimpleHeapAlloc(heap, kBlockSize);
     if (!blockDescriptor[i]) {

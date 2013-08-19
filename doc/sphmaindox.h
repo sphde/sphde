@@ -20,7 +20,7 @@
 * organizes blocks of SAS storage into useful functions for storing and
 * retrieving data.
 *
-*  \author Steven Munroe, et al.
+*  \authors Steven Munroe, Ryan S. Arnold, et al.
 *
 *  \section Rationale
 *
@@ -51,7 +51,7 @@
 *  Creating such an API is the goal of this project. The primary function
 *  is to manage backing files and memory map them into the application.
 *  For Linux, this allows data to be shared directly in the real pages of
-*  the kernels file cache. Since the files are always mapped at the same
+*  the kernel's file cache. Since the files are always mapped at the same
 *  virtual address, internal C pointers can be maintained for both
 *  inter-process sharing and transparent persistent storage. This easily
 *  supports zero-copy sharing and operate-in-place persistence.
@@ -76,7 +76,7 @@
 *  stack). Blocks are allocated in power-of-2 size and alignment from
 *  within the region.
 *
-*  Backing storage (files) is allocated in power-of-2 sizes called
+*  Backing storage (files) are allocated in power-of-2 sizes called
 *  "segments". "Segments must be smaller in size than the "region" and
 *  usually larger than "blocks".  Segments don't necessarily have anything
 *  to do with any notion of hardware segmentation, but it may be useful if
@@ -86,19 +86,18 @@
 #include <sassim.h> int main () { int rc;
 
   rc = SASJoinRegion();
-  if (!rc)
-  {
-     char *block;
+  if (rc)
+    return 1;
 
-     // allocation a block of SPHDE data ...
-     block = (char*)SASBlockAlloc (4096);
+  char *block;
 
-     // code accessing data in SPHDE region goes here.
+  // allocation a block of SPHDE data ...
+  block = (char*)SASBlockAlloc (4096);
 
-     SASCleanUp();
-     return 0;
-  }
-  return 1;
+  // code accessing data in SPHDE region goes here.
+
+  SASCleanUp();
+  return 0;
 }
 *  \endcode
 *
@@ -149,28 +148,27 @@ int main ()
 
   rc = SASJoinRegion();
 
-  if (!rc)
+  if (rc)
+    return 1;
+
+  char *block;
+  // primitive way to remember the root ptr
+  block = getSASFinder();
+
+  while (...)
   {
-     char *block;
-     // primative way to remember the root ptr
-     block = getSASFinder();
-
-     while (...)
-     {
-         SASLock(block, SASUserLock_WRITE);
-         // synchronized access to "block"
-         SASUnLock(block);
-     }
-
-     SASCleanUp();
-     return 0;
+      SASLock(block, SasUserLock__WRITE);
+      // synchronized access to "block"
+      SASUnlock(block);
   }
-  return 1;
+
+  SASCleanUp();
+  return 0;
 }
 *  \endcode
 *
-*  Currently the lock manager supports (shared) SASUserLock_READ and
-*  (exclusive) SASUserLock_WRITE locks. The intent is to add other lock
+*  Currently the lock manager supports (shared) SasUserLock__READ and
+*  (exclusive) SasUserLock__WRITE locks. The intent is to add other lock
 *  types as needed. For example, the index utility could use an "INTENT"
 *  lock (which allows multiple READ locks but is exclusive with other
 *  INTENT and WRITE lock) which is upgradeable to a WRITE lock.
@@ -202,48 +200,47 @@ int main ()
   SPHContext_t finderContext;
 
   rc = SASJoinRegion();
+  if (rc)
+    return 1;
 
-  if (!rc)
-  {
-     char *block;
+  char *block;
 
-     block = getSASFinder();
-     if (block)
-       finderContext = (SPHContext_t)block;
-     else
-       { // first time logic, only executes once.
-         finderContext = SPHContextCreate(block__Size16M);
-         setSASFinder(finderContext);
-       }
-     // create and provide a "name" for a new image
-     block = (char*)SASBlockAlloc (block__Size4M);
-     SPHContextAddName(finderContext, "my_image_buffer", block);
+  block = getSASFinder();
+  if (block)
+    finderContext = (SPHContext_t)block;
+  else
+    { // first time logic, only executes once.
+      finderContext = SPHContextCreate(block__Size16M);
+      setSASFinder(finderContext);
+    }
+  // create and provide a "name" for a new image
+  block = (char*)SASBlockAlloc (block__Size4M);
 
-     SASLock(block, SASUserLock_WRITE);
-     // should lock the new block because is now visible to others
-         ...
-     SASUnLock(block);
+  SPHContextAddName(finderContext, "my_image_buffer", block);
+
+  SASLock(block, SasUserLock__WRITE);
+  // should lock the new block because is now visible to others
      ...
-     // look up an old image by "name"
-     block = SPHContextFindByName(finderContext, "my_old_image");
-     if(block)
-       {
-         SASLock(block, SASUserLock_WRITE);
-         ...
-         SASUnLock(block);
-       }
-     }
+  SASUnlock(block);
+  ...
+  // look up an old image by "name"
+  block = SPHContextFindByName(finderContext, "my_old_image");
+  if(block)
+    {
+      SASLock(block, SasUserLock__WRITE);
+      ...
+      SASUnlock(block);
+    }
 
-     SASCleanUp();
-     return 0;
-  }
-  return 1;
+  SASCleanUp();
+  return 0;
+
 }
 *
 *  \endcode
 *
-*  \note A more general solution is provided by the
-*  SPHSetupProjectContext API defined in sphcontext.h.
+*  \note A general purpose solution is provided by the SPHSetupProjectContext API
+*  defined in sphcontext.h.
 *
 *  Utility objects like Context, Index, and StringBTree can be used to
 *  create directories or index large arrays of data structures for search.

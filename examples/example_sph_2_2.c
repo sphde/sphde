@@ -20,13 +20,13 @@
 
 /*
  * This example is similar to 'example_sph_2_1": it uses a SimpleHeap object
- * and allocates chuncks on memory within the object. The difference it it now
- * adds persistence by using the SphContext to retrieve the references to the
- * allocated memory over multiples runs of the program.
+ * and allocates chunks on memory within the object. The difference is that it
+ * now adds persistence by using the SphContext to retrieve the references to
+ * the allocated memory over multiples runs of the program.
  *
  * The SPHContext_t object is used to create an association between a string
- * and a shared memory address (in this case, the vector descriptor). Then
- * the association is used to retrieve the created shared heap and check its
+ * and a shared memory address (in this case, the vector descriptor). Then the
+ * association is used to retrieve the created shared heap and check its
  * contents.
  */
 
@@ -40,7 +40,7 @@ const block_size_t kBlockSize = 16384;
 
 
 /*
- * This function creates the shared heap with multiple chuncks of memory
+ * This function creates the shared heap with multiple chunks of memory
  * inside. */
 void **
 createHeap(size_t blockDescriptorCount)
@@ -49,8 +49,12 @@ createHeap(size_t blockDescriptorCount)
   void **blockDescriptor;
   int i;
 
-  /* Now it allocates a vector descriptor: the trick is SASSimpleHeap_t
-   * allocates a control header of size 'heap_offset':
+  /* Allocate a block of SAS storage for the vector descriptors that point to
+   * the heap allocations.  Since we'll be allocating 1MB of SimpleHeap and a
+   * SASSimpleHeap_t allocates a control header of size 'heap_offset' use the
+   * following to determine the necessary storage for the vector descriptor
+   * block:
+   * 
    * (1MB - heap_offset)/16KB == 63 entries
    *   32 bits -> 63*sizeof(void*) == 252 bytes 
    *   64 bits -> 63*sizeof(void*) == 504 bytes 
@@ -117,7 +121,8 @@ int main()
   printf("%s: SPHContext_t: %p\n", progName, finderContext);
 
   /* Find the block descriptor using a string as reference. */
-  blockDescriptorCount = (block__Size1M - heap_offset) / kBlockSize;
+  blockDescriptorCount = (block__Size1M - heap_offset) /
+			  (sizeof(void *) + kBlockSize);
   blockDescriptor = (void **)SPHContextFindByName(finderContext, blockName);
   printf("%s: SPHContextFindByName(%p, %s): %p\n", progName, finderContext,
 	 blockName, blockDescriptor);

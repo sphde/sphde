@@ -96,7 +96,7 @@ extern __C__ block_size_t
 SASSimpleHeapFreeSpace (SASSimpleHeap_t heap);
 
 /*!
- * \brief Return if the Simple Heap \a heap has not space left.
+ * \brief Return if the Simple Heap \a heap has no space left.
  *
  * The sas_type_t must be SAS_RUNTIME_SIMPLEHEAP. The functions holds an 
  * exclusive write while reading the empty spaces from heap object.

@@ -12,24 +12,31 @@
  *     IBM Corporation, Steven Munroe - initial API and implementation
  */
 
-/**! \file sphcontext.h
-*  \brief Shared Persistent Heap, name/address context
-*	for shared memory multi-thread/multi-core applications.
-*
-*   Manages reversible associations between the name strings and the address values.
-*   Either (name or address) can be use to retrieve the other at a later time.
-*   In the current implementation name to address associations are one to one
-*   within an specific context.
-*   Nothing prevents different context instances from having the same names
-*   or address values. And also different contexts can have different names
-*   associated with the same address value.
-*
-*   \todo In a future implementation the intent is to allow multiple named
-*   associations to a common address value within the same context.
-*   However the restriction that a specific name can only be associated
-*   with one address value will remain.
-*
-**/
+/*!
+ * \file  sphcontext.h
+ * \brief Shared Persistent Heap, name/address context for
+ *        shared memory multi-thread/multi-core applications.
+ *
+ * A Shared Persistent Heap name/address context manages reversible
+ * associations between name strings and address values.  Either (name
+ * or address) can be used to retrieve the other at a later time.  In the
+ * current implementation name-to-address associations are one-to-one within
+ * a specific context.
+ *
+ * Nothing prevents different context instances from having the same names or
+ * address values. And also different contexts can have different names
+ * associated with the same address value.
+ *
+ * \todo In a future implementation the intent is to allow multiple named
+ * associations to a common address value within the same context.  However the
+ * restriction that a specific name can only be associated with one address
+ * value will remain.
+ *
+ * Contexts may be nested as deeply as desired but there isn't an API for
+ * finding them.  They have to be searched for level by level using 
+ * SPHContextFindByName or SPHContextFindByAddr and using the result as the input
+ * context for the next level.
+ */
 
 #include "sastype.h"
 #include "sasstringbtreeenum.h"
@@ -212,6 +219,8 @@ SPHContextFreeSpace (SPHContext_t contxt);
 *	return that value as the result. This setup persists for the life of
 *	the region and new project contexts can be added at any time after.
 *
+*	The root context is 64K.   A project context is 1M.
+*
 *	\warning SPHSetupProjectContext should not be used before SASJoinRegion()
 *	or after SASCleanUp()/SASRemove()
 *
@@ -260,7 +269,7 @@ SPHRemoveProjectContext(char *project_name);
 extern __C__ int
 SPHDestroyProjectContext(char *project_name);
 
-/** \brief return named project contexts address.
+/** \brief return the address of the named project context.
 *
 *   \note Assumes that SPHSetupProjectContext or SPHSetupAltProjectContext
 *   have been called earlier for this region with this project name.
@@ -272,9 +281,9 @@ SPHDestroyProjectContext(char *project_name);
 extern __C__ SPHContext_t
 getProjectContextByName(char *project_name);
 
-/** \brief return the current project contexts address.
+/** \brief return the address of the current project context.
 *
-*	@return the address of the current project context.
+*	@return the address of the current project context, or NULL if there is no current project context.
 */
 extern __C__ SPHContext_t
 getCurrentProjectContext();

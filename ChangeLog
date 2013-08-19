@@ -1,3 +1,11 @@
+2013-08-19  Ryan S. Arnold  <rsa@linux.vnet.ibm.com>
+
+	* doc/sphmaindox.h: Updated documentation.
+	* examples/example_sph_2_1.c: Clarified comment.
+	* examples/example_sph_2_2.c: Likewise.
+	* src/sassimpleheap.h: Corrected doyxgen comment syntax.
+	* src/sphcontext.h: Likewise and updated comments.
+
 2013-03-25  Steven Munroe  <sjmunroe@us.ibm.com>
 
 	* src/sphgtod.c: include stdint.h.
