@@ -7,7 +7,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     IBM Corporation, M.P. Johnson - initial API and implementation
  */
@@ -57,9 +57,9 @@ void*
 SasLockListNode<Item, Key>::operator new
 ( size_t size, SasLockList<Item,Key> * const lockList )
 {
-   #ifdef __SOMDebugPrint__
-   cout << "SasLockListNode::operator new" << endl;
-   #endif
+#ifdef __SOMDebugPrint__
+   fprintf (stderr, "%s\n", __FUNCTION__);
+#endif
 
    // Get storage for a new list node from heap in the same
    // SAS block that the SasLockList object is in.
@@ -73,12 +73,12 @@ template<class Item, class Key>
 void
 SasLockListNode<Item, Key>::operator delete( void *deadObject )
 {
-   #ifdef __SOMDebugPrint__
-   cout << "SasListNode::operator delete" << endl;
-   #endif
+#ifdef __SOMDebugPrint__
+   fprintf (stderr, "%s\n", __FUNCTION__);
+#endif
 
    // Return storage to heap of the SAS block the object is in.
-   SASNearDealloc( deadObject, sizeof(SasLockListNode<Item, Key>) ); 
+   SASNearDealloc( deadObject, sizeof(SasLockListNode<Item, Key>) );
 }
 
 //----------------------------------------------------------------------------
@@ -98,11 +98,12 @@ SasLockList<Item, Key>::SasLockList(void)
 template<class Item, class Key>
 SasLockList<Item, Key>::~SasLockList(void)
 {
+#ifdef __SOMDebugPrint__
+   fprintf (stderr, "%s\n", __FUNCTION__);
+#endif
+
    SasLockListNode<Item,Key> * tempPtr = NULL;
    SasLockListNode<Item,Key> * iteratorPtr;
-   #ifdef __SOMDebugPrint__
-   cout << "SasLockList::~SasLockList" << endl;
-   #endif
 
    lock->write_lock();
 
@@ -116,7 +117,7 @@ SasLockList<Item, Key>::~SasLockList(void)
       // DTOR and free the Item that "this" at.
       Item *p = iteratorPtr->item;        // point to item to free
       p->~Item();                         // DTOR item
-      SASNearDealloc( p, sizeof(Item) );  // free item storage 
+      SASNearDealloc( p, sizeof(Item) );  // free item storage
 
       // Now DTOR and free the SasLockListNode itself
       tempPtr = iteratorPtr;
@@ -125,7 +126,7 @@ SasLockList<Item, Key>::~SasLockList(void)
     }
 
    // DTOR and free the SasUserLock that "this" object points to.
-   lock->~SasUserLock();                            // DTOR 
+   lock->~SasUserLock();                            // DTOR
    SASNearDealloc( lock, sizeof(SasUserLock) );     // free storage
    return;
 }
@@ -136,9 +137,9 @@ void*
 SasLockList<Item, Key>::operator new
 (size_t size, SasMasterLock * const masterLock )
 {
-   #ifdef __SOMDebugPrint__
-   cout << "SasLockList::operator new" << endl;
-   #endif
+#ifdef __SOMDebugPrint__
+   fprintf (stderr, "%s\n", __FUNCTION__);
+#endif
 
    // Get storage for a new list node from heap in the SAS block.
    void* byteAddr = SASNearAlloc( masterLock, size );
@@ -150,21 +151,21 @@ template<class Item, class Key>
 void
 SasLockList<Item, Key>::operator delete(void * deadObject)
 {
-   #ifdef __SOMDebugPrint__
-   cout << "SasLockList::operator delete" << endl;
-   #endif
+#ifdef __SOMDebugPrint__
+   fprintf (stderr, "%s\n", __FUNCTION__);
+#endif
 
    // Return storage to heap of the SAS block the object is in.
-   SASNearDealloc( deadObject, sizeof(SasLockList<Item, Key>) ); 
+   SASNearDealloc( deadObject, sizeof(SasLockList<Item, Key>) );
 }
 
 template<class Item, class Key>
 boolean_t
 SasLockList<Item, Key>::isEmpty(void) const
 {
-   #ifdef __SOMDebugPrint__
-   cout << "SasLockList<Item, Key>::isEmpty" << endl;
-   #endif
+#ifdef __SOMDebugPrint__
+   fprintf (stderr, "%s\n", __FUNCTION__);
+#endif
    lock->read_lock();
    if (count == 0)
     {
@@ -185,9 +186,9 @@ template<class Item, class Key>
 void
 SasLockList<Item, Key>::lockNode(Key keyAddr, sas_userlock_request_t lockT)
 {
-   #ifdef __SOMDebugPrint__
-   cout << "SasLockList<Item, Key>::lockNode" << endl;
-   #endif
+#ifdef __SOMDebugPrint__
+   fprintf (stderr, "%s\n", __FUNCTION__);
+#endif
    SasLockListNode<Item, Key> * iteratorPtr;
    SasUserLock * firstFreeLock = NULL;
 
@@ -200,9 +201,9 @@ SasLockList<Item, Key>::lockNode(Key keyAddr, sas_userlock_request_t lockT)
     {
       if (iteratorPtr->item->operator==(keyAddr))
        {
-         #ifdef __SOMDebugPrint__
-         cout << "SasLockList::lockNode -- found the lock." << endl;
-         #endif
+#ifdef __SOMDebugPrint__
+         fprintf (stderr, "%s - found the lock\n", __FUNCTION__);
+#endif
 
          // If we found the lock we're after, great--let's go ahead and lock it.
          // NOTE:  To prevent the task from locking the slot and then going to
@@ -222,7 +223,7 @@ SasLockList<Item, Key>::lockNode(Key keyAddr, sas_userlock_request_t lockT)
           }
        }   // end 'if..==keyAddr' Mark the first free lock object we find so
       // that in case we don't find
-      // an existing lock for this keyAddr, we'll be able to immediately get 
+      // an existing lock for this keyAddr, we'll be able to immediately get
       // a free lock object and use it.
       if (firstFreeLock == NULL)
          if (iteratorPtr->item->operator==(NullAddress))
@@ -233,9 +234,9 @@ SasLockList<Item, Key>::lockNode(Key keyAddr, sas_userlock_request_t lockT)
    // Specified node was not found.  Check if there's a free node to use
    if (firstFreeLock != NULL)
     {
-      #ifdef __SOMDebugPrint__
-      cout << "SasLockList::lockNode --found a free lock to use. " << endl;
-      #endif
+#ifdef __SOMDebugPrint__
+      fprintf (stderr, "%s - found a free lock to use\n", __FUNCTION__);
+#endif
       switch (lockT)
        {
          case SasUserLock__READ:
@@ -248,9 +249,9 @@ SasLockList<Item, Key>::lockNode(Key keyAddr, sas_userlock_request_t lockT)
     }
 
    // No free lock to use--so new-up one...
-   #ifdef __SOMDebugPrint__
-   cout << "SasLockList::lockNode -- new-up a lock." << endl;
-   #endif
+#ifdef __SOMDebugPrint__
+   fprintf (stderr, "%s - new-up a lock\n", __FUNCTION__);
+#endif
 
    char *byteAddr = (char*) SASNearAlloc( (void*) this, sizeof(SasUserLock) );
    SasUserLock * newUserLock = new(byteAddr) SasUserLock();
@@ -271,12 +272,12 @@ template<class Item, class Key>
 void
 SasLockList<Item, Key>::unlockNode(Key keyAddr)
 {
-   SasLockListNode<Item, Key> * iterPtr;
-   #ifdef __SOMDebugPrint__
-   cout << "SasLockList<Item, Key>::unlockNode" << endl;
-   #endif
-   lock->write_lock();
+#ifdef __SOMDebugPrint__
+   fprintf (stderr, "%s\n", __FUNCTION__);
+#endif
 
+   SasLockListNode<Item, Key> * iterPtr;
+   lock->write_lock();
 
    // Search the list for the specified key
    for (iterPtr = headPtr; iterPtr != NULL; iterPtr = iterPtr->next)
@@ -286,10 +287,10 @@ SasLockList<Item, Key>::unlockNode(Key keyAddr)
     }
    if (iterPtr == NULL)
     {
-   #ifdef __SOMDebugPrint__
-      cout << "Error:  Unlock requested for an address that is not locked."
-        << endl;
-   #endif
+#ifdef __SOMDebugPrint__
+      fprintf (stderr, "%s: error - unlock requested for an address that "
+               "is not locked\n", __FUNCTION__);
+#endif
       return;
     }
    iterPtr->item->unlock();	// unlock item
@@ -404,7 +405,7 @@ SasLockList<Item, Key>::getCount(void) const
 
 
 
-///////////////////////////////////////////////////////////////// 
+/////////////////////////////////////////////////////////////////
 // Private methods
 
 // Add an item to the list NOTE:  No locking is done in this private method.
@@ -413,9 +414,9 @@ template<class Item, class Key>
 void
 SasLockList<Item, Key>::add(Item *itemPtr)
 {
-   #ifdef __SOMDebugPrint__
-   cout << "SasLockList<Item, Key>::add" << endl;
-   #endif
+#ifdef __SOMDebugPrint__
+   fprintf (stderr, "%s\n", __FUNCTION__);
+#endif
 
    // Create new list node in the same SAS block that "this"
    // object is in.

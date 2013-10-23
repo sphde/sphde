@@ -4,24 +4,19 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     IBM Corporation, M.P. Johnson - initial API and implementation
  */
 
-/*
-*
-* DESCRIPTION:
-*	See SasMasterLock.H
-*/
+//#define __SOMDebugPrint__
 
 #include "saslock.h"
 #include "sasmlock.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <new>
-#include <iostream>
-using namespace std;
 
 #include "saslockl.cpp"
 
@@ -111,25 +106,26 @@ static char XOMA1HASHTABLE[256] = {
 
 SasMasterLock::SasMasterLock(unsigned int size)
 {
-   #ifdef __SOMDebugPrint__
-   cout << "SasMasterLock CTOR" << endl;
-   #endif
+#ifdef __SOMDebugPrint__
+   fprintf (stderr, "%s\n", __FUNCTION__);
+#endif
 
    if (size != 256)
-      throw "ERROR -- only size = 256 is currently supported.";
-      
+      fprintf (stderr, "%s: only size of 256 is currently supported\n",
+               __FUNCTION__);
+
    //eyecatcher = 0x6D6C636B;
    tableSize = size;
-      
+
    //eyecatcher2 = 0x6B636C6D;
    initHashTable();
 }
 
 SasMasterLock::~SasMasterLock(void)
 {
-   #ifdef __SOMDebugPrint__
-   cout << "Destroying master lock table..." << endl;
-   #endif
+#ifdef __SOMDebugPrint__
+   fprintf (stderr, "%s\n", __FUNCTION__);
+#endif
 
    // Call DTOR for each SasUserLock in SasLockList and
    // then deallocate the storage used for that SasUserLock
@@ -151,9 +147,9 @@ SasMasterLock::~SasMasterLock(void)
 //  New operator.
 void* SasMasterLock::operator new(size_t size, SASBlockHeader * blockHdr )
 {
-   #ifdef __SOMDebugPrint__
-   cout << "SasMasterLock::operator new" << endl;
-   #endif
+#ifdef __SOMDebugPrint__
+   fprintf (stderr, "%s\n", __FUNCTION__);
+#endif
 
    // Get storage for a new list node from heap in the SAS block.
    void* byteAddr = SASNearAlloc( blockHdr, size );
@@ -163,29 +159,29 @@ void* SasMasterLock::operator new(size_t size, SASBlockHeader * blockHdr )
 // Delete operator.
 void SasMasterLock::operator delete(void * deadObject)
 {
-   #ifdef __SOMDebugPrint__
-   cout << "SasMasterLock::operator delete" << endl;
-   #endif
+#ifdef __SOMDebugPrint__
+   fprintf (stderr, "%s\n", __FUNCTION__);
+#endif
 
    // Return storage to heap of the SAS block the object is in.
-   SASNearDealloc( deadObject, sizeof(SasMasterLock) ); 
+   SASNearDealloc( deadObject, sizeof(SasMasterLock) );
 }
 
 void
 SasMasterLock::lock(vm_address_t addr,
                     sas_userlock_request_t lockT)
 {
-   #ifdef __SOMDebugPrint__
-   cout << "SasMasterLock::lock" << endl;
-   #endif
+#ifdef __SOMDebugPrint__
+   fprintf (stderr, "%s\n", __FUNCTION__);
+#endif
 
    long initialHash = hash((void *) &addr);
    short index = initialHash & UPPER_BYTES_MASK;
 
-   #ifdef __SOMDebugPrint__
-   cout << "Hash result: " << initialHash << endl;
-   cout << "Hash index:  " << index       << endl;
-   #endif
+#ifdef __SOMDebugPrint__
+   fprintf (stderr, " hash result:  %ld\n", initialHash);
+   fprintf (stderr, " hash index :  %d\n", index);
+#endif
 
    slots[index]->lockNode(addr, lockT);
 }
@@ -193,15 +189,17 @@ SasMasterLock::lock(vm_address_t addr,
 void
 SasMasterLock::unlock(vm_address_t addr)
 {
-   #ifdef __SOMDebugPrint__
-   cout << "SasMasterLock::unlock" << endl;
-   #endif
+#ifdef __SOMDebugPrint__
+   fprintf (stderr, "%s\n", __FUNCTION__);
+#endif
    long initialHash = hash((void *) &addr);
    short index = initialHash & UPPER_BYTES_MASK;
-   #ifdef __SOMDebugPrint__
-   cout << "Hash result: " << initialHash << endl;
-   cout << "Hash index:  " << index       << endl;
-   #endif
+
+#ifdef __SOMDebugPrint__
+   fprintf (stderr, " hash result:  %ld\n", initialHash);
+   fprintf (stderr, " hash index :  %d\n", index);
+#endif
+
    slots[index]->unlockNode(addr);
 }
 
@@ -222,7 +220,6 @@ SasMasterLock::printHighLevelStats(void)
    #endif
 
    // Gather total stats
-   cout << endl << "=========== HIGH LEVEL STATS ============= " << endl;
    for (unsigned int loop = 0; loop < tableSize; ++loop)
     {
       countInSlot = slots[loop]->getCount();
@@ -249,12 +246,12 @@ SasMasterLock::printHighLevelStats(void)
     }
 
    //////  OK -- got some total statistics to print, so let's do it.
-   cout << "Number of table slots: " << tableSize << endl;
-   cout << "Total items in table: " << tallyOfLockObjects << endl;
-   cout << "Hash table load factor is totalItems/tableSize. " << endl;
-   cout << "Number of table slots with items: " << tallyOfSlotsWithLocks
-     << endl;
-   cout << "Highest item density: " << lockDensity << endl;
+   printf ("=========== HIGH LEVEL STATS =============\n");
+   printf ("Number of table slots: %u\n", tableSize);
+   printf ("Total items in table: %u\n", tallyOfLockObjects);
+   printf ("Hash table load factor is totalItems/tableSize\n");
+   printf ("Number of table slots with items: %u\n", tallyOfSlotsWithLocks);
+   printf ("Highest item density: %u\n", lockDensity);
    #ifdef collectstats
    cout << "Highest useage count = " << runningHighestUseage
      << " in slot #" << highestUseageSlot << endl;
@@ -273,9 +270,6 @@ SasMasterLock::printDetailedStats(void)
      << endl;
    for (int loop = 0; loop < tableSize; ++loop)
       slots[loop]->printStats(loop);
-   #else
-   cout << endl << "No detailed statistics were collected. " << endl;
-   cout << "You must compile with `collectstats` defined." << endl;
    #endif
 }
 
@@ -287,13 +281,13 @@ SasMasterLock::initHashTable(void)
 {
    // Compute size of hash table and allocate the hash table in
    // the heap of the SAS block that "this" object is in.
-                
+
    long allocSize = sizeof(SasLockList<SasUserLock, vm_address_t> *);
    allocSize *= tableSize;
 
-   #ifdef __SOMDebugPrint__
-   cout << "slots size = " << allocSize << endl;
-   #endif
+#ifdef __SOMDebugPrint__
+   fprintf (stderr, "%s: slots size = %ld\n", __FUNCTION__, allocSize);
+#endif
 
    void *byteAddr = SASNearAlloc( (void*) this, allocSize );
    slots = (SasLockList<SasUserLock, vm_address_t> **) byteAddr;
@@ -306,9 +300,9 @@ SasMasterLock::initHashTable(void)
       slots[loop] = new( this ) SasLockList<SasUserLock,vm_address_t>();
     }
 
-   #ifdef __SOMDebugPrint__
-   cout << loop << " lock slots created in Master Lock." << endl;
-   #endif
+#ifdef __SOMDebugPrint__
+   fprintf (stderr, "%s: %i locks slots created\n", __FUNCTION__, loop);
+#endif
 }
 
 
@@ -325,10 +319,9 @@ SasMasterLock::hash(void * kk)
 #endif
    } ff;
 
-   #ifdef __SOMDebugPrint__
-   cout << "SasMasterLock::hash" << endl;
-   cout << "  key = " << hex <<  *((int *)kk) << dec << endl;
-   #endif
+#ifdef __SOMDebugPrint__
+   fprintf (stderr, "%s: key = 0x%08X\n", __FUNCTION__, *((int *)kk));;
+#endif
 
    ff.k = 0;
    p = (unsigned char *)kk;
