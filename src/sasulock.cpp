@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     IBM Corporation, M.P. Johnson - initial API and implementation
  */
@@ -14,7 +14,12 @@
 #include "sasulock.h"
 #include <string.h>             // memset()
 
-#ifdef mylockdebug
+//#define mylockdebug
+//#define coherenceCheck
+
+#if defined(mylockdebug) || defined(coherenceCheck)
+#include <stdio.h>
+#include <inttypes.h>
 #include <pthread.h>
 #endif
 
@@ -22,9 +27,6 @@
 // is and when it would be used.
 #ifdef lockthreadtest
 #include "sasostrm.H"
-#else
-#include <iostream>
-using namespace std;
 #endif
 
 #define WAKE_ALL	FALSE
@@ -45,7 +47,7 @@ syscall_vm_thread_wakeup(vm_address_t		event,
 }
 */
 
-// Constructor 
+// Constructor
 SasUserLock::SasUserLock(vm_address_t addrToLock)
 {
 #ifdef collectstats
@@ -55,7 +57,7 @@ SasUserLock::SasUserLock(vm_address_t addrToLock)
   address = addrToLock;
   spin_lock_init(&data_lock);
   spin_lock(&data_lock);
-  
+
   //eyecatcher = 0x756C636B;
   status                        = SasUserLock__not_exclusive;
   total_readers_count           = 0;
@@ -68,7 +70,7 @@ SasUserLock::SasUserLock(vm_address_t addrToLock)
   writer_thread_lock_count      = 0;
   memset((void *)readers, 0x00, sizeof(readers));
   //eyecatcher2 = 0x6B636C75;
-  
+
   spin_unlock(&data_lock);
 }
 
@@ -99,61 +101,25 @@ SasUserLock::~SasUserLock(void)
   {
     spin_unlock(&data_lock);
 #ifdef mylockdebug
-    cout << "SasUserLock::unlock throw APAR SasUserLock__LOCK_DESTRUCT_ERROR";
-    cout << " thread = " << this_thread;
-    cout << " task_id = " << this_task;
-    cout << " Object = " << this << endl;
+    fprintf (stderr, "%s\n", __FUNCTION__);
+    fprintf (stderr, " thread[%ld,%ld]\n",
+      (long int) this_task, (long int) this_thread);
+    fprintf (stderr, " object  = %p\n", this);
 #endif
   }
 }
 
-/*
-void *
-SasUserLock::operator new(size_t, void * address)
-{
-  #ifdef debug
-  cout << "SasUserLock::operator new" << endl;
-  #endif
-  return address;
-}
-
-
-void *
-SasUserLock::operator new(size_t size, SasUserLock__storage storage)
-{
-  #ifdef debug
-  cout << "SasUserLock::operator new" << endl;
-  #endif
-  
-  if (heap == NULL)
-    return malloc(size);
-
-  if (storage == SasUserLock__PERM_STORAGE)
-    return heap->allocPerm(size);
-  else
-    return heap->allocTemp(size);
-}
-
-void
-SasUserLock::operator delete(void * object)
-{
-#ifdef debug
-  cout << "SasUserLock::operator delete" << endl;
-#endif
-  if (heap == NULL)
-    free(object);
-  else
-    heap->free(object);
-}
-*/
-
 int
 SasUserLock::operator==(vm_address_t addrToLock)
 {
-#ifdef mylockdebug1
-    cout << "SasUserlock::operator==()" << endl;
-    cout << "Input address: " << addrToLock << "  Lock object's address: " << address
-      << endl;
+#ifdef mylockdebug
+    pid_t this_thread = sphdeGetTID();
+    pid_t this_task = getpid();
+    fprintf (stderr, "%s\n", __FUNCTION__);
+    fprintf (stderr, " thread[%ld,%ld]\n",
+      (long int) this_task, (long int) this_thread);
+    fprintf (stderr, "  input address: %p", addrToLock);
+    fprintf (stderr, " | lock object's address: %p\n", address);
 #endif
     if (address == addrToLock)
         return TRUE;
@@ -165,13 +131,12 @@ SasUserLock::thread_sleep (	vm_address_t event,
 				sem_t       *sem,
   				spin_lock_t *lock)
 {
-// #ifdef mylockdebug
 #ifdef mylockdebug
     pid_t this_thread = sphdeGetTID();
     pid_t this_task = getpid();
-    cout 	<< "thread[" << this_task << ", " << this_thread << "] "
-		<< "SasUserLock::thread_sleep (" 
-		<< event << ", " << sem << ")" << endl;
+    fprintf (stderr, "%s\n", __FUNCTION__);
+    fprintf (stderr, "  thread[%ld,%ld] : %p, %p\n",
+      (long int) this_task, (long int) this_thread, event, sem);
 #endif
     spin_unlock(&data_lock);
     sem_wait(sem);
@@ -188,11 +153,11 @@ SasUserLock::thread_wakeup(	vm_address_t event,
 #ifdef mylockdebug
     pid_t this_thread = sphdeGetTID();
     pid_t this_task = getpid();
-    cout  	<< "thread[" << this_task << ", " << this_thread << "] "
-		<< "SasUserLock::thread_wakeup (" 
-		<< event << ", " << waiters << ")" << endl;
+    fprintf (stderr, "%s\n", __FUNCTION__);
+    fprintf (stderr, "  thread[%ld,%ld] : %p %i\n",
+      (long int) this_task, (long int) this_thread, event, waiters);
 #endif
-    
+
     for ( i = 0; i < waiters; i++ )
 	sem_post(sem);
 }
@@ -211,11 +176,12 @@ SasUserLock::read_lock(SasUserLock * lockObj, vm_address_t lockAddr)
   // thread-safe...
   pid_t this_thread = sphdeGetTID();
   pid_t this_task = getpid();
-  #ifdef mylockdebug1
-  cout << "SasUserLock::read_lock beginning attempt at lock - thread = "
-      << this_thread << " Object = " << this << endl;
-  cout << " task_id = " << this_task << endl;
-  #endif
+#ifdef mylockdebug
+  fprintf (stderr, "%s\n", __FUNCTION__);
+  fprintf (stderr, " thread[%ld,%ld] - beggining attempt to lock",
+      (long int) this_task, (long int) this_thread);
+  fprintf (stderr, " object = %p\n", this);
+#endif
 
   spin_lock(&data_lock);
 // OK--now that we've got the spin lock, we must check if we need
@@ -234,13 +200,13 @@ SasUserLock::read_lock(SasUserLock * lockObj, vm_address_t lockAddr)
       (writer_task_id == this_task))
   {
     writer_thread_lock_count++;
-#ifdef mylockdebug1
-    cout << "SasUserLock::read_lock obtained - thread = "
-      << this_thread;
-    cout << " task_id = " << this_task;
-    cout << " Object = " << this;
-    cout << " writer thread count = "
-      << writer_thread_lock_count << endl;
+#ifdef mylockdebug
+    fprintf (stderr, "%s\n", __FUNCTION__);
+    fprintf (stderr, " thread[%ld,%ld] - lock obtained",
+      (long int) this_task, (long int) this_thread);
+    fprintf (stderr, " | object = %p", this);
+    fprintf (stderr, " | writer thread count = %i\n",
+      writer_thread_lock_count);
 #endif
 #ifdef collectstats
     ++useageCount;
@@ -271,16 +237,14 @@ SasUserLock::read_lock(SasUserLock * lockObj, vm_address_t lockAddr)
         // this thread already has a read lock
         readers[i].reader_thread_lock_count++;
         total_readers_count++;
-        #ifdef mylockdebug1
-        cout << "SasUserLock::read_lock obtained - thread = "
-          << this_thread;
-        cout << " task_id = " << this_task;
-        cout << " Object = " << this;
-        cout << " reader count = "
-          << readers[i].reader_thread_lock_count
-          << " Total readers count = "
-          << total_readers_count << endl;
-        #endif
+#ifdef mylockdebug
+        fprintf (stderr, "%s\n", __FUNCTION__);
+        fprintf (stderr, " thread[%ld,%ld] - lock obtained",
+          (long int) this_task, (long int) this_thread);
+        fprintf (stderr, " | object = %p", this);
+        fprintf (stderr, " | reader count = %i", readers[i].reader_thread_lock_count);
+        fprintf (stderr, " | total reader count = %i\n", total_readers_count);
+#endif
 #ifdef collectstats
 	++useageCount;
 #endif
@@ -290,15 +254,15 @@ SasUserLock::read_lock(SasUserLock * lockObj, vm_address_t lockAddr)
       }
     }  // end scan for has reader lock already
   }    // end if(total_readers_count)
-  
+
   // wait until all the writers are done.
   while (status == SasUserLock__exclusive || writers_waiting)
     {
       readers_waiting++;
-      
+
       SasUserLock::thread_sleep((vm_address_t)&readers_waiting,
 				&readers_waiting_sem, &data_lock);
-			      
+
       spin_lock(&data_lock);	// need to relock since above unlocks
       if (readers_waiting)
           readers_waiting--;
@@ -315,59 +279,52 @@ SasUserLock::read_lock(SasUserLock * lockObj, vm_address_t lockAddr)
       if (readers[j].reader_thread_lock_count > 0)
         {
           // not an open slot
-          #ifdef coherenceCheck
-          if ((readers[j].reader_thread_id ==
-               this_thread) &&
-              (readers[j].reader_task_id ==
-               this_task))
+#ifdef coherenceCheck
+          if ((readers[j].reader_thread_id == this_thread) &&
+              (readers[j].reader_task_id == this_task))
             {
-              // should never already be in the
-              // table here.
-              cout <<
-                "SasUserLock::read_lock " <<
-                "APAR - thread = " <<
-                this_thread <<
-                 " in task_id = " << this_task <<
-                " is already in the table with " <<
-                readers[j].reader_thread_lock_count <<
-                " reader thread lock count." << endl;
-              cout << "total readers = " <<
-                total_readers_count++ << endl;
+              // should never already be in the table here.
+              fprintf (stderr, "%s\n", __FUNCTION__);
+              fprintf (stderr, " thread[%ld,%ld] - thread is already in",
+                (long int) this_task, (long int) this_thread);
+              fprintf (stderr, "the table with %d read thread lock count\n",
+                total_readers_count++);
               // guess if this happens we will
               // just give it to him...
               readers[j].reader_thread_lock_count++;
               total_readers_count++;
             }
-          #endif 
+#endif
         }
       else
         {
           // an open slot - use it
-          #ifdef coherenceCheck
+#ifdef coherenceCheck
           if (readers[j].reader_thread_lock_count < 0)
             {
-              cout <<
-                "SasUserLock::read_lock - APAR " <<
-                "a reader thread count is negative " <<
-                readers[j].reader_thread_lock_count << endl;
+              fprintf (stderr, "%s\n", __FUNCTION__);
+              fprintf (stderr, " thread[%ld,%ld] - reader thread count is "
+                               "negative %i\n",
+                (long int) this_task, (long int) this_thread,
+                readers[j].reader_thread_lock_count);
             }
-          #endif
+#endif
           readers[j].reader_thread_id =
             this_thread;
           readers[j].reader_task_id = this_task;
           readers[j].reader_thread_lock_count = 1;
           total_readers_count++;
 
-          #ifdef mylockdebug1
-          cout << "SasUserLock::read_lock obtained - thread = "
-            << this_thread;
-          cout << " task_id = " << this_task;
-          cout << " Object = " << this;
-          cout << " reader thread count = "
-            << readers[j].reader_thread_lock_count
-            << " Total readers count = "
-            << total_readers_count << endl;
-          #endif
+#ifdef mylockdebug
+          fprintf (stderr, "%s\n", __FUNCTION__);
+          fprintf (stderr, " thread[%ld,%ld] - lock obtained\n",
+            (long int) this_task, (long int) this_thread);
+          fprintf (stderr, " object  = %p", this);
+          fprintf (stderr, " | reader thread count = %i",
+            readers[j].reader_thread_lock_count);
+          fprintf (stderr, " | total readers count = %i\n",
+            total_readers_count);
+#endif
 #ifdef collectstats
 	  ++useageCount;
 #endif
@@ -384,9 +341,11 @@ SasUserLock::read_lock(SasUserLock * lockObj, vm_address_t lockAddr)
   // lock up.  Oughta notice that.  Thus,
   // I intentionally didn't release the spin lock
   // here.
-  cout << "SasUserLock::read_lock() APAR"
-    << " NO OPEN SLOTS in reader table." << endl;
-  
+#ifdef mylockdebug
+  fprintf (stderr, "%s\n", __FUNCTION__);
+  fprintf (stderr, " thread[%ld,%ld] - no opne slots in reader table\n",
+    (long int) this_task, (long int) this_thread);
+#endif
 }
 
 // Get non-shared write lock.  A thread can call this more than once.
@@ -404,10 +363,11 @@ SasUserLock::write_lock(SasUserLock * lockObj, vm_address_t lockAddr)
   // thread-safe...
   pid_t this_thread = sphdeGetTID();
   pid_t this_task = getpid();
-#ifdef mylockdebug1
-  cout << "SasUserLock::write_lock attempt - thread = "
-    << this_thread;
-  cout << " Object = " << this << endl;
+#ifdef mylockdebug
+  fprintf (stderr, "%s\n", __FUNCTION__);
+  fprintf (stderr, " thread[%ld,%ld] - attempt\n",
+    (long int) this_task, (long int) this_thread);
+  fprintf (stderr, " object  = %p\n", this);
 #endif
 
   boolean_t	wakeup_writers = FALSE;
@@ -428,12 +388,12 @@ SasUserLock::write_lock(SasUserLock * lockObj, vm_address_t lockAddr)
       (writer_task_id == this_task))
   {
     writer_thread_lock_count++;
-#ifdef mylockdebug1
-    cout << "SasUserLock::write_lock obtained - thread = "
-      << this_thread;
-    cout << " task_id = " << this_task;
-    cout << " Object = " << this;
-    cout << " count = " << writer_thread_lock_count << endl;
+#ifdef mylockdebug
+    fprintf (stderr, "%s\n", __FUNCTION__);
+    fprintf (stderr, " thread[%ld,%ld] - obtained\n",
+    (long int) this_task, (long int) this_thread);
+    fprintf (stderr, " object  = %p | count = %i\n",
+      this, writer_thread_lock_count);
 #endif
 #ifdef collectstats
     ++useageCount;
@@ -447,7 +407,7 @@ SasUserLock::write_lock(SasUserLock * lockObj, vm_address_t lockAddr)
   while (status == SasUserLock__exclusive)
   {
     writers_waiting++;
-    
+
     SasUserLock::thread_sleep(	(vm_address_t)&writers_waiting,
 				&writers_waiting_sem, &data_lock);
 
@@ -464,54 +424,54 @@ SasUserLock::write_lock(SasUserLock * lockObj, vm_address_t lockAddr)
     wakeup_writers = TRUE;
   if (readers_waiting)
     wakeup_readers = TRUE;
-  
+
   spin_unlock(&data_lock);
 
   // use local variables outside of spin lock
   if (wakeup_writers)
   {
-    SasUserLock::thread_wakeup(	(vm_address_t)&writers_waiting, 
+    SasUserLock::thread_wakeup(	(vm_address_t)&writers_waiting,
 				&writers_waiting_sem, WAKE_ONE);
   }
-  
+
   if (wakeup_readers)
   {
     SasUserLock::thread_wakeup(	(vm_address_t)&readers_waiting,
 				&readers_waiting_sem, WAKE_ALL);
   }
-  
+
   spin_lock(&data_lock);
   // while still being used by the readers
   while (total_readers_count)
   {
     // look like a writer so that the unlock code wakes us up.
     writers_waiting++;
-      
+
     SasUserLock::thread_sleep(	(vm_address_t)&writers_waiting,
 				&writers_waiting_sem, &data_lock);
-			   
+
     spin_lock(&data_lock);
     if (writers_waiting)
       writers_waiting--;
   }
   // no more readers, so we now have the write lock
 
-  #ifdef coherenceCheck
+#ifdef coherenceCheck
   if (writer_thread_lock_count != 0)
     {
-      cout << "SasUserLock::write_lock() - APAR"
-        << " just obtained write lock and "
-        << "writer lock count was not "
-        << "zero but was "
-        << writer_thread_lock_count << endl;
+      fprintf (stderr, "%s\n", __FUNCTION__);
+      fprintf (stderr, " thread[%ld,%ld] - just obtained write lock and "
+        "writer lock count was not zero but was %i\n",
+        (long int) this_task, (long int) this_thread,
+        writer_thread_lock_count);
     }
-  #endif
-  
-#ifdef mylockdebug1
-  cout << "SasUserLock::write_lock obtained - thread = "
-    << this_thread;
-  cout << " task_id = " << this_task;
-  cout << " Object = " << this << endl;
+#endif
+
+#ifdef mylockdebug
+  fprintf (stderr, "%s\n", __FUNCTION__);
+  fprintf (stderr, " thread[%ld,%ld] - obtained\n",
+    (long int) this_task, (long int) this_thread);
+  fprintf (stderr, " object  = %p\n", this);
 #endif
 #ifdef collectstats
   ++useageCount;
@@ -523,13 +483,16 @@ SasUserLock::write_lock(SasUserLock * lockObj, vm_address_t lockAddr)
   spin_unlock(&data_lock);
 }
 
-void 
+void
 SasUserLock::unlock(void)
 {
-#ifdef mylockdebug1
-  cout << "SasUserLock::unlock - thread = "
-    << pthread_self();
-  cout << "Object = " << this << endl;
+  pid_t this_thread = sphdeGetTID();
+  pid_t this_task = getpid();
+#ifdef mylockdebug
+  fprintf (stderr, "%s\n", __FUNCTION__);
+  fprintf (stderr, " thread[%ld,%ld]\n",
+    (long int) this_task, (long int) this_thread);
+  fprintf (stderr, " object  = %p\n", this);
 #endif
   boolean_t	wakeup_writers = FALSE;
   boolean_t	wakeup_readers = FALSE;
@@ -537,9 +500,6 @@ SasUserLock::unlock(void)
   // issue it only once in this routine.  This is
   // a local automatic variable so it is also
   // thread-safe...
-  pid_t this_thread = sphdeGetTID();
-  pid_t this_task = getpid();
-  
   spin_lock(&data_lock);
 
   // if there are any readers, then no write locks,
@@ -552,14 +512,15 @@ SasUserLock::unlock(void)
     if (total_readers_count==0)
 	address = NullAddress;
 
-    #ifdef coherenceCheck
+#ifdef coherenceCheck
     if (total_readers_count < 0)
     {
-      cout << "SasUserLock::unlock() - APAR "
-        << "total readers count is negative "
-        << total_readers_count << endl;
+      fprintf (stderr, "%s\n", __FUNCTION__);
+      fprintf (stderr, " thread[%ld,%ld] - total readers count is negative: %i\n",
+        (long int) this_task, (long int) this_thread,
+        total_readers_count);
     }
-    #endif 
+#endif
     if ((total_readers_count==0) && (writers_waiting))
       wakeup_writers = TRUE;
     // unlock the reader that has it
@@ -571,26 +532,22 @@ SasUserLock::unlock(void)
            this_task))
       {
         readers[i].reader_thread_lock_count--;
-        #ifdef coherenceCheck
+#ifdef coherenceCheck
         if (readers[i].reader_thread_lock_count < 0)
         {
-          cout << "SasUserLock::unlock() - APAR "
-            << "thread = " << this_thread
-            << " task = " << this_task
-            << " lock count just went negative "
-            << readers[i].reader_thread_lock_count
-            << endl;
+          fprintf (stderr, "%s\n", __FUNCTION__);
+          fprintf (stderr, " thread[%ld,%ld] - lock count just went negative %i\n",
+            (long int) this_task, (long int) this_thread,
+            readers[i].reader_thread_lock_count);
         }
-        #endif
-        #ifdef mylockdebug1
-        cout << "SasUserLock::unlock thread = "
-          << this_thread;
-        cout << " task_id = " << this_task;
-        cout << "Object = " << this;
-        cout << "reader thread count = "
-          << readers[i].reader_thread_lock_count
-          << endl;
-        #endif
+#endif
+#ifdef mylockdebug
+        fprintf (stderr, "%s\n", __FUNCTION__);
+        fprintf (stderr, " thread[%ld,%ld]\n",
+          (long int) this_task, (long int) this_thread);
+        fprintf (stderr, " object  = %p | read thread count = %i\n",
+          this, readers[i].reader_thread_lock_count);
+#endif
         if (readers[i].reader_thread_lock_count == 0)
         {
           // remove the thread id
@@ -606,23 +563,24 @@ SasUserLock::unlock(void)
     if (status == SasUserLock__exclusive)	// unlock a write lock
     {
       writer_thread_lock_count--;
-      #ifdef coherenceCheck
+#ifdef coherenceCheck
       if (writer_thread_lock_count < 0)
       {
-        cout << "SasUserLock::unlock() - APAR "
-          << "writer lock count is negative "
-          << writer_thread_lock_count << endl;
+        fprintf (stderr, "%s\n", __FUNCTION__);
+        fprintf (stderr, " thread[%ld,%ld] - write lock count is negative %i\n",
+          (long int) this_task, (long int) this_thread,
+          writer_thread_lock_count);
       }
-      #endif
+#endif
       if (writer_thread_lock_count)
       {
-        #ifdef mylockdebug1
-        cout << "SasUserLock::unlock thread = " << this_thread;
-        cout << " task_id = " << this_task;
-        cout << " Object = " << this;
-        cout << " writer count = "
-          << writer_thread_lock_count << endl;
-        #endif
+#ifdef mylockdebug
+        fprintf (stderr, "%s\n", __FUNCTION__);
+        fprintf (stderr, " thread[%ld,%ld]\n",
+          (long int) this_task, (long int) this_thread);
+        fprintf (stderr, " object  = %p | writer count = %i\n",
+          this, writer_thread_lock_count);
+#endif
         spin_unlock(&data_lock);
         return;
       }
@@ -643,37 +601,35 @@ SasUserLock::unlock(void)
     }       // end status==lock_exclusive (a write lock)
     else	// change this to coherency check later
     {
-      #ifdef coherenceCheck
-      cout << "SasUserLock::unlock throw APAR SasUserLock__LOCK_NOT_HELD"
-        << endl;
-      cout << " thread = " << this_thread;
-      cout << " task = " << this_task;
-      cout << " Object = " << this;
-      cout << "writer count = " << writer_thread_lock_count;
-      cout << "total reader count = " << total_readers_count
-        << endl;
-      #endif
+#ifdef coherenceCheck
+      fprintf (stderr, "%s\n", __FUNCTION__);
+      fprintf (stderr, " thread[%ld,%ld]\n",
+        (long int) this_task, (long int) this_thread);
+      fprintf (stderr, " object  = %p | writer count = %i | reader count = %i\n",
+        this, writer_thread_lock_count, total_readers_count);
+#endif
       spin_unlock(&data_lock);
       return;
     }
-    #ifdef mylockdebug1
-    cout << "SasUserLock::unlock thread = " << this_thread;
-    cout << " task_id = " << this_task;
-    cout << " Object = " << this;
-    cout << " writer_count = " << writer_thread_lock_count << endl;
-    #endif
+#ifdef mylockdebug
+    fprintf (stderr, "%s\n", __FUNCTION__);
+    fprintf (stderr, " thread[%ld,%ld]\n",
+      (long int) this_task, (long int) this_thread);
+    fprintf (stderr, " object  = %p | write count = %i\n",
+      this, writer_thread_lock_count);
+#endif
 
   } // end else no readers waiting
   spin_unlock(&data_lock);
 
   if (wakeup_writers)
   {
-    SasUserLock::thread_wakeup(	(vm_address_t)&writers_waiting, 
+    SasUserLock::thread_wakeup(	(vm_address_t)&writers_waiting,
 				&writers_waiting_sem, WAKE_ONE);
   }
   if (wakeup_readers)
   {
-    SasUserLock::thread_wakeup(	(vm_address_t)&readers_waiting, 
+    SasUserLock::thread_wakeup(	(vm_address_t)&readers_waiting,
 				&readers_waiting_sem, WAKE_ALL);
   }
 }
@@ -681,12 +637,13 @@ SasUserLock::unlock(void)
 boolean_t
 SasUserLock::waiters(void)
 {
-  #ifdef mylockdebug1
+#ifdef mylockdebug
   pid_t this_thread = sphdeGetTID();
   pid_t this_task = getpid();
-  cout << "SasUserLock::waiters thread = " << this_thread << endl;
-  cout << " task_id = " << this_task << endl;;
-  #endif
+  fprintf (stderr, "%s\n", __FUNCTION__);
+  fprintf (stderr, " thread[%ld,%ld]\n",
+    (long int) this_task, (long int) this_thread);
+#endif
   if ((readers_waiting) || (writers_waiting))
     return TRUE;
   else
