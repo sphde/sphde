@@ -664,9 +664,8 @@ SPHLFLoggerIteratorNext (SPHLFLogIterator_t * iterator,
       entryPtr = (SPHLFLogHeader_t *) lPtr;
 
 #ifdef __SASDebugPrint__
-      sas_printf ("  lPtr=%lx entryPtr=%p end=%lx valid=%d\n",
-		  lPtr, entryPtr, iterator->end_log,
-		  entryPtr->entryID.detail.valid);
+      sas_printf ("  lPtr=%lx entryPtr=%p end=%lx \n",
+	lPtr, entryPtr, iterator->end_log);
 #endif
 
       if ((lPtr < iterator->end_log) && (entryPtr->entryID.detail.valid))
@@ -690,7 +689,8 @@ SPHLFLoggerIteratorNext (SPHLFLogIterator_t * iterator,
 	  lPtr += eLen;
 
 #ifdef __SASDebugPrint__
-	  sas_printf ("  lPtr=%lx eLen=%ld\n", lPtr, eLen);
+	  sas_printf ("  lPtr=%lx eLen=%ld valid=%d\n", lPtr, eLen,
+	    entryPtr->entryID.detail.valid);
 #endif
 	  if ((log_options & SPHLFLOGGER_CIRCULAR)
 	      && (log_options & SPHLFLOGGER_CIRCULAR_WRAPED))

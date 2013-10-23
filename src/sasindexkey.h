@@ -65,10 +65,6 @@ typedef struct SASIndexKey_t
  * Also optimized for early (in the first or only word of the key)
  * misscompare.
  *
- * \todo Need to fix this for little endian machines. Must use a
- * machine_uint_t word compare to insure consistent comparison across types.
- * Memcmp will not give the expect order on little endian machines.
- *
  * @param op_a Handle of the left SASIndexKey_t.
  * @param op_b Handle of the right SASIndexKey_t.
  * @return an integer value -1 for op_a < op_b, 0 for op_a == op_b,
@@ -105,10 +101,20 @@ SASIndexKeyCompare (SASIndexKey_t * op_a, SASIndexKey_t * op_b)
 		rc = 1;
 	    }
 	}
-      else
+      else if (len > sizeof (machine_uint_t))
 	{
-	  if (len > sizeof (machine_uint_t))
-	    rc = memcmp (&op_a->data[0], &op_b->data[0], len);
+	  unsigned int i = 1;
+	  for (i = 1; i < (len / sizeof (machine_uint_t)); i++)
+	    {
+	      if (op_a->data[i] != op_b->data[i])
+		{
+		  if (op_a->data[i] > op_b->data[i])
+		    rc = 1;
+		  else
+		    rc = -1;
+		  break;
+		}
+	    }
 	}
     }
   return rc;
