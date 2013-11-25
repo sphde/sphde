@@ -1,3 +1,8 @@
+2013-11-22  Steven J. Munroe  <sjmunroe@us.ibm.com>
+
+	* src/sphgtod.c (_SPH_PLATFORM_HAS_INT128): Use __int128 only when
+	compiler supports it.
+
 2013-08-19  Ryan S. Arnold  <rsa@linux.vnet.ibm.com>
 
 	* configure.ac (SPHDE_SO_VERSION): Export 0:1:0 to correspond to

@@ -21,6 +21,12 @@
 #include "sphtimer.h"
 #include <stddef.h>
 
+#if __GNUC__ == 4 && __GNUC_MINOR__ >= 6 && __SIZEOF_INT128__ == 16
+#define _SPH_PLATFORM_HAS_INT128 1
+#else
+#define _SPH_PLATFORM_HAS_INT128 0
+#endif
+
 /* Time since epoch in units equivalent to those returned by the timebase
    register.  */
 static sphtimer_t tb2gtod;
@@ -29,7 +35,7 @@ static sphtimer_t tb2gtod;
    well (since this object file will be statically linked).  */
 static sphtimer_t tb_freq;
 
-#if __WORDSIZE == 64
+#if defined __powerpc64__ || _SPH_PLATFORM_HAS_INT128
 /* On PowerPC64 (Power7 and later) we can use special instructions to perform
    fast integer mathematics.  */
 # if !defined _ARCH_PWR7
@@ -93,22 +99,21 @@ int sphtb2gtod_withfactor (struct timeval *tv, sphtimer_t timestamp, sphtimer_t 
   /* timezone is not used/honored.  */
   uint64_t tb;
   uint64_t tb2;
-#if __WORDSIZE == 64
+#if defined __powerpc64__ || _SPH_PLATFORM_HAS_INT128
   unsigned long long int frac_secs;
   const unsigned long long int usec_conv = uS_P_S;
+#ifdef __powerpc64__
+  uint64_t tmp1;
+#endif
 #else
   uint64_t tb2_sec, tb2_rem, tb2_us;
-#endif
-#ifdef __powerpc__
-  uint64_t tmp1;
 #endif
 
   tb = timestamp;
 
   tb2 = tb + tb2gtod_factor;
 
-#if __WORDSIZE == 64
-#if  defined __powerpc__
+#if  defined __powerpc64__
   __asm__ volatile (
     "mulld %0, %4, %5\n\t"
     "mulhdu %1, %4, %5\n\t"
@@ -118,7 +123,7 @@ int sphtb2gtod_withfactor (struct timeval *tv, sphtimer_t timestamp, sphtimer_t 
     "mulhdu %3, %3, %6\n\t"
     : "=&r" (frac_secs), "=&r" (tmp1), "=&r" (tv->tv_sec), "=&r" (tv->tv_usec)
     : "r" (tb2), "r" (tb_freq_shifted_recip), "r" (usec_conv));
-#else
+#elif _SPH_PLATFORM_HAS_INT128
   unsigned __int128 qtemp;
 
   qtemp = (__int128)tb2 * (__int128)tb_freq_shifted_recip;
@@ -128,7 +133,6 @@ int sphtb2gtod_withfactor (struct timeval *tv, sphtimer_t timestamp, sphtimer_t 
   qtemp = frac_secs;
   qtemp = qtemp * (unsigned __int128)usec_conv;
   tv->tv_usec = (unsigned long long int)(qtemp >> 64);
-#endif
 #else
   tb2_sec = tb2 / tb_freq;
 
@@ -177,7 +181,7 @@ __sphgtod_init (void)
      resolution. This is used in all emulated gtod calls.  */
   sphget_tb2gtod_factor ();
 
-#if __WORDSIZE == 64
+#if defined __powerpc64__ || _SPH_PLATFORM_HAS_INT128
   /* The 'one' used in this calculation is left-shifted 24 bits.  We're using
      it to precalculate 1/tb_freq in 128-bit fractional fixed-point math so
      that we can do reciprocal fixed-point multiplication in place of a divide
