@@ -20,6 +20,8 @@
 #include "sasindexpriv.h"
 #include "sasindexnodepriv.h"
 
+//#define __SASDebugPrint__ 1
+
 static inline int
 SASIndexAvail(SASIndexHeader *headerBlock)
 {
@@ -400,7 +402,6 @@ SASIndexAlloc (SASIndex_t heap)
 	    	
 	    	if (SASIndexPercentUsed(lastHeader) >= DEFAULT_LOAD_FACTOR)
 	    	{
-	    		last_lock = list->count-2;
 				for ( i = 0; i < list->count-1; i++ )
 				{
 					SASIndexHeader	*expandBlock = list->heap[i];
@@ -418,6 +419,7 @@ SASIndexAlloc (SASIndex_t heap)
 				{
 					expandHeader = (SASIndexHeader*)
 					                 SASIndexExpandCreate (heap);
+		    		last_lock = list->count-2;
 				}
 	    	} else {
 	    		expandHeader = lastHeader;

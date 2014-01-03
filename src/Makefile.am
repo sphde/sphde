@@ -185,6 +185,10 @@ TESTS                += sasindex_t
 sasindex_t_SOURCES = tests/sasindex_t.c
 sasindex_t_LDADD   = libsphde.la
 
+TESTS                += sasindex_tt
+sasindex_tt_SOURCES = tests/sasindex_tt.c
+sasindex_tt_LDADD   = libsphde.la
+
 TESTS                += sasstringbtree_t
 sasstringbtree_t_SOURCES = tests/sasstringbtree_t.c
 sasstringbtree_t_LDADD   = libsphde.la

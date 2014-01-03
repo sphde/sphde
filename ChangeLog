@@ -1,3 +1,31 @@
+2014-01-02  Steven Munroe  <sjmunroe@us.ibm.com>
+
+	* src/Makefile.am: Add sasindex_tt.  
+	* src/sasindex.cpp (SASIndexAlloc): Correct last_lock count for
+	first first "expand" segment.
+	* src/sasindexenum.cpp (SASIndexEnumNext)[__SASDebugPrint__]:
+	Add debug prints.
+	* src/sasindexenum.cpp (SASIndexEnumNext): For first time case,
+	use SASIndexNodeSearchGE() instead of SASIndexNodeSearchGT().
+	This is required to support NULL and 0 (zero) keys.
+	* src/sasindexnode.cpp (SASIndexNodeSearchGE): Fix up debug
+	prints.  Make result true, if found is true.
+	* src/sasindexnode.cpp (SASIndexNodePushIn):  Fix up debug
+	prints.
+	* src/sasindexnode.cpp (SASIndexNodeSplit):  Fix up debug
+	prints.
+	* src/sasindexnode.cpp (SASIndexNodeInsert):  Fix up debug
+	prints.
+	* src/sasindexnode.cpp (SASIndexNodePushIn):  Fix up debug
+	prints.
+
+	* src/tests/sasindex_t.c (sasindex_print_node_uint): Improve
+	readability of Btree diag print.
+	* src/tests/sasindex_t.c (sassim_index_test_split): New
+	function.
+	* src/tests/sasindex_t.c (main): Call sassim_index_test_split.
+	* src/tests/sasindex_tt.c: New file.
+
 2013-12-20  Steven Munroe  <sjmunroe@us.ibm.com>
 
 	* src/ssasindexkey.h: Define union sasindexkeymap_t.  

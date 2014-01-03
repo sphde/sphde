@@ -9,7 +9,7 @@
  *     IBM Corporation, Steven Munroe - initial API and implementation
  */
 
-//#define __SASDebugPrint__ 1
+//#define __SASDebugPrint__ 2
 #define sas_printf printf
 #include <stdlib.h>
 #include <stdio.h>
@@ -702,7 +702,7 @@ SASIndexNodeSearchNode (SASIndexNode_t header, SASIndexKey_t * target)
 	    {
 #if __SASDebugPrint__ > 1
 	      sas_printf ("SearchNode keys[%d]=%lx\n",
-			  position, node->keys[position].data[0]);
+			  position, node->keys[position]->data[0]);
 #endif
 	      position--;
 	    };
@@ -734,7 +734,7 @@ SASIndexNodeSearchNode (SASIndexNode_t header, SASIndexKey_t * target)
 		{
 #if __SASDebugPrint__ > 1
 		  sas_printf ("SearchNode keys[%d]=%lx m=%d\n",
-			      position, node->keys[position].data[0], m);
+			      position, node->keys[position]->data[0], m);
 #endif
 		  if (SASIndexKeyCompare (target, node->keys[position]) < 0)
 		    {
@@ -950,11 +950,16 @@ SASIndexNodeSearchGE (SASIndexNode_t header,
     {
 #ifdef __SASDebugPrint__
       sas_printf
-	("SASIndexNodeSearchGT(%p, %lx, %p) does not match type/subtype\n",
+	("SASIndexNodeSearchGE(%p, %lx, %p) does not match type/subtype\n",
 	 header, target->data[0], ref);
 #endif
       return false;
     }
+#ifdef __SASDebugPrint__
+  sas_printf
+	("SASIndexNodeSearchGE(%p, %lx, %p)\n",
+	 header, target->data[0], ref);
+#endif
 
   pos = SASIndexNodeSearchNode (header, target);
   if (pos < 0)
@@ -974,8 +979,9 @@ SASIndexNodeSearchGE (SASIndexNode_t header,
     {
       ref->node = header;
       ref->pos = pos;
+      result = found;
 #ifdef __SASDebugPrint__
-      sas_printf ("SearchGE not found =%lx pos=%d\n", target->data[0],
+      sas_printf ("SearchGE found =%lx pos=%d\n", target->data[0],
 		  ref->pos);
 #endif
     }
@@ -983,19 +989,19 @@ SASIndexNodeSearchGE (SASIndexNode_t header,
     {
       if (node->branch[pos] != NULL)
 	{
-	  result = SASIndexNodeSearchGT (node->branch[pos], target, ref);
+	  result = SASIndexNodeSearchGE (node->branch[pos], target, ref);
 	  if (!result)
 	    {
 	      if (pos < node->count)
-		{
-		  ref->node = header;
-		  ref->pos = pos + 1;
-		  result = true;
+			{
+			  ref->node = header;
+			  ref->pos = pos + 1;
+			  result = true;
 #ifdef __SASDebugPrint__
-		  sas_printf ("SearchGE not found =%lx pos=%d\n",
-			      target->data[0], ref->pos);
+		  sas_printf ("SearchGE@%p not found =%lx pos=%d\n",
+				  node->branch[pos], target->data[0], ref->pos);
 #endif
-		}
+			}
 	    }
 	}
       else
@@ -1277,7 +1283,8 @@ SASIndexNodePushIn (SASIndexNode_t node_t, __IDXnodeKeyRef * ref, short k)
   size_t key_len, max_frag;
   short i;
 #ifdef __SASDebugPrint__
-  sas_printf ("PushIn@%p ref->key=%p k=%hd\n", node, ref->key, k);
+  sas_printf ("PushIn@%p ref->key@%p=%lx k=%hd\n",
+		  node, ref->key, ref->key->data[0], k);
 #endif
   str_ptr = (char *) node;
   end_ptr = str_ptr + node->blockHeader.blockSize;
@@ -1345,6 +1352,10 @@ SASIndexNodeSplit (SASIndexNode_t node_t,
 
   for (i = (short) (median + 1); i <= node->max_count; i++)
     {
+#if __SASDebugPrint__ > 1
+	  sas_printf ("Split@%p copy pos=%hd key%lx to=%hd\n",
+	    		  yr, i, thisKeys[i]->data[0], (i - median));
+#endif
 
       SASIndexNodeKeyMove (yr, (i - median), thisKeys[i]);
       yrVals[i - median] = thisVals[i];
@@ -1511,15 +1522,23 @@ SASIndexNodeInsert (SASIndexNode_t node_t,
       result = SASIndexNearAlloc (node_t);
       new_node = (SASIndexNodeHeader *) result;
       new_node->count = 1;
+#if __SASDebugPrint__ > 1
+	  sas_printf ("Insert:pushup@%p key@%p key=%lx val=%p to=1\n",
+			  new_node, xref.key, xref.val, xref.key->data[0]);
+#endif
       SASIndexNodeKeyMove (new_node, 1, xref.key);
       new_node->vals[1] = xref.val;
       new_node->branch[1] = (SASIndexNodeHeader *) xref.node;
       new_node->branch[0] = node;
+#if __SASDebugPrint__ > 1
+	  sas_printf ("Insert:top@%p left@%p right=%p val=%p\n",
+			  result, new_node->branch[0], new_node->branch[1], new_node->vals[1]);
+#endif
     }
   else
     {
       if (xref.dupKey)
-	result = NULL;		/* we have a dup key error */
+	  result = NULL;		/* we have a dup key error */
     }
 
   return result;

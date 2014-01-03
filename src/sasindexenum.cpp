@@ -9,6 +9,7 @@
  *     IBM Corporation, Steven Munroe - initial API and implementation
  */
 
+//#define __SASDebugPrint__ 2
 #include <stdlib.h>
 #include <string.h>
 #include "sasalloc.h"
@@ -87,6 +88,10 @@ SASIndexEnumNext (SASIndexEnum_t idxenum)
 
   SASLock (indexenum->tree, SasUserLock__WRITE);
   maxkey = SASIndexGetMaxKey (indexenum->tree);
+#if __SASDebugPrint__ > 1
+  sas_printf ("SASIndexEnumNext; enum->tree=%p maxkey=%p\n",
+		  indexenum->tree, maxkey);
+#endif
   if (maxkey != NULL)
     {
       indexenum->hasmore =
@@ -133,20 +138,41 @@ SASIndexEnumNext (SASIndexEnum_t idxenum)
 	    }
 	  if (!found)
 	    {
+#if __SASDebugPrint__ > 1
+		  sas_printf ("SASIndexEnumNext; !found enum->tree=%p curkey=%p=%ix\n",
+				  indexenum->tree, indexenum->curkey, indexenum->curkey->data[0]);
+#endif
 	      SASIndexNode_t curnode = SASIndexGetRootNode (indexenum->tree);
-	      found =
-		SASIndexNodeSearchGT (curnode, indexenum->curkey,
+	      if (indexenum->ref.node == NULL)
+	      {
+		      found = SASIndexNodeSearchGE (curnode, indexenum->curkey,
+					      &indexenum->ref);
+#if __SASDebugPrint__ > 1
+		      sas_printf ("SASIndexEnumNext; !found curnode=%p SearchGE=%d\n",
+				  curnode, found);
+#endif
+	      } else {
+	          found = SASIndexNodeSearchGT (curnode, indexenum->curkey,
 				      &indexenum->ref);
+#if __SASDebugPrint__ > 1
+	          sas_printf ("SASIndexEnumNext; !found curnode=%p SearchGT=%d\n",
+				  curnode, found);
+#endif
+	      }
 	      if (found)
 		{
 		  short curpos = indexenum->ref.pos;
 		  SASIndexNodeHeader *curSBnode =
-		    (SASIndexNodeHeader *) curnode;
+		    (SASIndexNodeHeader *) indexenum->ref.node;
 		  result = curSBnode->vals[curpos];
 		  indexenum->curkey = curSBnode->keys[curpos];
 		  indexenum->curmod = treemod;
 		  indexenum->hasmore =
 		    (SASIndexKeyCompare (indexenum->curkey, maxkey) < 0);
+#if __SASDebugPrint__ > 1
+		  sas_printf ("SASIndexEnumNext; curpos=%hd node=%p result=%p\n",
+				  curpos, curSBnode, result);
+#endif
 		}
 	      else
 		{
