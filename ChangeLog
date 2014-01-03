@@ -1,3 +1,28 @@
+2013-12-20  Steven Munroe  <sjmunroe@us.ibm.com>
+
+	* src/ssasindexkey.h: Define union sasindexkeymap_t.  
+	* src/ssasindexkey.h (SASIndexKeyInitUInt64): Replace cast/shift
+	with sasindexkeymap_t field references.
+	* src/ssasindexkey.h (SASIndexKeyReturn1stUInt64): New inline
+	function.
+	* src/ssasindexkey.h (SASIndexKeyInitInt64): Replace cast/shift
+	with sasindexkeymap_t field references.
+	* src/ssasindexkey.h (SASIndexKeyReturn1stInt64): New inline
+	function.
+	* src/ssasindexkey.h (SSASIndexKeyInitDouble): New inline
+	function.
+	* src/ssasindexkey.h (SASIndexKeyReturn1stDouble): New inline
+	function.
+
+	* src/tests/sasindex_t.c : Define sassim_dump_block conditional
+	on __SASDebugPrint__.
+	* src/tests/sasindex_t.c (sasindex_print_node_uint): New function.
+	* src/tests/sasindex_t.c (asindex_print_uint): New function.
+	* src/tests/sasindex_t.c (sassim_index_test2): New function.
+	* src/tests/sasindex_t.c (sassim_index_test1): Make
+	sassim_dump_block calls conditional on __SASDebugPrint__.
+	* src/tests/sasindex_t.c (main) : Add call to assim_index_test2.
+
 2013-11-22  Steven J. Munroe  <sjmunroe@us.ibm.com>
 
 	* src/sphgtod.c (_SPH_PLATFORM_HAS_INT128): Use __int128 only when

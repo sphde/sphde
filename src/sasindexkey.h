@@ -164,11 +164,31 @@ SASIndexKeyInitRef (SASIndexKey_t * dest, void *value)
   dest->data[0] = (machine_uint_t) value;
 }
 
+
+/** \brief Union of value types and key machine integer types.
+*/
+typedef union {
+#ifdef __WORDSIZE_64
+	machine_uint_t	key_element;
+#else
+    struct {
+#if __BYTE_ORDER == __BIG_ENDIAN
+		machine_uint_t	data_0;
+		machine_uint_t	data_1;
+#else
+		machine_uint_t	data_1;
+		machine_uint_t	data_0;
+#endif
+    } key_element;
+#endif
+    unsigned long long	uint64_key;
+    long long			int64_key;
+    double				double_key;
+	} sasindexkeymap_t;
+
 /*!
- * \brief Initial a binary key @ destination with a unsigned Integer value.
- *
- * \todo Need to fix this for 32-bit little endian machines by
- * reversing the word order.
+ * \brief Initial a binary key @ destination with a unsigned 64-bit
+ * integer value.
  *
  * @param dest Handle of the destination SASIndexKey_t.
  * @param value unsigned long long value which will be the key.
@@ -176,26 +196,48 @@ SASIndexKeyInitRef (SASIndexKey_t * dest, void *value)
 static inline void
 SASIndexKeyInitUInt64 (SASIndexKey_t * dest, unsigned long long value)
 {
+  sasindexkeymap_t	key_val;
+
+  key_val.uint64_key = value;
 #ifdef __WORDSIZE_64
   dest->compare_size = sizeof (unsigned long long);
   dest->copy_size = sizeof (void *) + sizeof (unsigned long long);
-  dest->data[0] = (machine_uint_t) value;
+  dest->data[0] = key_val.key_element;
 #else
   dest->compare_size = sizeof (unsigned long long);
   dest->copy_size = sizeof (void *) + sizeof (unsigned long long);
-  dest->data[0] = value >> 32;
-  dest->data[1] = (machine_uint_t) value;
+  dest->data[0] = key_val.key_element.data_0;
+  dest->data[1] = key_val.key_element.data_1;
 #endif
 }
 
 /*!
- * \brief Initial a binary key @ destination with a signed Integer value.
+ * \brief Return the value of the 1st binary key as a unsigned 64-bit
+ * integer value.
+ *
+ * @param dest Handle of the source SASIndexKey_t.
+ * @return value of the 1st key element as a unsigned 64-bit integer.
+ */
+static inline unsigned long long
+SASIndexKeyReturn1stUInt64 (SASIndexKey_t * dest)
+{
+  sasindexkeymap_t	key_val;
+
+#ifdef __WORDSIZE_64
+  key_val.key_element = dest->data[0];
+#else
+  key_val.key_element.data_0 = dest->data[0];
+  key_val.key_element.data_1 = dest->data[1];
+#endif
+  return key_val.uint64_key;
+}
+
+/*!
+ * \brief Initial a binary key @ destination with a signed 64-bit
+ * integer value.
  *
  * \note Need to flip the sign bit to get the correct ordering with a
  * mix of signed and unsigned key values.
- *
- * \todo Need to fix this for 32-bit little endian machines by
- * reversing the word order.
  *
  * @param dest Handle of the destination SASIndexKey_t.
  * @param value signed long long value which will be the key.
@@ -203,16 +245,89 @@ SASIndexKeyInitUInt64 (SASIndexKey_t * dest, unsigned long long value)
 static inline void
 SASIndexKeyInitInt64 (SASIndexKey_t * dest, signed long long value)
 {
+  sasindexkeymap_t	key_val;
+
+  key_val.int64_key = value;
 #ifdef __WORDSIZE_64
   dest->compare_size = sizeof (unsigned long long);
   dest->copy_size = sizeof (void *) + sizeof (unsigned long long);
-  dest->data[0] = (machine_uint_t) (value ^ machine_sign_mask);
+  dest->data[0] = key_val.key_element ^ machine_sign_mask;
 #else
   dest->compare_size = sizeof (unsigned long long);
   dest->copy_size = sizeof (void *) + sizeof (unsigned long long);
-  dest->data[0] = (machine_uint_t) ((value >> 32) ^ machine_sign_mask);
-  dest->data[1] = (machine_uint_t) value;
+  dest->data[0] = key_val.key_element.data_0 ^ machine_sign_mask;
+  dest->data[1] = key_val.key_element.data_1;
 #endif
+}
+
+/*!
+ * \brief Return the value of the 1st binary key as a signed 64-bit
+ * integer value.
+ *
+ * @param dest Handle of the source SASIndexKey_t.
+ * @return value of the 1st key element as a unsigned 64-bit integer.
+ */
+static inline long long
+SASIndexKeyReturn1stInt64 (SASIndexKey_t * dest)
+{
+  sasindexkeymap_t	key_val;
+
+#ifdef __WORDSIZE_64
+  key_val.key_element = dest->data[0] ^ machine_sign_mask;
+#else
+  key_val.key_element.data_0 = dest->data[0] ^ machine_sign_mask;
+  key_val.key_element.data_1 = dest->data[1];
+#endif
+  return key_val.int64_key;
+}
+
+/*!
+ * \brief Initial a binary key @ destination with a signed 64-bit
+ * integer value.
+ *
+ * \note Need to flip the sign bit to get the correct ordering with a
+ * mix of signed and unsigned key values.
+ *
+ * @param dest Handle of the destination SASIndexKey_t.
+ * @param value signed long long value which will be the key.
+ */
+static inline void
+SASIndexKeyInitDouble (SASIndexKey_t * dest, double value)
+{
+  sasindexkeymap_t	key_val;
+
+  key_val.double_key = value;
+#ifdef __WORDSIZE_64
+  dest->compare_size = sizeof (unsigned long long);
+  dest->copy_size = sizeof (void *) + sizeof (unsigned long long);
+  dest->data[0] = key_val.key_element ^ machine_sign_mask;
+#else
+  dest->compare_size = sizeof (unsigned long long);
+  dest->copy_size = sizeof (void *) + sizeof (unsigned long long);
+  dest->data[0] = key_val.key_element.data_0 ^ machine_sign_mask;
+  dest->data[1] = key_val.key_element.data_1;
+#endif
+}
+
+/*!
+ * \brief Return the value of the 1st binary key as a signed 64-bit
+ * integer value.
+ *
+ * @param dest Handle of the source SASIndexKey_t.
+ * @return value of the 1st key element as a unsigned 64-bit integer.
+ */
+static inline double
+SASIndexKeyReturn1stDouble (SASIndexKey_t * dest)
+{
+  sasindexkeymap_t	key_val;
+
+#ifdef __WORDSIZE_64
+  key_val.key_element = dest->data[0] ^ machine_sign_mask;
+#else
+  key_val.key_element.data_0 = dest->data[0] ^ machine_sign_mask;
+  key_val.key_element.data_1 = dest->data[1];
+#endif
+  return key_val.double_key;
 }
 
 #endif /* __SAS_INDEXKEY_H */
