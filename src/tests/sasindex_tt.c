@@ -87,6 +87,7 @@ sassim_dump_block (const char *func, int line, void *blockAddr,
 #define SASSIM_DUMP_BLOCK(fmt, ...) sassim_dump_block(__FUNCTION__, __LINE__, fmt, ##__VA_ARGS__)
 #endif
 
+#ifdef __SASDebugPrint__
 static void
 sasindex_print_node (SASIndexNode_t node)
 {
@@ -160,6 +161,7 @@ sasindex_print_uint (SASIndex_t index)
     }
   printf ("\n");
 }
+#endif
 
 #define JOIN_EXIT_FAILURE 128
 //#define __SASDebugPrint__ 1
@@ -175,8 +177,6 @@ sassim_index_random ()
   SASIndexKey_t *temp1;
   SASIndexKey_t *temp2;
   SASIndexKey_t ndxkey;
-  SASIndexKey_t ndxkey2;
-  SASIndexKey_t ndxkey3;
   int i;
   long modcnt;
   int rc1;
@@ -184,7 +184,6 @@ sassim_index_random ()
   unsigned long long *keyref;
   unsigned long long keylist[LARGE_KEY_COUNT];
   void *keyval, *keyval2;
-  unsigned short int seed[3] = {293, 907, 1907};
   unsigned int prime_rng;
 
   sphtimer_t	tempt, startt, endt, freqt;
@@ -595,8 +594,6 @@ sassim_index_sequential ()
   SASIndexKey_t *temp1;
   SASIndexKey_t *temp2;
   SASIndexKey_t ndxkey;
-  SASIndexKey_t ndxkey2;
-  SASIndexKey_t ndxkey3;
   int i;
   long modcnt;
   int rc1;

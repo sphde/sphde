@@ -50,18 +50,14 @@ SASSimpleSpaceInitInternal (void* heap_seg,  sas_type_t sasType,
                             block_size_t space_size)
 {
     SASSimpleSpaceHeader	*heapBlock = (SASSimpleSpaceHeader*)heap_seg;
-    char		*heapStart = NULL;
     char		*spaceStart = NULL;
     char		*spaceEnd = NULL;
     char		*allocEnd = NULL;
     node_size_t		remaining;
     
     if ( heapBlock )
-    {
-		heapStart = (char*) heapBlock + HEAP_OFFSET;
-		initSOMSASBlock((SASBlockHeader*)heapBlock, sasType, 
+	initSOMSASBlock((SASBlockHeader*)heapBlock, sasType, 
 		                block_size, NULL);
-    }
     
     spaceStart = (char*) heapBlock + DEFAULT_PAGE;
     spaceEnd   = (char*) heapBlock + DEFAULT_PAGE + space_size;

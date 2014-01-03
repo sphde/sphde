@@ -172,15 +172,13 @@ sassim_index_test_split ()
   SASIndexKey_t *temp1;
   SASIndexKey_t *temp2;
   SASIndexKey_t ndxkey;
-  SASIndexKey_t ndxkey2;
-  SASIndexKey_t ndxkey3;
   int i;
   long modcnt;
   int rc1;
   unsigned long long rawkey, rawkey2;
   unsigned long long *keyref;
   unsigned long long keylist[128];
-  void *keyval, *keyval2;
+  void *keyval;
 
   index = SASIndexCreate (blockSize);
   if (!index)

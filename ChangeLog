@@ -1,3 +1,10 @@
+2012-06-19  Adhemerval Zanella  <azanella@linux.vnet.ibm.com>
+
+	* src/sassimplespace.cpp (SASSimpleSpaceInitInternal): Cleanup ununsed
+	variables.
+	* src/tests/sasindex_t.c (sassim_index_test_split): Likewise.
+	* src/tests/sasindex_tt.c (sassim_index_random): Likewise.
+
 2014-01-02  Steven Munroe  <sjmunroe@us.ibm.com>
 
 	* src/Makefile.am: Add sasindex_tt.  
