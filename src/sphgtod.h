@@ -44,8 +44,8 @@
  *
  * The timezone is not currently honored in the conversion.
  *
- * @param address of the struct timeval buffer.
- * @param address of the stuct timezone or NULL.
+ * @param tv address of the struct timeval buffer.
+ * @param tz address of the stuct timezone or NULL.
  * @return The timebase converted to gettimeofday in struct timeval.
  */
 
@@ -80,9 +80,9 @@ sphget_gtod_conv_factor (void);
  * the log to get the corrected gettimeofday value for formated time
  * values.
  *
- * @param address of the struct timeval buffer.
+ * @param tv address of the struct timeval buffer.
  * @param timestamp value via sphgettimer().
- * @param timebase to gettimeofday conversion factor.
+ * @param tb2gtod_factor timebase to gettimeofday conversion factor.
  * @return The timebase converted to gettimeofday in struct timeval.
  */
 

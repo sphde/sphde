@@ -57,16 +57,16 @@
 *  supports zero-copy sharing and operate-in-place persistence.
 *
 *  \section sasSection SAS Overview
-*  The SAS layer manages a "region" of process address space to provide:
+*  The SAS layer manages a region of process address space to provide:
 *   \li Sharing and transparent storage persistence of data within that
 *   region by providing and managing backing file space and memory mapping
 *   the backing files for the process.
 *   \li Sharing of data within that region between cooperating processes.
 *   \li Locking primitives to provide synchronization of use/update
 *   between cooperating processes and threads.
-*   \li APIs for allocating/deallocating "blocks" of shared/persistent
+*   \li APIs for allocating/deallocating blocks of shared/persistent
 *   data.
-*   \li Further tools for managing "blocks" as data structures (heaps,
+*   \li Further tools for managing blocks as data structures (heaps,
 *   stacks, indexes, etc.).
 *
 *  Some additional SAS definitions:
@@ -77,8 +77,8 @@
 *  within the region.
 *
 *  Backing storage (files) are allocated in power-of-2 sizes called
-*  "segments". "Segments must be smaller in size than the "region" and
-*  usually larger than "blocks".  Segments don't necessarily have anything
+*  segments. Segments must be smaller in size than the region and
+*  usually larger than blocks.  Segments don't necessarily have anything
 *  to do with any notion of hardware segmentation, but it may be useful if
 *  the size/alignment of SAS segments match the underlying hardware.
 *
