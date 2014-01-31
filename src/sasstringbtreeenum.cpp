@@ -152,6 +152,10 @@ SASStringBTreeEnumNext (SASStringBTreeEnum_t sbtenum)
 
   SASLock (stringenum->tree, SasUserLock__WRITE);
   maxkey = SASStringBTreeGetMaxKey (stringenum->tree);
+#if __SASDebugPrint__ > 1
+  sas_printf ("SASStringBTreeEnumNext; enum->tree=%p maxkey=%s\n",
+                  stringenum->tree, maxkey);
+#endif
   if (maxkey != NULL)
     {
       stringenum->hasmore = (strcmp (stringenum->curkey, maxkey) < 0);
@@ -205,16 +209,35 @@ SASStringBTreeEnumNext (SASStringBTreeEnum_t sbtenum)
 	    }
 	  if (!found)
 	    {
+#if __SASDebugPrint__ > 1
+    sas_printf ("SASStringBTreeEnumNext; !found enum->tree=%s\n",
+            stringenum->tree, stringenum->curkey);
+#endif
 	      SASStringBTreeNode_t curnode =
 		SASStringBTreeGetRootNode (stringenum->tree);
-	      found =
-		SASStringBTreeNodeSearchGT (curnode, stringenum->curkey,
+              if (stringenum->ref.node == NULL)
+              {
+	          found =
+		  SASStringBTreeNodeSearchGE (curnode, stringenum->curkey,
 					    &stringenum->ref);
+#if __SASDebugPrint__ > 1
+    sas_printf ("SASStringBTreeEnumNext; !found curnode=%p SearchGE=%d\n",
+                                  curnode, found);
+#endif
+              } else {
+	          found =
+		  SASStringBTreeNodeSearchGT (curnode, stringenum->curkey,
+					    &stringenum->ref);
+#if __SASDebugPrint__ > 1
+    sas_printf ("SASStringBTreeEnumNext; !found curnode=%p SearchGT=%d\n",
+                                  curnode, found);
+#endif
+              }
 	      if (found)
 		{
 		  short curpos = stringenum->ref.pos;
 		  SASStringBTreeNodeHeader *curSBnode =
-		    (SASStringBTreeNodeHeader *) curnode;
+		    (SASStringBTreeNodeHeader *) stringenum->ref.node;
 		  result = curSBnode->vals[curpos];
 		  stringenum->curkey = curSBnode->keys[curpos];
 		  stringenum->curmod = treemod;
@@ -222,6 +245,10 @@ SASStringBTreeEnumNext (SASStringBTreeEnum_t sbtenum)
 		    SASStringBTreeGetCurCount (stringenum->tree);
 		  stringenum->hasmore =
 		    (strcmp (stringenum->curkey, maxkey) < 0);
+#if __SASDebugPrint__ > 1
+     sas_printf ("SASStringBTreeEnumNext; curpos=%hd node=%p result=%p\n",
+                                  curpos, curSBnode, result);
+#endif
 		}
 	      else
 		{

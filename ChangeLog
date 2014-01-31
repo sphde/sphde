@@ -1,3 +1,31 @@
+2014-01-31  Rajalakshmi Srinivasaraghavan <raji@linux.vnet.ibm.com>
+
+	* src/sasindex.cpp (SASIndexRemove): Update Min and Max
+	keys on deleting left and right most nodes.
+	* src/sasindexnode.cpp (SASIndexNodePrint): Fix up debug
+	prints.
+	(SASIndexNodeRemove): Fix up debug prints.
+	* src/sasstringbtree.cpp (SASStringBTreeAlloc) : Correct
+	last_lock count for first first "expand" segment.
+	(SASStringBTreeRemove): Update Min and Max keys on deleting left and
+	right most nodes.
+	* src/sasstringbtreeenum.cpp (SASStringBTreeEnumNext): For
+	first time case,use SASStringBTreeNodeSearchGE() instead of
+	SASStringBTreeNodeSearchGT().This is required to support
+	NULL and 0 (zero) keys. Add debug prints.
+	* src/sasstringbtreenode.cpp (SASStringBTreeNodeSearchGE) :
+	Make result true, if found is true. Fix up debug prints.
+	* src/tests/sasindex_t.c: New functions:
+	sasindex_print_node_int,sasindex_print_node_double,
+	sasindex_print_int, sasindex_print_double, sassim_index_test3
+	and sassim_index_test3
+	(main): Call sassim_index_test3 and sassim_index_test4
+	* src/tests/sasstringbtree_t.c (sasbtree_print_node): Fix
+	printing all branches and Improve readability of SASStringBTree
+	diag print.
+	(sassim_btree_test_split): New function.
+	(main) : call sassim_btree_test_split.
+
 2012-06-19  Adhemerval Zanella  <azanella@linux.vnet.ibm.com>
 
 	* src/sassimplespace.cpp (SASSimpleSpaceInitInternal): Cleanup ununsed

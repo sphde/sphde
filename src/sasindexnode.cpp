@@ -42,7 +42,8 @@ SASIndexNodePrint (SASIndexNode_t header)
     {
       if (i > 1)
 	sas_printf (" ");
-      sas_printf ("%lx", node->keys[i]->data[0]);
+      if (node->keys[i])
+        sas_printf ("%lx", node->keys[i]->data[0]);
       if (node->branch[i] != NULL)
 	SASIndexNodePrint (node->branch[i]);
     }
@@ -1558,8 +1559,9 @@ SASIndexNodeRemove (SASIndexNode_t node_t, short pos)
 
   q = ((SASIndexNodeHeader *) node->branch[pos]);
 #ifdef __SASDebugPrint__
-  sas_printf ("Remove@%p key[%hd]=%lx branch=%p\n",
-	      node_t, pos, node->keys[pos]->data[0], q);
+  sas_printf ("Remove@%p pos=%hd branch=%p\n", node_t, pos, q);
+  if (node->keys[pos])
+    sas_printf ("key[%hd]=%lx\n", pos, node->keys[pos]->data[0]);
 #endif
   SASIndexNodeKeyDelete (node_t, pos);
 

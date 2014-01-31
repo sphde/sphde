@@ -34,6 +34,10 @@ typedef unsigned long machine_uint_t;
 typedef unsigned int machine_uhalf_t;
 /*! \brief mask use to invert the signbit. */
 const unsigned long machine_sign_mask = (0x8000000000000000);
+/*! \brief mask use to invert the exponent. */
+const unsigned long double_exp_mask = (0x7ff0000000000000);
+/*! \brief mask use to invert the sign and exponent. */
+const unsigned long double_mask = (0xffffffffffffffff);
 #else
 /*! \brief word size data unit used for binary keys. */
 typedef unsigned long machine_uint_t;
@@ -41,6 +45,10 @@ typedef unsigned long machine_uint_t;
 typedef unsigned short machine_uhalf_t;
 /*! \brief mask use to invert the signbit. */
 const unsigned long machine_sign_mask = (0x80000000);
+/*! \brief mask use to invert the exponent. */
+const unsigned long double_exp_mask = (0x7ff00000);
+/*! \brief mask use to invert the sign and exponent. */
+const unsigned long double_mask = (0xffffffff);
 #endif
 
 /*!
@@ -300,11 +308,18 @@ SASIndexKeyInitDouble (SASIndexKey_t * dest, double value)
 #ifdef __WORDSIZE_64
   dest->compare_size = sizeof (unsigned long long);
   dest->copy_size = sizeof (void *) + sizeof (unsigned long long);
-  dest->data[0] = key_val.key_element ^ machine_sign_mask;
+  if (value < 0.0)
+	  dest->data[0] = key_val.key_element ^ double_mask;
+  else
+	  dest->data[0] = key_val.key_element ^ machine_sign_mask;
 #else
   dest->compare_size = sizeof (unsigned long long);
   dest->copy_size = sizeof (void *) + sizeof (unsigned long long);
-  dest->data[0] = key_val.key_element.data_0 ^ machine_sign_mask;
+  if (value < 0.0)
+	  dest->data[0] = key_val.key_element.data_0 ^ double_mask;
+  else
+	  dest->data[0] = key_val.key_element.data_0 ^ machine_sign_mask;
+
   dest->data[1] = key_val.key_element.data_1;
 #endif
 }
@@ -322,10 +337,21 @@ SASIndexKeyReturn1stDouble (SASIndexKey_t * dest)
   sasindexkeymap_t	key_val;
 
 #ifdef __WORDSIZE_64
-  key_val.key_element = dest->data[0] ^ machine_sign_mask;
+  if (dest->data[0] & machine_sign_mask)
+	  key_val.key_element = dest->data[0] ^ machine_sign_mask;
+  else
+	  key_val.key_element = dest->data[0] ^ double_mask;
 #else
-  key_val.key_element.data_0 = dest->data[0] ^ machine_sign_mask;
-  key_val.key_element.data_1 = dest->data[1];
+  if (dest->data[0] & machine_sign_mask)
+  {
+	  key_val.key_element.data_0 = dest->data[0] ^ machine_sign_mask;
+	  key_val.key_element.data_1 = dest->data[1];
+  }
+  else
+  {
+	  key_val.key_element.data_0 = dest->data[0] ^ double_mask;
+	  key_val.key_element.data_1 = dest->data[1];
+  }
 #endif
   return key_val.double_key;
 }

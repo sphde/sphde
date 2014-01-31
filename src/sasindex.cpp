@@ -1326,6 +1326,7 @@ SASIndexRemove (SASIndex_t  heap, SASIndexKey_t *key)
 	SASIndexNode_t newRoot;
 	__IDXnodePosRef ref = {NULL, 0};
     void	*result = NULL;
+    SASIndexNodeHeader *node;
     
     if (SOMSASCheckBlockSigAndType ((SASBlockHeader*)heap, 
                                     SAS_RUNTIME_INDEX))
@@ -1352,6 +1353,27 @@ SASIndexRemove (SASIndex_t  heap, SASIndexKey_t *key)
 		    if ( btree->root != NULL )
 		    {
 				btree->common->count--;
+				if (btree->common->count > 0)
+				{
+				    if(SASIndexKeyCompare(key, btree->common->min_key) == 0)
+				    {
+				        node = (SASIndexNodeHeader *) btree->root;
+				        if (node->branch[0] != NULL)
+				        {
+				            node = node->branch[0];
+				        }
+				        SASIndexUpdateMin(heap, node->keys[1]);
+				    }
+				    if(SASIndexKeyCompare(key, btree->common->max_key) == 0)
+				    {
+				        node = (SASIndexNodeHeader *) btree->root;
+				        if(node->branch[node->count] != NULL)
+				        {
+				            node = node->branch[node->count];
+				        }
+				        SASIndexUpdateMax(heap ,node->keys[(node->count)]);
+				    }
+				}
 		    } else {
 				btree->common->count = 0;
 				SASIndexUpdateMax(heap, NULL);

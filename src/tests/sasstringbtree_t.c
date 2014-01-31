@@ -88,19 +88,22 @@ sasbtree_print_node(SASStringBTreeNode_t node)
 {
   int i, n;
   n = SASStringBTreeNodeGetCount(node);
+  printf (" node@%p {", node);
   for (i = 0; i <= n; ++i)
     {
       SASStringBTreeNode_t br;
       const char *key = SASStringBTreeNodeGetKeyIndexed(node, i);
-      if (!key)
-        continue;
-      printf("(%s : %s)", SASStringBTreeNodeGetKeyIndexed(node, i),
-	(char*)SASStringBTreeNodeGetValIndexed(node, i));
+      if (key)
+        {
+          printf("(%s : %s)", SASStringBTreeNodeGetKeyIndexed(node, i),
+	  (char*)SASStringBTreeNodeGetValIndexed(node, i));
+        }
       if ((br = SASStringBTreeNodeGetBranchIndexed(node, i)))
 	sasbtree_print_node(br);
       if (i != n)
 	printf(", ");
     }
+  printf ("}");
 }
 
 static inline void
@@ -118,6 +121,225 @@ sasbtree_print(SASStringBTree_t btree)
 
 #define JOIN_EXIT_FAILURE 128
 //#define __SASDebugPrint__ 1
+static int
+sassim_btree_test_split ()
+{
+  SASStringBTree_t stringBTree;
+  unsigned long blockSize = block__Size64K;
+  SASStringBTreeEnum_t senum;
+  char *rawkey, *keyval, *strptr;
+  char *temp1, *temp2;
+  int i, rc1;
+  long modcnt;
+  char chr, str[128], keylist[128];
+  char str2[4] = " ";
+
+  stringBTree = SASStringBTreeCreate (blockSize);
+  if (!stringBTree)
+    {
+      SASSIM_PRINT_ERR ("SASStringBTreeCreate(%zu)", blockSize);
+      return 1;
+    }
+  SASSIM_PRINT_MSG ("SASStringBTreeCreate (%lu) success", blockSize);
+  SASSIM_PRINT_MSG ("SASStringBTreeFreeSpace() = %zu", SASStringBTreeFreeSpace (stringBTree));
+#ifdef __SASDebugPrint__
+  SASSIM_DUMP_BLOCK (stringBTree, 128);
+#endif
+  SASSIM_PRINT_MSG ("SASStringBTreeIsEmpty(stringBTree) = %d", SASStringBTreeIsEmpty (stringBTree));
+
+  memset (str, '\0', 128);
+  strptr = &str[0];
+  i = 0;
+  for (chr = '1'; chr <= 0x7d; chr++)
+    {
+      keylist[i] = chr;
+      *strptr = chr;
+      rc1 = SASStringBTreePut (stringBTree, strptr, strptr);
+      if (!rc1) {
+        SASSIM_PRINT_ERR ("SASStringBTreePut (%p, %s, %s)", stringBTree, strptr, strptr);
+        return 1;
+      }
+#ifdef __SASDebugPrint__
+      SASSIM_PRINT_MSG ("sasbtree_print=");
+      sasbtree_print (stringBTree);
+#endif
+     strptr++;
+     i++;
+    }
+  SASSIM_PRINT_MSG ("sasbtree_print=");
+  sasbtree_print (stringBTree);
+
+  temp1 = SASStringBTreeGetMinKey (stringBTree);
+  if (!temp1)
+    {
+      SASSIM_PRINT_ERR ("SASStringBTreeGetMinKey (%p)", stringBTree);
+      return 1;
+    }
+  SASSIM_PRINT_MSG ("SASStringBTreeGetMinKey=(%s)", temp1);
+  temp2 = SASStringBTreeGetMaxKey (stringBTree);
+  if (!temp2)
+    {
+      SASSIM_PRINT_ERR ("SASStringBTreeGetMaxKey (%p)", stringBTree);
+      return 1;
+    }
+  SASSIM_PRINT_MSG ("SASStringBTreeGetMaxKey=(%s)", temp2);
+  modcnt = SASStringBTreeGetModCount (stringBTree);
+  if (!modcnt)
+    {
+      SASSIM_PRINT_ERR ("SASStringBTreeGetModCount (%p)", stringBTree);
+      return 1;
+    }
+  SASSIM_PRINT_MSG ("SASStringBTreeGetModCount=%ld", modcnt);
+
+  senum = SASStringBTreeEnumCreate (stringBTree);
+  if (!senum)
+    {
+      SASSIM_PRINT_ERR ("SASStringBTreeEnumCreate (%p)", stringBTree);
+      return 1;
+    }
+  SASSIM_PRINT_MSG ("SASStringBTreeEnumCreate(%p)", stringBTree);
+
+  i = 0;
+  while (SASStringBTreeEnumHasMore (senum))
+    {
+      char *temp = (char *) SASStringBTreeEnumNext (senum);
+      if (!temp)
+        {
+          break;
+        }
+        if (keylist[i] != *temp)
+        {
+            SASSIM_PRINT_ERR ("SASStringBTreeEnumNext: misscompare %c != %c",
+                        keylist[i] != *temp);
+            return 1;
+        }
+      SASSIM_PRINT_MSG ("<%p> %c", temp, *temp);
+      i++;
+    }
+  SASStringBTreeEnumDestroy (senum);
+
+  SASSIM_PRINT_MSG ("SASStringBTreeFreeSpace() = %zu", SASStringBTreeFreeSpace (stringBTree));
+#ifdef __SASDebugPrint__
+  SASSIM_DUMP_BLOCK (stringBTree, 128);
+#endif
+  for (chr = 0x31; chr <= 0x60; chr++)
+    {
+      str2[0] = chr;
+      keyval = (char *) SASStringBTreeRemove (stringBTree, str2);
+      if (!keyval) {
+        SASSIM_PRINT_ERR ("SASStringBTreeRemove (%p, %s) = %c", stringBTree, str2, *keyval);
+        return 1;
+      } else {
+        SASSIM_PRINT_MSG ("SASStringBTreeRemove (%p, %s) = %c", stringBTree, str2, *keyval);
+      }
+
+#ifdef __SASDebugPrint__
+      SASSIM_PRINT_MSG ("sasbtree_print=");
+      sasbtree_print (stringBTree);
+#endif
+    }
+  SASSIM_PRINT_MSG ("sasbtree_print=");
+  sasbtree_print (stringBTree);
+
+  temp1 = SASStringBTreeGetMinKey (stringBTree);
+  if (!temp1)
+    {
+      SASSIM_PRINT_ERR ("SASStringBTreeGetMinKey (%p)", stringBTree);
+      return 1;
+    }
+  SASSIM_PRINT_MSG ("SASStringBTreeGetMinKey=%s", temp1);
+  temp2 = SASStringBTreeGetMaxKey (stringBTree);
+  if (!temp2)
+    {
+      SASSIM_PRINT_ERR ("SASStringBTreeGetMaxKey(%p)", stringBTree);
+      return 1;
+    }
+  SASSIM_PRINT_MSG ("SASStringBTreeGetMaxKey=%s", temp2);
+  modcnt = SASStringBTreeGetModCount (stringBTree);
+  if (modcnt == 0)
+    {
+      SASSIM_PRINT_ERR ("SASStringBTreeGetModCount (%p)", stringBTree);
+      return 1;
+    }
+  SASSIM_PRINT_MSG ("SASStringBTreeGetModCount=%ld", modcnt);
+
+  senum = SASStringBTreeEnumCreate (stringBTree);
+  if (!senum)
+    {
+      SASSIM_PRINT_ERR ("SASStringBTreeEnumCreate (%p)", stringBTree);
+      return 1;
+    }
+  SASSIM_PRINT_MSG ("SASStringBTreeEnumCreate(%p)", stringBTree);
+
+  keyval = (char *) SASStringBTreeEnumNext (senum);
+  if (!keyval)
+    {
+      SASSIM_PRINT_ERR ("SASStringBTreeEnumNext (%p)", senum);
+      return 1;
+    }
+  SASSIM_PRINT_MSG ("<%p> %c", keyval, *keyval);
+  if (*keyval != 'a')
+  {
+    SASSIM_PRINT_ERR ("SASStringBTreeEnumNext(%p)=%c expected 'a'",
+                senum, *keyval);
+    return 1;
+  }
+  rawkey = keyval;
+  while (SASStringBTreeEnumHasMore (senum))
+    {
+      keyval = (char *) SASStringBTreeEnumNext (senum);
+      if (!keyval)
+        {
+          SASSIM_PRINT_ERR ("SASStringBTreeEnumNext (%p)", senum);
+          return 1;
+        }
+      SASSIM_PRINT_MSG ("<%p> %c", keyval, *keyval);
+      if (rawkey < keyval)
+          rawkey = keyval;
+      else
+      {
+          SASSIM_PRINT_ERR ("SASStringBTreeEnumNext(%p) ordering %c=%c",
+                          senum, rawkey, *keyval);
+          return 1;
+      }
+    }
+  SASStringBTreeEnumDestroy (senum);
+  for (chr = 0x61; chr <= 0x7d; chr++)
+    {
+      str2[0] = chr;
+      keyval = (char *) SASStringBTreeRemove (stringBTree, str2);
+      if (!keyval) {
+        SASSIM_PRINT_ERR ("SASStringBTreeRemove (%p, %s) = %c", stringBTree, str2, *keyval);
+        return 1;
+      } else {
+        SASSIM_PRINT_MSG ("SASStringBTreeRemove (%p, %s) = %c", stringBTree, str2, *keyval);
+      }
+#ifdef __SASDebugPrint__
+      SASSIM_PRINT_MSG ("sasbtree_print=");
+      sasbtree_print (stringBTree);
+#endif
+    }
+
+  SASSIM_PRINT_MSG ("sasbtree_print=");
+  sasbtree_print (stringBTree);
+
+  rc1 = SASStringBTreeIsEmpty (stringBTree);
+  if (!rc1)
+    {
+      SASSIM_PRINT_ERR ("SASStringBTreeIsEmpty(stringBTree) = %d", rc1);
+      return 1;
+    }
+  SASSIM_PRINT_MSG ("SASStringBTreeIsEmpty(stringBTree) = %d", rc1);
+
+  SASSIM_PRINT_MSG ("SASStringBTreeFreeSpace() = %zu", SASStringBTreeFreeSpace (stringBTree));
+
+#ifdef __SASDebugPrint__
+  SASSIM_DUMP_BLOCK (stringBTree, 128);
+#endif
+  SASStringBTreeDestroy (stringBTree);
+
+  return 0;
+}
 
 static int
 sassim_btree_test1 ()
@@ -542,6 +764,7 @@ main ()
   printf ("__SAS_TEMP_FREE   =%lx\n", __SAS_TEMP_FREE);
 
   failures += sassim_btree_test1 ();
+  failures += sassim_btree_test_split();
 
   //SASCleanUp();
   printf("SAS removed\n");

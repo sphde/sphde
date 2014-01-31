@@ -420,7 +420,6 @@ SASStringBTreeAlloc (SASStringBTree_t heap)
 
 	  if (SASStringBTreePercentUsed (lastHeader) >= DEFAULT_LOAD_FACTOR)
 	    {
-	      last_lock = list->count - 2;
 	      for (i = 0; i < list->count - 1; i++)
 		{
 		  SASStringBTreeHeader *expandBlock = list->heap[i];
@@ -438,6 +437,7 @@ SASStringBTreeAlloc (SASStringBTree_t heap)
 		{
 		  expandHeader = (SASStringBTreeHeader *)
 		    SASStringBTreeExpandCreate (heap);
+	          last_lock = list->count - 2;
 		}
 	    }
 	  else
@@ -1462,6 +1462,7 @@ SASStringBTreeRemove (SASStringBTree_t heap, char *key)
   SASStringBTreeNode_t newRoot;
   SBTnodePosRef ref = { NULL, 0 };
   void *result = NULL;
+  SASStringBTreeNodeHeader *node;
 
   if (SOMSASCheckBlockSigAndType ((SASBlockHeader *) heap,
 				  SAS_RUNTIME_STRINGBTREE))
@@ -1488,6 +1489,23 @@ SASStringBTreeRemove (SASStringBTree_t heap, char *key)
 	  if (btree->root != NULL)
 	    {
 	      btree->common->count--;
+              if (btree->common->count > 0)
+                {
+                  if(strcmp(key, btree->common->min_key) == 0)
+                    {
+                       node = (SASStringBTreeNodeHeader *) btree->root;
+                       if (node->branch[0] != NULL)
+                          node = node->branch[0];
+                       SASStringBTreeUpdateMin(heap, node->keys[1]);
+                    }
+                  if(strcmp(key, btree->common->max_key) == 0)
+                    {
+                       node = (SASStringBTreeNodeHeader *) btree->root;
+                       if (node->branch[node->count] != NULL)
+                          node = node->branch[node->count];
+                       SASStringBTreeUpdateMax(heap, node->keys[(node->count)]);
+                    }
+                }
 	    }
 	  else
 	    {

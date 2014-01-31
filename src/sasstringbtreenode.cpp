@@ -968,7 +968,7 @@ SASStringBTreeNodeSearchGE (SASStringBTreeNode_t header,
     {
 #ifdef __SASDebugPrint__
       sas_printf
-	("SASStringBTreeNodeSearchGT(%p, %s, %p) does not match type/subtype\n",
+	("SASStringBTreeNodeSearchGE(%p, %s, %p) does not match type/subtype\n",
 	 header, target, ref);
 #endif
       return false;
@@ -992,8 +992,9 @@ SASStringBTreeNodeSearchGE (SASStringBTreeNode_t header,
     {
       ref->node = header;
       ref->pos = pos;
+      result = found;
 #ifdef __SASDebugPrint__
-      sas_printf ("SearchGE not found =%s pos=%d\n", target, ref->pos);
+      sas_printf ("SearchGE found =%s pos=%d\n", target, ref->pos);
 #endif
     }
   else
@@ -1001,7 +1002,7 @@ SASStringBTreeNodeSearchGE (SASStringBTreeNode_t header,
       if (node->branch[pos] != NULL)
 	{
 	  result =
-	    SASStringBTreeNodeSearchGT (node->branch[pos], target, ref);
+	    SASStringBTreeNodeSearchGE (node->branch[pos], target, ref);
 	  if (!result)
 	    {
 	      if (pos < node->count)
