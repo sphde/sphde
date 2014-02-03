@@ -75,7 +75,7 @@ main (int argc, char *argv[])
 
   if (llabs(gtod_ns - sphgtod_ns) > ALLOWABLE_DRIFT)
     {
-      printf ("The difference between gettimeofday and sphgtod (%"PRIu64"ns)\n",
+      printf ("The difference between gettimeofday and sphgtod (%llins)\n",
 	llabs(gtod_ns - sphgtod_ns));
       printf ("exceeded the allowable drift of %"PRIu64" ns\n",
 	ALLOWABLE_DRIFT);
@@ -95,7 +95,7 @@ main (int argc, char *argv[])
 
  if (llabs(gtod_ns - sphgtod_ns) > ALLOWABLE_DRIFT)
    {
-     printf ("The difference between gettimeofday and sphtb2gtod_withfactor (%"PRIu64"ns)\n",
+     printf ("The difference between gettimeofday and sphtb2gtod_withfactor (%llins)\n",
 	      llabs(gtod_ns - sphgtod_ns));
      printf ("exceeded the allowable drift of %"PRIu64" ns\n",
 	      ALLOWABLE_DRIFT);

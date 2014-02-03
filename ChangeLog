@@ -1,3 +1,10 @@
+2012-02-03  Adhemerval Zanella  <azanella@linux.vnet.ibm.com>
+
+	* src/Makefile.am (sphgtod_t_LDADD): Change link order of libsphde.la
+	since libsphgtod.a depends of it.
+	* src/Makefile.in: Regenerated.
+	* src/tests/sphgtod_t.c (main): Fix compiler warnings.
+
 2014-01-31  Rajalakshmi Srinivasaraghavan <raji@linux.vnet.ibm.com>
 
 	* src/sasindex.cpp (SASIndexRemove): Update Min and Max

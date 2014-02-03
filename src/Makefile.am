@@ -133,7 +133,7 @@ sasutil_LDADD        = libsphde.la
 TESTS = 
 TESTS            += sphgtod_t
 sphgtod_t_SOURCES = tests/sphgtod_t.c
-sphgtod_t_LDADD   = libsphde.la .libs/libsphgtod.a
+sphgtod_t_LDADD   = .libs/libsphgtod.a libsphde.la
 
 TESTS            += sasatom_t
 sasatom_t_SOURCES = tests/sasatom_t.c
