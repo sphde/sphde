@@ -250,6 +250,255 @@ sasindex_print_double (SASIndex_t index)
 #define JOIN_EXIT_FAILURE 128
 //#define __SASDebugPrint__ 1
 static int
+sassim_index_test5 ()
+{
+  SASIndex_t index;
+  unsigned long blockSize = block__Size64K;
+  SASIndexEnum_t senum;
+  SASIndexKey_t *temp1;
+  SASIndexKey_t *temp2;
+  SASIndexKey_t ndxkey;
+
+  int i;
+  int rc1;
+  long modcnt;
+  double rawkey, rawkey2;
+  double keylist[64];
+  void *keyval;
+
+  index = SASIndexCreate (blockSize);
+  if (!index)
+    {
+      SASSIM_PRINT_ERR ("SASIndexCreate(%zu)", blockSize);
+      return 1;
+    }
+  SASSIM_PRINT_MSG ("SASIndexCreate (%lu) success", blockSize);
+  SASSIM_PRINT_MSG ("SASIndexFreeSpace() = %zu", SASIndexFreeSpace (index));
+#ifdef __SASDebugPrint__
+  SASSIM_DUMP_BLOCK (index, 128);
+#endif
+  SASSIM_PRINT_MSG ("SASIndexIsEmpty(index) = %d", SASIndexIsEmpty (index));
+
+  SASSIM_PRINT_MSG ("SASIndexFreeSpace() = %zu", SASIndexFreeSpace (index));
+#ifdef __SASDebugPrint__
+  SASSIM_DUMP_BLOCK (index, 128);
+#endif
+
+  keylist[0] = -4.0;
+  keylist[1] = -3.0;
+  keylist[2] = -2.0;
+  keylist[3] = -1.0;
+  keylist[4] =  0.0;
+  keylist[5] =  1.0;
+  keylist[6] =  2.0;
+  keylist[7] =  3.0;
+  keylist[8] =  4.0;
+
+  for (i = 0; i < 9; i++)
+    {
+      rawkey = keylist[i];
+      keyval = &keylist[i];
+      SASIndexKeyInitDouble (&ndxkey, rawkey);
+      rawkey2 = SASIndexKeyReturn1stDouble (&ndxkey);
+      if (rawkey != rawkey2)
+        {
+          SASSIM_PRINT_ERR ("SASIndexKeyInitDouble/1st (%p, %lf) != %lf", &ndxkey, rawkey, rawkey2);
+          return 1;
+        }
+      rc1 = SASIndexPut (index, &ndxkey, keyval);
+      if (!rc1)
+        {
+          SASSIM_PRINT_ERR ("SASIndexPut (%p, %lf, %p)", index, rawkey, keyval);
+          return 1;
+        }
+
+      SASSIM_PRINT_MSG ("SASIndexPut (%p, %lf (%.14a), %p)", index, rawkey, rawkey, keyval);
+#ifdef __SASDebugPrint__
+      SASSIM_PRINT_MSG ("SASIndexPrint=");
+      sasindex_print_double (index);
+#endif
+    }
+  SASSIM_PRINT_MSG ("SASIndexPrint=");
+  sasindex_print_double (index);
+
+  keylist[9] =  -27.0;
+  keylist[10] = -26.0;
+  keylist[11] =  26.0;
+  keylist[12] =  27.0;
+  keylist[13] =  2147483647.0;
+  keylist[14] =  2147483647.5;
+  keylist[15] =  2147483647.75;
+  keylist[16] = -2147483647.0;
+  keylist[17] = -2147483647.5;
+  keylist[18] = -2147483647.75;
+  /*
+  keylist[19] = -1.7976931348623157e+308;
+  keylist[20] =  1.7976931348623157e+308;
+  */
+  for (i = 9; i < 19; i++)
+    {
+      rawkey = keylist[i];
+      keyval = &keylist[i];
+      SASIndexKeyInitDouble (&ndxkey, rawkey);
+      rawkey2 = SASIndexKeyReturn1stDouble (&ndxkey);
+      if (rawkey != rawkey2)
+        {
+          SASSIM_PRINT_ERR ("SASIndexKeyInitDouble/1st (%p, %lf) != %lf", &ndxkey, rawkey, rawkey2);
+          return 1;
+        }
+      rc1 = SASIndexPut (index, &ndxkey, keyval);
+      if (!rc1)
+        {
+          SASSIM_PRINT_ERR ("SASIndexPut (%p, %lf, %p)", index, rawkey, keyval);
+          return 1;
+        }
+      SASSIM_PRINT_MSG ("SASIndexPut (%p, %lf (%.14a), %p)", index, rawkey, rawkey, keyval);
+#ifdef __SASDebugPrint__
+      SASSIM_PRINT_MSG ("SASIndexPrint=");
+      sasindex_print_double (index);
+#endif
+    }
+  SASSIM_PRINT_MSG ("SASIndexPrint=");
+  sasindex_print_double (index);
+
+  SASSIM_PRINT_MSG ("SASIndexFreeSpace() = %zu", SASIndexFreeSpace (index));
+#ifdef __SASDebugPrint__
+  SASSIM_DUMP_BLOCK (index, 128);
+#endif
+
+  SASSIM_PRINT_MSG ("SASIndexPrintValue=");
+  modcnt = SASIndexGetModCount (index);
+  if (modcnt == 0L)
+    {
+      SASSIM_PRINT_ERR ("SASIndexGetModCount (%p)", index);
+      return 1;
+    }
+  SASSIM_PRINT_MSG ("SASIndexGetModCount=%ld", modcnt);
+
+  temp1 = SASIndexGetMinKey (index);
+  if (!temp1)
+    {
+      SASSIM_PRINT_ERR ("SASIndexGetMinKey (%p)", index);
+      return 1;
+    }
+  SASSIM_PRINT_MSG ("SASIndexGetMinKey=%lf", SASIndexKeyReturn1stDouble(temp1));
+  temp2 = SASIndexGetMaxKey (index);
+  if (!temp2)
+    {
+      SASSIM_PRINT_ERR ("SASIndexGetMaxKey (%p)", index);
+      return 1;
+    }
+  SASSIM_PRINT_MSG ("SASIndexGetMaxKey=%lf", SASIndexKeyReturn1stDouble(temp2));
+
+  senum = SASIndexEnumCreate (index);
+  if (!senum)
+    {
+      SASSIM_PRINT_ERR ("SASIndexEnumCreate (%p)", index);
+      return 1;
+    }
+  SASSIM_PRINT_MSG ("SASIndexEnumCreate(%p)", index);
+  while (SASIndexEnumHasMore (senum))
+    {
+      double *temp = (double *) SASIndexEnumNext (senum);
+      if (!temp)
+        {
+          SASSIM_PRINT_ERR ("SASIndexEnumNext (%p)", senum);
+          return 1;
+        }
+      SASSIM_PRINT_MSG ("<%p> %lf", temp, *temp);
+    }
+  SASIndexEnumDestroy (senum);
+
+  keylist[19] = -1.7976931348623157e+308;
+  keylist[20] =  1.7976931348623157e+308;
+  keylist[21] =  __builtin_inf();
+  keylist[22] = -__builtin_inf();
+  keylist[23] =  2.2250738585072014e-308;
+  keylist[24] = -2.2250738585072014e-308;
+
+  for (i = 19; i < 25; i++)
+    {
+      rawkey = keylist[i];
+      keyval = &keylist[i];
+      SASIndexKeyInitDouble (&ndxkey, rawkey);
+      rawkey2 = SASIndexKeyReturn1stDouble (&ndxkey);
+      if (rawkey != rawkey2)
+        {
+          SASSIM_PRINT_ERR ("SASIndexKeyInitDouble/1st (%p, %lg) != %lg", &ndxkey, rawkey, rawkey2);
+          return 1;
+        }
+      rc1 = SASIndexPut (index, &ndxkey, keyval);
+      if (!rc1)
+        {
+          SASSIM_PRINT_ERR ("SASIndexPut (%p, %lg, %p)", index, rawkey, keyval);
+          return 1;
+        }
+      SASSIM_PRINT_MSG ("SASIndexPut (%p, %lg (%.14a), %p)", index, rawkey, rawkey, keyval);
+#ifdef __SASDebugPrint__
+      SASSIM_PRINT_MSG ("SASIndexPrint=");
+      sasindex_print_double (index);
+#endif
+    }
+  SASSIM_PRINT_MSG ("SASIndexPrint=");
+  sasindex_print_double (index);
+
+  SASSIM_PRINT_MSG ("SASIndexFreeSpace() = %zu", SASIndexFreeSpace (index));
+#ifdef __SASDebugPrint__
+  SASSIM_DUMP_BLOCK (index, 128);
+#endif
+
+  SASSIM_PRINT_MSG ("SASIndexPrintValue=");
+  modcnt = SASIndexGetModCount (index);
+  if (modcnt == 0L)
+    {
+      SASSIM_PRINT_ERR ("SASIndexGetModCount (%p)", index);
+      return 1;
+    }
+  SASSIM_PRINT_MSG ("SASIndexGetModCount=%ld", modcnt);
+
+  temp1 = SASIndexGetMinKey (index);
+  if (!temp1)
+    {
+      SASSIM_PRINT_ERR ("SASIndexGetMinKey (%p)", index);
+      return 1;
+    }
+  SASSIM_PRINT_MSG ("SASIndexGetMinKey=%lf", SASIndexKeyReturn1stDouble(temp1));
+  temp2 = SASIndexGetMaxKey (index);
+  if (!temp2)
+    {
+      SASSIM_PRINT_ERR ("SASIndexGetMaxKey (%p)", index);
+      return 1;
+    }
+  SASSIM_PRINT_MSG ("SASIndexGetMaxKey=%lf", SASIndexKeyReturn1stDouble(temp2));
+
+  senum = SASIndexEnumCreate (index);
+  if (!senum)
+    {
+      SASSIM_PRINT_ERR ("SASIndexEnumCreate (%p)", index);
+      return 1;
+    }
+  SASSIM_PRINT_MSG ("SASIndexEnumCreate(%p)", index);
+  while (SASIndexEnumHasMore (senum))
+    {
+      double *temp = (double *) SASIndexEnumNext (senum);
+      if (!temp)
+        {
+          SASSIM_PRINT_ERR ("SASIndexEnumNext (%p)", senum);
+          return 1;
+        }
+      SASSIM_PRINT_MSG ("<%p> %lg", temp, *temp);
+    }
+  SASIndexEnumDestroy (senum);
+
+#ifdef __SASDebugPrint__
+  SASSIM_DUMP_BLOCK (index, 128);
+#endif
+  SASIndexDestroy (index);
+
+  return 0;
+}
+
+static int
 sassim_index_test4 ()
 {
   SASIndex_t index;
@@ -280,39 +529,7 @@ sassim_index_test4 ()
 #endif
   SASSIM_PRINT_MSG ("SASIndexIsEmpty(index) = %d", SASIndexIsEmpty (index));
   sasindex_print_double (index);
-  rawkey = -3.25;
-  keyval = (void *)-3;
-  SASIndexKeyInitDouble (&ndxkey, rawkey);
-  rawkey2 = SASIndexKeyReturn1stDouble (&ndxkey);
-  if (rawkey != rawkey2)
-    {
-      SASSIM_PRINT_ERR ("SASIndexKeyInitDouble/1st (%p, %lf) != %lf", &ndxkey, rawkey, rawkey2);
-      return 1;
-    }
-  rc1 = SASIndexPut (index, &ndxkey, keyval);
-  if (!rc1)
-    {
-      SASSIM_PRINT_ERR ("SASIndexPut (%p, %lf, %p)", index, rawkey, keyval);
-      return 1;
-    }
-  temp1 = SASIndexGetMinKey (index);
-  if (!temp1)
-    {
-      SASSIM_PRINT_ERR ("SASIndexGetMinKey (%p)", index);
-      return 1;
-    }
-  SASSIM_PRINT_MSG ("SASIndexGetMinKey=%lf", SASIndexKeyReturn1stDouble(temp1));
-  temp2 = SASIndexGetMaxKey (index);
-  if (!temp2)
-    {
-      SASSIM_PRINT_ERR ("SASIndexGetMaxKey (%p)", index);
-      return 1;
-    }
-  SASSIM_PRINT_MSG ("SASIndexGetMaxKey=%lf", SASIndexKeyReturn1stDouble(temp2));
-
-  SASSIM_PRINT_MSG ("SASIndexIsEmpty(index) = %d", SASIndexIsEmpty (index));
-  sasindex_print_double (index);
-  rawkey = 's';
+  rawkey = 115.0;
   keyval = (void *)'s';
   SASIndexKeyInitDouble (&ndxkey, rawkey);
   rawkey2 = SASIndexKeyReturn1stDouble (&ndxkey);
@@ -330,7 +547,7 @@ sassim_index_test4 ()
     }
   SASSIM_PRINT_MSG ("SASIndexPrint=");
   sasindex_print_double (index);
-  rawkey = 0;
+  rawkey = 0.0;
   keyval = (void *)0;
   SASIndexKeyInitDouble (&ndxkey, rawkey);
 
@@ -368,7 +585,7 @@ sassim_index_test4 ()
     }
   SASSIM_PRINT_MSG ("SASIndexPrint=");
   sasindex_print_double (index);
-  rawkey = 300;
+  rawkey = 300.0;
   keyval = (void *)300;
   SASIndexKeyInitDouble (&ndxkey, rawkey);
   rc1 = SASIndexPut (index, &ndxkey, keyval);
@@ -379,7 +596,7 @@ sassim_index_test4 ()
     }
   SASSIM_PRINT_MSG ("SASIndexPrint=");
   sasindex_print_double (index);
-  rawkey = '!';
+  rawkey = 33.0;
   keyval = (void *)'!';
   SASIndexKeyInitDouble (&ndxkey, rawkey);
   rc1 = SASIndexPut (index, &ndxkey, keyval);
@@ -414,16 +631,16 @@ sassim_index_test4 ()
   rawkey = -3.25;
   SASIndexKeyInitDouble (&ndxkey, rawkey);
   rc1 = SASIndexContainsKey (index, &ndxkey);
-  if (!rc1)
+  if (rc1)
     {
       SASSIM_PRINT_ERR ("SASIndexContainsKey (%p, %lf)", index, rawkey);
       return 1;
     }
   else
     {
-      SASSIM_PRINT_MSG ("SASIndexContainsKey (%p, %lf) true", index, rawkey);
+      SASSIM_PRINT_MSG ("SASIndexContainsKey (%p, %lf) false", index, rawkey);
     }
-  rawkey = 's';
+  rawkey = 115.0;
   SASIndexKeyInitDouble (&ndxkey2, rawkey);
   rc1 = SASIndexContainsKey (index, &ndxkey2);
   if (!rc1)
@@ -435,7 +652,7 @@ sassim_index_test4 ()
     {
       SASSIM_PRINT_MSG ("SASIndexContainsKey (%p, %lf) true", index, rawkey);
     }
-  rawkey = 'S';
+  rawkey = 83.0;
   SASIndexKeyInitDouble (&ndxkey3, rawkey);
   rc1 = SASIndexContainsKey (index, &ndxkey3);
   if (rc1)
@@ -473,14 +690,14 @@ sassim_index_test4 ()
     }
   rawkey = -3.25;
   keyval = (void *) SASIndexGet (index, &ndxkey);
-  if (!keyval)
+  if (keyval)
     {
       SASSIM_PRINT_ERR ("SASIndexGet (%p, %p)", index, keyval);
       return 1;
     }
   SASSIM_PRINT_MSG ("SASIndexGet(%lf)=%p", rawkey, keyval);
 
-  rawkey = 's';
+  rawkey = 115.0;
   keyval = (void *) SASIndexGet (index, &ndxkey2);
   if (!keyval)
     {
@@ -497,7 +714,7 @@ sassim_index_test4 ()
     }
   SASSIM_PRINT_MSG ("SASIndexGet(%lf)=%p", rawkey, keyval);
 
-  rawkey = 's';
+  rawkey = 115.0;
   keyval = (void *)'M';
   SASIndexKeyInitDouble (&ndxkey2, rawkey);
   rc1 = SASIndexPut (index, &ndxkey2, keyval);
@@ -519,7 +736,7 @@ sassim_index_test4 ()
   SASSIM_PRINT_MSG ("SASIndexPrint=");
   sasindex_print_double (index);
 
-  rawkey = 'n';
+  rawkey = 110.0;
   keyval = (void *)'n';
   SASIndexKeyInitDouble (&ndxkey, rawkey);
   keyval2 = (char *) SASIndexReplace (index, &ndxkey, keyval);
@@ -531,6 +748,7 @@ sassim_index_test4 ()
   SASSIM_PRINT_MSG ("SASIndexReplace(%p)=<%p>", keyval, keyval2);
   SASSIM_PRINT_MSG ("SASIndexPrint=");
   sasindex_print_double (index);
+#if 0
   rawkey = -3.25;
   SASIndexKeyInitDouble (&ndxkey2, rawkey);
   keyval = (char *) SASIndexRemove (index, &ndxkey2);
@@ -542,7 +760,7 @@ sassim_index_test4 ()
   SASSIM_PRINT_MSG ("SASIndexRemove(s)=<%p>", keyval);
   SASSIM_PRINT_MSG ("SASIndexPrint=");
   sasindex_print_double (index);
-
+#endif
   rawkey = 's';
   SASIndexKeyInitDouble (&ndxkey2, rawkey);
   keyval = (char *) SASIndexRemove (index, &ndxkey2);
@@ -2855,6 +3073,9 @@ main ()
   // for double keys
 #if 1
   failures += sassim_index_test4 ();
+#endif
+#if 1
+  failures += sassim_index_test5 ();
 #endif
   //SASCleanUp();
   printf("SAS removed\n");

@@ -1,3 +1,17 @@
+2014-02-06  Steven Munroe  <sjmunroe@us.ibm.com>
+
+	* src/sasindexkey.h (SASIndexKeyInitDouble): Correct transform
+	to internal binary.  
+	(SASIndexKeyReturn1stDouble) Correct transform from internal
+	binary.  
+	* src/tests/sasindex_t.c (sassim_index_test5): New Test.
+	(sassim_index_test4): Use float values for keys.
+	(main): Call sassim_index_test5.
+
+2014-01-31  Rajalakshmi Srinivasaraghavan <raji@linux.vnet.ibm.com>
+
+	* src/sassim.cpp:  Change BYTE_ORDER check for LE.	
+
 2012-02-03  Adhemerval Zanella  <azanella@linux.vnet.ibm.com>
 
 	* src/Makefile.am (sphgtod_t_LDADD): Change link order of libsphde.la

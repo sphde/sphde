@@ -316,11 +316,16 @@ SASIndexKeyInitDouble (SASIndexKey_t * dest, double value)
   dest->compare_size = sizeof (unsigned long long);
   dest->copy_size = sizeof (void *) + sizeof (unsigned long long);
   if (value < 0.0)
+    {
 	  dest->data[0] = key_val.key_element.data_0 ^ double_mask;
+	  dest->data[1] = key_val.key_element.data_1 ^ double_mask;
+    }
   else
+    {
 	  dest->data[0] = key_val.key_element.data_0 ^ machine_sign_mask;
+	  dest->data[1] = key_val.key_element.data_1;
+    }
 
-  dest->data[1] = key_val.key_element.data_1;
 #endif
 }
 
@@ -350,7 +355,7 @@ SASIndexKeyReturn1stDouble (SASIndexKey_t * dest)
   else
   {
 	  key_val.key_element.data_0 = dest->data[0] ^ double_mask;
-	  key_val.key_element.data_1 = dest->data[1];
+	  key_val.key_element.data_1 = dest->data[1] ^ double_mask;
   }
 #endif
   return key_val.double_key;
