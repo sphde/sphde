@@ -123,12 +123,12 @@ typedef struct
   unsigned long offset:56;
 #endif
 #else
-#if __BYTE_ORDER__ == __LITTLE_ENDIAN__
-  unsigned int offset:24;
+#if __BYTE_ORDER == __BIG_ENDIAN
   unsigned int size:8;
+  unsigned int offset:24;
 #else
-  unsigned int size:8;
   unsigned int offset:24;
+  unsigned int size:8;
 #endif
 #endif
 } logNodeType;
