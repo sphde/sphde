@@ -172,7 +172,7 @@ static int
 sassim_index_random ()
 {
   SASIndex_t index;
-  unsigned long blockSize = block__Size16M;
+  unsigned long blockSize = block__Size1M;
   SASIndexEnum_t senum;
   SASIndexKey_t *temp1;
   SASIndexKey_t *temp2;
@@ -589,7 +589,7 @@ static int
 sassim_index_sequential ()
 {
   SASIndex_t index;
-  unsigned long blockSize = block__Size16M;
+  unsigned long blockSize = block__Size1M;
   SASIndexEnum_t senum;
   SASIndexKey_t *temp1;
   SASIndexKey_t *temp2;
