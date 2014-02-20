@@ -50,6 +50,24 @@ AC_SUBST([AM_LIBTOOLFLAGS], [--silent])
 # Defines host_cpu, host_vendor, and host_os variables.
 AC_CANONICAL_HOST
 
+# GCC using -march=i386 does not provide __sync_fetch_and_add_4
+# move -march to a high chip level to get the required support
+case $host in
+x86_64*)
+  case $LD in
+  *elf_i386*)
+    if test "x$GCC" = xyes; then
+      CFLAGS="$CFLAGS -march=i686"
+    fi
+    if test "x$GXX" = xyes; then
+      CXXFLAGS="$CXXFLAGS -march=i686"
+    fi
+  ;;
+  esac
+;;
+esac
+
+
 # Checks for header files.
 AC_HEADER_STDC
 
