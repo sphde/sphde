@@ -1,3 +1,8 @@
+2014-03-10  Rajalakshmi Srinivasaraghavan <raji@linux.vnet.ibm.com>
+
+	* configure.ac: Update version.
+	* configure: Regenerate.
+
 2014-02-20  Rajalakshmi Srinivasaraghavan <raji@linux.vnet.ibm.com>
 
 	* configure.ac: move -march to a high chip level to get the
