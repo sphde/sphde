@@ -38,7 +38,8 @@ build_triplet = @build@
 host_triplet = @host@
 noinst_PROGRAMS = example_sph_1$(EXEEXT) example_sph_2_1$(EXEEXT) \
 	example_sph_2_2$(EXEEXT) example_sph_3$(EXEEXT) \
-	example_sphtimer$(EXEEXT) example_sasindex$(EXEEXT)
+	example_sphtimer$(EXEEXT) example_sasindex$(EXEEXT) \
+	example_sph_4$(EXEEXT)
 subdir = examples
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -86,6 +87,12 @@ example_sph_3_DEPENDENCIES = ../src/libsphde.la
 example_sph_3_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(example_sph_3_CFLAGS) \
 	$(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
+am_example_sph_4_OBJECTS = example_sph_4-example_sph_4.$(OBJEXT)
+example_sph_4_OBJECTS = $(am_example_sph_4_OBJECTS)
+example_sph_4_DEPENDENCIES = ../src/libsphde.la
+example_sph_4_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(example_sph_4_CFLAGS) \
+	$(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 am_example_sphtimer_OBJECTS =  \
 	example_sphtimer-example_sphtimer.$(OBJEXT)
 example_sphtimer_OBJECTS = $(am_example_sphtimer_OBJECTS)
@@ -108,10 +115,12 @@ LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	$(LDFLAGS) -o $@
 SOURCES = $(example_sasindex_SOURCES) $(example_sph_1_SOURCES) \
 	$(example_sph_2_1_SOURCES) $(example_sph_2_2_SOURCES) \
-	$(example_sph_3_SOURCES) $(example_sphtimer_SOURCES)
+	$(example_sph_3_SOURCES) $(example_sph_4_SOURCES) \
+	$(example_sphtimer_SOURCES)
 DIST_SOURCES = $(example_sasindex_SOURCES) $(example_sph_1_SOURCES) \
 	$(example_sph_2_1_SOURCES) $(example_sph_2_2_SOURCES) \
-	$(example_sph_3_SOURCES) $(example_sphtimer_SOURCES)
+	$(example_sph_3_SOURCES) $(example_sph_4_SOURCES) \
+	$(example_sphtimer_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -273,6 +282,9 @@ example_sphtimer_LDADD = $(AM_LDADD) ../src/libsphde.la
 example_sasindex_SOURCES = example_sasindex.c
 example_sasindex_CFLAGS = $(AM_CFLAGS)
 example_sasindex_LDADD = $(AM_LDADD) ../src/libsphde.la
+example_sph_4_SOURCES = example_sph_4.c
+example_sph_4_CFLAGS = $(AM_CFLAGS)
+example_sph_4_LDADD = $(AM_LDADD) ../src/libsphde.la
 all: all-am
 
 .SUFFIXES:
@@ -331,6 +343,9 @@ example_sph_2_2$(EXEEXT): $(example_sph_2_2_OBJECTS) $(example_sph_2_2_DEPENDENC
 example_sph_3$(EXEEXT): $(example_sph_3_OBJECTS) $(example_sph_3_DEPENDENCIES) 
 	@rm -f example_sph_3$(EXEEXT)
 	$(example_sph_3_LINK) $(example_sph_3_OBJECTS) $(example_sph_3_LDADD) $(LIBS)
+example_sph_4$(EXEEXT): $(example_sph_4_OBJECTS) $(example_sph_4_DEPENDENCIES)
+	@rm -f example_sph_4$(EXEEXT)
+	$(example_sph_4_LINK) $(example_sph_4_OBJECTS) $(example_sph_4_LDADD) $(LIBS)
 example_sphtimer$(EXEEXT): $(example_sphtimer_OBJECTS) $(example_sphtimer_DEPENDENCIES) 
 	@rm -f example_sphtimer$(EXEEXT)
 	$(example_sphtimer_LINK) $(example_sphtimer_OBJECTS) $(example_sphtimer_LDADD) $(LIBS)
@@ -346,6 +361,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/example_sph_2_1-example_sph_2_1.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/example_sph_2_2-example_sph_2_2.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/example_sph_3-example_sph_3.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/example_sph_4-example_sph_4.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/example_sphtimer-example_sphtimer.Po@am__quote@
 
 .c.o:
@@ -438,6 +454,20 @@ example_sph_3-example_sph_3.obj: example_sph_3.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='example_sph_3.c' object='example_sph_3-example_sph_3.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(example_sph_3_CFLAGS) $(CFLAGS) -c -o example_sph_3-example_sph_3.obj `if test -f 'example_sph_3.c'; then $(CYGPATH_W) 'example_sph_3.c'; else $(CYGPATH_W) '$(srcdir)/example_sph_3.c'; fi`
+
+example_sph_4-example_sph_4.o: example_sph_4.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(example_sph_4_CFLAGS) $(CFLAGS) -MT example_sph_4-example_sph_4.o -MD -MP -MF $(DEPDIR)/example_sph_4-example_sph_4.Tpo -c -o example_sph_4-example_sph_4.o `test -f 'example_sph_4.c' || echo '$(srcdir)/'`example_sph_4.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/example_sph_4-example_sph_4.Tpo $(DEPDIR)/example_sph_4-example_sph_4.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='example_sph_4.c' object='example_sph_4-example_sph_4.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(example_sph_4_CFLAGS) $(CFLAGS) -c -o example_sph_4-example_sph_4.o `test -f 'example_sph_4.c' || echo '$(srcdir)/'`example_sph_4.c
+
+example_sph_4-example_sph_4.obj: example_sph_4.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(example_sph_4_CFLAGS) $(CFLAGS) -MT example_sph_4-example_sph_4.obj -MD -MP -MF $(DEPDIR)/example_sph_4-example_sph_4.Tpo -c -o example_sph_4-example_sph_4.obj `if test -f 'example_sph_4.c'; then $(CYGPATH_W) 'example_sph_4.c'; else $(CYGPATH_W) '$(srcdir)/example_sph_4.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/example_sph_4-example_sph_4.Tpo $(DEPDIR)/example_sph_4-example_sph_4.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='example_sph_4.c' object='example_sph_4-example_sph_4.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(example_sph_4_CFLAGS) $(CFLAGS) -c -o example_sph_4-example_sph_4.obj `if test -f 'example_sph_4.c'; then $(CYGPATH_W) 'example_sph_4.c'; else $(CYGPATH_W) '$(srcdir)/example_sph_4.c'; fi`
 
 example_sphtimer-example_sphtimer.o: example_sphtimer.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(example_sphtimer_CFLAGS) $(CFLAGS) -MT example_sphtimer-example_sphtimer.o -MD -MP -MF $(DEPDIR)/example_sphtimer-example_sphtimer.Tpo -c -o example_sphtimer-example_sphtimer.o `test -f 'example_sphtimer.c' || echo '$(srcdir)/'`example_sphtimer.c
