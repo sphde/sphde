@@ -1265,7 +1265,7 @@ SASIndexPut (SASIndex_t  heap, SASIndexKey_t *key, void *value)
 		if (btree->root != NULL)
 		{
 			SASIndexNode_t node;
-		    node = SASIndexNodeInsert(btree->root, key, value);
+		    node = SASIndexNodeInsert(btree->root, key, value, LOCK_ON);
 		    if (node != NULL)
 			{
 			    btree->root = node;
@@ -1278,7 +1278,7 @@ SASIndexPut (SASIndex_t  heap, SASIndexKey_t *key, void *value)
 		    } 
 		} else {
 		    btree->root = SASIndexAlloc(heap);
-		    SASIndexNodeInitialize(btree->root, key, value);
+		    SASIndexNodeInitialize(btree->root, key, value, LOCK_ON);
 		    SASIndexUpdateMin(heap, key);
 		    SASIndexUpdateMax(heap, key);
 			btree->common->modCount++;
@@ -1344,7 +1344,7 @@ SASIndexRemove (SASIndex_t  heap, SASIndexKey_t *key)
 				result = SASIndexNodeGetValIndexed(ref.node, ref.pos);
 		    }
 			  
-		    newRoot = SASIndexNodeDelete(btree->root, key);
+		    newRoot = SASIndexNodeDelete(btree->root, key, LOCK_ON);
 		    if ( newRoot != btree->root )
 		    {   //Delete the old root which is empty
 				SASIndexNearDealloc(btree->root);

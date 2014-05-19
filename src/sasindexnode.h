@@ -17,6 +17,10 @@
 
 typedef void *SASIndexNode_t;
 
+typedef int lock_on_t;
+const lock_on_t LOCK_ON = 1;
+const lock_on_t LOCK_OFF = 0;
+
 typedef struct __IDXnodePosRef
 {
   SASIndexNode_t node;
@@ -43,9 +47,9 @@ SASIndexNodeInit (void *heap_block, sas_type_t sasType,
 
 extern __C__ SASIndexNode_t SASIndexNodeCreate (block_size_t heap_size);
 
-extern __C__ int SASIndexNodeDestroy (SASIndexNode_t heap);
+extern __C__ int SASIndexNodeDestroy (SASIndexNode_t heap, lock_on_t lock_on);
 
-extern __C__ block_size_t SASIndexNodeFreeSpace (SASIndexNode_t heap);
+extern __C__ block_size_t SASIndexNodeFreeSpace (SASIndexNode_t heap, lock_on_t lock_on);
 
 extern __C__ block_size_t
 SASIndexNodeFreeFragmentsNoLock (SASIndexNode_t heap);
@@ -53,13 +57,13 @@ SASIndexNodeFreeFragmentsNoLock (SASIndexNode_t heap);
 extern __C__ block_size_t SASIndexNodeMaxFragmentNoLock (SASIndexNode_t heap);
 
 extern __C__ void *SASIndexNodeAlloc (SASIndexNode_t heap,
-				      block_size_t alloc_size);
+				      block_size_t alloc_size, lock_on_t lock_on);
 
 extern __C__ int
 SASIndexNodeFree (SASIndexNode_t heap,
-		  void *free_block, block_size_t alloc_size);
+		  void *free_block, block_size_t alloc_size, lock_on_t lock_on);
 
-extern __C__ void *SASIndexNodeNearAlloc (void *nearObj, long allocSize);
+extern __C__ void *SASIndexNodeNearAlloc (void *nearObj, long allocSize, lock_on_t lock_on);
 
 extern __C__ int SASIndexNodeDestroyNoLock (SASIndexNode_t heap);
 
@@ -108,13 +112,14 @@ SASIndexNodeSearchLE (SASIndexNode_t header,
 
 extern __C__ SASIndexNode_t
 SASIndexNodeInitialize (SASIndexNode_t header,
-			SASIndexKey_t * newkey, void *newval);
+			SASIndexKey_t * newkey, void *newval, lock_on_t lock_on);
 
 extern __C__ SASIndexNode_t
 SASIndexNodeInsert (SASIndexNode_t header,
-		    SASIndexKey_t * newkey, void *newval);
+		    SASIndexKey_t * newkey, void *newval, lock_on_t lock_on);
 
 extern __C__ SASIndexNode_t
-SASIndexNodeDelete (SASIndexNode_t header, SASIndexKey_t * target);
+SASIndexNodeDelete (SASIndexNode_t header, SASIndexKey_t * target,
+		lock_on_t lock_on);
 
 #endif /* __SAS_INDEXNODE_H */

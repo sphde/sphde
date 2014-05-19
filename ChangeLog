@@ -1,3 +1,69 @@
+2014-05-02  Steven Munroe  <sjmunroe@us.ibm.com>
+
+	* /src/sasindex.cpp (SASIndexPut): Update SASIndexNodeInsert
+	and SASIndexNodeInitialize with lock parm.
+	(SASIndexRemove): Update SASIndexNodeDelete with lock parm.
+	* src/sasindexnode.cpp (SASIndexNodeAlloc): Add lock_on_t parm.
+	Conditionally call SASLock/SASUnlock.
+	(SASIndexNodeFree): Add lock_on_t parm.  Conditionally call
+	SASLock/SASUnlock.
+	(SASIndexNodeFree): Add lock_on_t parm.  Conditionally call
+	SASLock/SASUnlock.
+	(SASIndexNodeNearDealloc): Add lock_on_t parm.  Conditionally
+	call SASLock/SASUnlock.
+	(SASIndexNodeNearAlloc): Add lock_on_t parm.  Conditionally
+	call SASLock/SASUnlock.
+	(SASIndexNodeFreeSpace): Add lock_on_t parm.  Conditionally call
+	SASLock/SASUnlock.
+	(SASIndexNodeDestroy): Add lock_on_t parm.
+	Conditionally call SASLock/SASUnlock.
+	(SASIndexNodeKeyMove): Add lock_on_t parm. Pass lock_on parm to
+	SASIndexNodeNearAlloc() and SASIndexNodeNearDealloc().
+	(SASIndexNodeKeyCopy): Add lock_on_t parm. Pass lock_on parm to
+	SASIndexNodeNearAlloc() and SASIndexNodeNearDealloc().
+	(SASIndexNodeKeyDelete): Add lock_on_t parm. Pass lock_on to
+	SASIndexNodeNearDealloc().
+	(SASIndexNodeKeyReplace): Add lock_on_t parm. Pass lock_on to
+	SASIndexNodeNearAlloc().
+	(SASIndexNodePushIn): Add lock_on_t parm. Pass lock_on to
+	SASIndexNodeKeyCopy() and SASIndexNodeKeyReplace().
+	(SASIndexNodeSplit): Add lock_on_t parm. Pass lock_on to
+	SASIndexNodeKeyMove(), SASIndexNodePushIn() and
+	SASIndexNodeKeyCopy().
+	(SASIndexNodePushDown): Add lock_on_t parm.  Pass lock_on to
+	SASIndexNodePushDown(), SASIndexNodePushIn(), and
+	SASIndexNodeSplit().
+	(SASIndexNodeInitialize): Add lock_on_t parm.  Pass lock_on to
+	SASIndexNodeKeyCopy().
+	(SASIndexNodeInsert): Add lock_on_t parm.  Pass lock_on to
+	SASIndexNodePushDown() and SASIndexNodeKeyMove().
+	(SASIndexNodeRemove): Add lock_on_t parm.  Pass lock_on to SASIndexNodeKeyDelete() SASIndexNodeKeyCopy().
+	(SASIndexNodeCombine): Add lock_on_t parm.  Pass lock_on to
+	SASIndexNodeKeyMove(), SASIndexNodeKeyMove(), and
+	SASIndexNodeRemove().
+	(SASIndexNodeMoveLeft): Add lock_on_t parm.  Pass lock_on to
+	SASIndexNodeKeyCopy() and SASIndexNodeKeyMove().
+	(SASIndexNodeMoveRight): Add lock_on_t parm.  Pass lock_on to
+	SASIndexNodeKeyCopy() and SASIndexNodeKeyMove().
+	(SASIndexNodeRestore): Add lock_on_t parm. Pass lock_on to
+	SASIndexNodeMoveRight(), SASIndexNodeMoveLeft(),
+	and SASIndexNodeCombine().
+	(SASIndexNodeSuccessor): Add lock_on_t parm.  Pass lock_on to
+	SASIndexNodeKeyCopy().
+	(SASIndexNodeRecDelete): Add lock_on_t parm.  Pass lock_on to
+	SASIndexNodeRemove(), SASIndexNodeSuccessor(),
+	SASIndexNodeRecDelete(), and SASIndexNodeRestore().
+	(SASIndexNodeDelete): Add lock_on_t parm.  Pass lock_on to
+	SASIndexNodeRecDelete().
+	* /src/sasindexnode.h: Declare lock_on_t.
+	Define LOCK_ON and LOCK_OFF. 
+	(SASIndexNodeDestroy, SASIndexNodeFreeSpace, SASIndexNodeAlloc,
+	SASIndexNodeFree, SASIndexNodeNearAlloc,
+	SASIndexNodeInitialize, SASIndexNodeInsert,
+	SASIndexNodeDelete): Add lock_on_t parm.
+	* /src/sasindexnodepriv.h (SASIndexNodeNearDealloc):
+	Add lock_on_t parm.
+
 2014-03-10  Rajalakshmi Srinivasaraghavan <raji@linux.vnet.ibm.com>
 
 	* configure.ac: Update version.

@@ -189,16 +189,17 @@ SASIndexNodeAllocNoLock (SASIndexNode_t heap, block_size_t alloc_size)
 }
 
 void *
-SASIndexNodeAlloc (SASIndexNode_t heap, block_size_t alloc_size)
+SASIndexNodeAlloc (SASIndexNode_t heap, block_size_t alloc_size,
+			lock_on_t lock_on)
 {
   SASBlockHeader *headerBlock = (SASBlockHeader *) heap;
   void *mem = NULL;
 
   if (SOMSASCheckBlockSigAndType (headerBlock, SAS_RUNTIME_SIMPLEHEAP))
     {
-      SASLock (heap, SasUserLock__WRITE);
+	  if (lock_on) SASLock (heap, SasUserLock__WRITE);
       mem = SASIndexNodeAllocNoLock (heap, alloc_size);
-      SASUnlock (heap);
+      if (lock_on) SASUnlock (heap);
 #ifdef __SASDebugPrint__
     }
   else
@@ -254,16 +255,17 @@ SASIndexNodeFreeNoLock (SASIndexNode_t heap,
 
 int
 SASIndexNodeFree (SASIndexNode_t heap,
-		  void *free_block, block_size_t alloc_size)
+		  void *free_block, block_size_t alloc_size,
+		  lock_on_t lock_on)
 {
   SASBlockHeader *headerBlock = (SASBlockHeader *) heap;
   int rc;
 
   if (SOMSASCheckBlockSigAndType (headerBlock, SAS_RUNTIME_INDEXNODE))
     {
-      SASLock (heap, SasUserLock__WRITE);
+	  if (lock_on) SASLock (heap, SasUserLock__WRITE);
       rc = SASIndexNodeFreeNoLock (heap, free_block, alloc_size);
-      SASUnlock (heap);
+      if (lock_on) SASUnlock (heap);
     }
   else
     {
@@ -305,7 +307,7 @@ SASIndexNodeIsSpill (SASIndexNode_t heap)
  * non-local and we need to lock the spill node before we free the block.  */
 int
 SASIndexNodeNearDealloc (SASIndexNode_t heap, void *free_block,
-			 block_size_t alloc_size)
+			 block_size_t alloc_size, lock_on_t lock_on)
 {
   SASBlockHeader *headerBlock = (SASBlockHeader *) heap;
   SASBlockHeader *nearHeader = SASFindHeader (free_block);
@@ -321,9 +323,9 @@ SASIndexNodeNearDealloc (SASIndexNode_t heap, void *free_block,
       newHeap = SASIndexNodeVerify ((SASIndexNode_t) nearHeader);
       if (newHeap != NULL)
 	{
-	  SASLock (newHeap, SasUserLock__WRITE);
+      if (lock_on) SASLock (newHeap, SasUserLock__WRITE);
 	  rc = SASIndexNodeFreeNoLock (newHeap, free_block, alloc_size);
-	  SASUnlock (newHeap);
+	  if (lock_on) SASUnlock (newHeap);
 	}
       else
 	{
@@ -339,7 +341,7 @@ SASIndexNodeNearDealloc (SASIndexNode_t heap, void *free_block,
 }
 
 void *
-SASIndexNodeNearAlloc (void *nearObj, long allocSize)
+SASIndexNodeNearAlloc (void *nearObj, long allocSize, lock_on_t lock_on)
 {
   void *result;
   result = SASNearAlloc (nearObj, allocSize);
@@ -372,7 +374,7 @@ SASIndexNodeNearAlloc (void *nearObj, long allocSize)
 		  compoundHeader = (SASIndexHeader *) nearHeader->baseBlock;
 		}
 	      spill_lst = SASIndexGetSpill (compoundHeader);
-	      SASLock (spill_lst, SasUserLock__WRITE);
+	      if (lock_on) SASLock (spill_lst, SasUserLock__WRITE);
 	      if (spill_lst->count == 0)
 		{
 		  newHeap = SASIndexSpillAlloc (nearObj);
@@ -392,7 +394,7 @@ SASIndexNodeNearAlloc (void *nearObj, long allocSize)
 		  for (int i = 0; i < spill_lst->count; i++)
 		    {
 		      newHeap = (SASIndexNode_t) spill_lst->spillHeap[i];
-		      result = SASIndexNodeAlloc (newHeap, allocSize);
+		      result = SASIndexNodeAlloc (newHeap, allocSize, lock_on);
 		      if (result != NULL)
 			break;
 		    }
@@ -411,7 +413,7 @@ SASIndexNodeNearAlloc (void *nearObj, long allocSize)
 #endif
 		    }
 		}
-	      SASUnlock (spill_lst);
+	      if (lock_on) SASUnlock (spill_lst);
 	    }
 	}
     }
@@ -490,16 +492,16 @@ SASIndexNodeFreeSpaceNoLock (SASIndexNode_t heap)
 }
 
 block_size_t
-SASIndexNodeFreeSpace (SASIndexNode_t heap)
+SASIndexNodeFreeSpace (SASIndexNode_t heap, lock_on_t lock_on)
 {
   SASBlockHeader *headerBlock = (SASBlockHeader *) heap;
   block_size_t heapFree = 0;
 
   if (SOMSASCheckBlockSigAndType (headerBlock, SAS_SIMPLEHEAP_TYPE))
     {
-      SASLock (heap, SasUserLock__WRITE);
+	  if (lock_on) SASLock (heap, SasUserLock__WRITE);
       heapFree = SASIndexNodeFreeSpaceNoLock (heap);
-      SASUnlock (heap);
+      if (lock_on) SASUnlock (heap);
 #ifdef __SASDebugPrint__
     }
   else
@@ -537,7 +539,7 @@ SASIndexNodeDestroyNoLock (SASIndexNode_t heap)
 }
 
 int
-SASIndexNodeDestroy (SASIndexNode_t heap)
+SASIndexNodeDestroy (SASIndexNode_t heap, lock_on_t lock_on)
 {
   SASBlockHeader *headerBlock = (SASBlockHeader *) heap;
   int rc;
@@ -545,9 +547,9 @@ SASIndexNodeDestroy (SASIndexNode_t heap)
   if (SOMSASCheckBlockSigAndTypeAndSubtype (headerBlock,
 					    SAS_RUNTIME_INDEXNODE))
     {
-      SASLock (heap, SasUserLock__WRITE);
+	  if (lock_on) SASLock (heap, SasUserLock__WRITE);
       rc = SASIndexNodeDestroyNoLock (heap);
-      SASUnlock (heap);
+      if (lock_on) SASUnlock (heap);
     }
   else
     {
@@ -1201,21 +1203,22 @@ SASIndexNodeSearchLE (SASIndexNode_t header,
 }
 
 static inline void
-SASIndexNodeKeyMove (SASIndexNode_t heap, short pos, SASIndexKey_t * key)
+SASIndexNodeKeyMove (SASIndexNode_t heap, short pos,
+		SASIndexKey_t * key, lock_on_t lock_on)
 {
   SASIndexNodeHeader *node = (SASIndexNodeHeader *) heap;
   SASIndexKey_t *oldkey = node->keys[pos];
   SASIndexKey_t *tempkey;
   size_t key_len = SASIndexKeySize (key);
 
-  tempkey = (SASIndexKey_t *) SASIndexNodeNearAlloc (heap, key_len);
+  tempkey = (SASIndexKey_t *) SASIndexNodeNearAlloc (heap, key_len, lock_on);
   SASIndexKeyCopy (tempkey, key);
   node->keys[pos] = tempkey;
 
   if (oldkey != NULL)
     {
       int keylen = SASIndexKeySize (oldkey);
-      SASIndexNodeNearDealloc (heap, oldkey, keylen);
+      SASIndexNodeNearDealloc (heap, oldkey, keylen, lock_on);
       node->keys[pos] = NULL;
     }
 
@@ -1224,32 +1227,34 @@ SASIndexNodeKeyMove (SASIndexNode_t heap, short pos, SASIndexKey_t * key)
       if ((unsigned long) key >= getMemLow ())
 	{
 	  if ((unsigned long) key <= getMemHigh ())
-	    SASIndexNodeNearDealloc (heap, key, key_len);
+	    SASIndexNodeNearDealloc (heap, key, key_len, lock_on);
 	}
     }
 }
 
 static inline void
-SASIndexNodeKeyCopy (SASIndexNode_t heap, short pos, SASIndexKey_t * key)
+SASIndexNodeKeyCopy (SASIndexNode_t heap, short pos,
+		SASIndexKey_t * key, lock_on_t lock_on)
 {
   SASIndexNodeHeader *node = (SASIndexNodeHeader *) heap;
   SASIndexKey_t *oldkey = node->keys[pos];
   SASIndexKey_t *tempkey;
   size_t key_len = SASIndexKeySize (key);
 
-  tempkey = (SASIndexKey_t *) SASIndexNodeNearAlloc (heap, key_len);
+  tempkey = (SASIndexKey_t *) SASIndexNodeNearAlloc (heap, key_len, lock_on);
   SASIndexKeyCopy (tempkey, key);
   node->keys[pos] = tempkey;
 
   if (oldkey != NULL)
     {
       int keylen = SASIndexKeySize (oldkey);
-      SASIndexNodeNearDealloc (heap, oldkey, keylen);
+      SASIndexNodeNearDealloc (heap, oldkey, keylen, lock_on);
     }
 }
 
 static inline void
-SASIndexNodeKeyDelete (SASIndexNode_t heap, short pos)
+SASIndexNodeKeyDelete (SASIndexNode_t heap, short pos,
+		lock_on_t lock_on)
 {
   SASIndexNodeHeader *node = (SASIndexNodeHeader *) heap;
   SASIndexKey_t *oldkey = node->keys[pos];
@@ -1258,24 +1263,26 @@ SASIndexNodeKeyDelete (SASIndexNode_t heap, short pos)
   if (oldkey != NULL)
     {
       keylen = SASIndexKeySize (oldkey);
-      SASIndexNodeNearDealloc (heap, oldkey, keylen);
+      SASIndexNodeNearDealloc (heap, oldkey, keylen, lock_on);
     }
 }
 
 static inline void
-SASIndexNodeKeyReplace (SASIndexNode_t heap, short pos, SASIndexKey_t * key)
+SASIndexNodeKeyReplace (SASIndexNode_t heap, short pos,
+		SASIndexKey_t * key, lock_on_t lock_on)
 {
   SASIndexNodeHeader *node = (SASIndexNodeHeader *) heap;
   SASIndexKey_t *tempkey;
   size_t key_len = SASIndexKeySize (key);
 
-  tempkey = (SASIndexKey_t *) SASIndexNodeNearAlloc (heap, key_len);
+  tempkey = (SASIndexKey_t *) SASIndexNodeNearAlloc (heap, key_len, lock_on);
   SASIndexKeyCopy (tempkey, key);
   node->keys[pos] = tempkey;
 }
 
 void
-SASIndexNodePushIn (SASIndexNode_t node_t, __IDXnodeKeyRef * ref, short k)
+SASIndexNodePushIn (SASIndexNode_t node_t, __IDXnodeKeyRef * ref,
+		short k, lock_on_t lock_on)
 {
   SASIndexNodeHeader *node = (SASIndexNodeHeader *) node_t;
   char *str_ptr;
@@ -1307,13 +1314,13 @@ SASIndexNodePushIn (SASIndexNode_t node_t, __IDXnodeKeyRef * ref, short k)
 	      sas_printf ("PushIn@%p copy far pos=%hd key@%p len=%d\n",
 			  node_t, (i + 1), temp_key, key_len);
 #endif
-	      SASIndexNodeKeyCopy ((SASIndexNode_t) node, (i + 1), temp_key);
+	      SASIndexNodeKeyCopy ((SASIndexNode_t) node, (i + 1), temp_key, lock_on);
 	      max_frag = SASIndexNodeMaxFragmentNoLock (node_t);
 	    }
 	}
     }
 
-  SASIndexNodeKeyReplace (node, (k + 1), ref->key);
+  SASIndexNodeKeyReplace (node, (k + 1), ref->key, lock_on);
   node->vals[k + 1] = ref->val;
   node->branch[k + 1] = (SASIndexNodeHeader *) ref->node;
   node->count++;
@@ -1321,7 +1328,8 @@ SASIndexNodePushIn (SASIndexNode_t node_t, __IDXnodeKeyRef * ref, short k)
 
 void
 SASIndexNodeSplit (SASIndexNode_t node_t,
-		   __IDXnodeKeyRef * xref, short k, __IDXnodeKeyRef * yref)
+		   __IDXnodeKeyRef * xref, short k, __IDXnodeKeyRef * yref,
+		   lock_on_t lock_on)
 {
   SASIndexNodeHeader *node = (SASIndexNodeHeader *) node_t;
   short i, median;
@@ -1358,7 +1366,7 @@ SASIndexNodeSplit (SASIndexNode_t node_t,
 	    		  yr, i, thisKeys[i]->data[0], (i - median));
 #endif
 
-      SASIndexNodeKeyMove (yr, (i - median), thisKeys[i]);
+      SASIndexNodeKeyMove (yr, (i - median), thisKeys[i], lock_on);
       yrVals[i - median] = thisVals[i];
       yrBranch[i - median] = thisBranch[i];
     }
@@ -1367,11 +1375,11 @@ SASIndexNodeSplit (SASIndexNode_t node_t,
 
   if (k <= min)
     {
-      SASIndexNodePushIn (node_t, xref, k);
+      SASIndexNodePushIn (node_t, xref, k, lock_on);
     }
   else
     {
-      SASIndexNodePushIn (yr, xref, (short) (k - median));
+      SASIndexNodePushIn (yr, xref, (short) (k - median), lock_on);
     }
 
   yrBranch[0] = (SASIndexNodeHeader *) thisBranch[node->count];
@@ -1405,7 +1413,7 @@ SASIndexNodeSplit (SASIndexNode_t node_t,
 	      sas_printf ("Split@%p copy far pos=%hd key@%p len=%d\n",
 			  node_t, (i + 1), temp_key, key_len);
 #endif
-	      SASIndexNodeKeyCopy ((SASIndexNode_t) node, i, temp_key);
+	      SASIndexNodeKeyCopy ((SASIndexNode_t) node, i, temp_key, lock_on);
 	      max_frag = SASIndexNodeMaxFragmentNoLock (node_t);
 	    }
 	}
@@ -1415,7 +1423,7 @@ SASIndexNodeSplit (SASIndexNode_t node_t,
 int
 SASIndexNodePushDown (SASIndexNode_t node_t,
 		      SASIndexKey_t * newkey, void *newval,
-		      __IDXnodeKeyRef * ref)
+		      __IDXnodeKeyRef * ref, lock_on_t lock_on)
 {
   SASIndexNodeHeader *node = (SASIndexNodeHeader *) node_t;
   short pos;			// AKA k
@@ -1452,7 +1460,8 @@ SASIndexNodePushDown (SASIndexNode_t node_t,
 
   if (node->branch[pos] != NULL)
     {
-      pushup = SASIndexNodePushDown (node->branch[pos], newkey, newval, ref);
+      pushup = SASIndexNodePushDown (node->branch[pos], newkey, newval,
+    		  ref, lock_on);
     }
   else
     {
@@ -1473,12 +1482,12 @@ SASIndexNodePushDown (SASIndexNode_t node_t,
       if (node->count < node->max_count)
 	{
 	  pushup = false;
-	  SASIndexNodePushIn (node_t, ref, pos);
+	  SASIndexNodePushIn (node_t, ref, pos, lock_on);
 	}
       else
 	{
 	  pushup = true;
-	  SASIndexNodeSplit (node_t, ref, pos, ref);
+	  SASIndexNodeSplit (node_t, ref, pos, ref, lock_on);
 	}
     }
   return pushup;
@@ -1486,7 +1495,7 @@ SASIndexNodePushDown (SASIndexNode_t node_t,
 
 SASIndexNode_t
 SASIndexNodeInitialize (SASIndexNode_t node_t,
-			SASIndexKey_t * newkey, void *newval)
+			SASIndexKey_t * newkey, void *newval, lock_on_t lock_on)
 {
   SASIndexNodeHeader *node = (SASIndexNodeHeader *) node_t;
   SASIndexNode_t result = node_t;
@@ -1496,7 +1505,7 @@ SASIndexNodeInitialize (SASIndexNode_t node_t,
 	      node, newkey->data[0], newval);
 #endif
   node->count = 1;
-  SASIndexNodeKeyCopy (node, 1, newkey);
+  SASIndexNodeKeyCopy (node, 1, newkey, lock_on);
   node->vals[1] = newval;
   node->branch[1] = NULL;
   node->branch[0] = NULL;
@@ -1506,7 +1515,7 @@ SASIndexNodeInitialize (SASIndexNode_t node_t,
 
 SASIndexNode_t
 SASIndexNodeInsert (SASIndexNode_t node_t,
-		    SASIndexKey_t * newkey, void *newval)
+		    SASIndexKey_t * newkey, void *newval, lock_on_t lock_on)
 {
   SASIndexNodeHeader *node = (SASIndexNodeHeader *) node_t;
   int pushup;
@@ -1516,7 +1525,7 @@ SASIndexNodeInsert (SASIndexNode_t node_t,
 #ifdef __SASDebugPrint__
   sas_printf ("Insert@%p newkey=%lx\n", node, newkey->data[0]);
 #endif
-  pushup = SASIndexNodePushDown (node_t, newkey, newval, &xref);
+  pushup = SASIndexNodePushDown (node_t, newkey, newval, &xref, lock_on);
   if (pushup)
     {
       SASIndexNodeHeader *new_node;
@@ -1527,7 +1536,7 @@ SASIndexNodeInsert (SASIndexNode_t node_t,
 	  sas_printf ("Insert:pushup@%p key@%p key=%lx val=%p to=1\n",
 			  new_node, xref.key, xref.val, xref.key->data[0]);
 #endif
-      SASIndexNodeKeyMove (new_node, 1, xref.key);
+      SASIndexNodeKeyMove (new_node, 1, xref.key, lock_on);
       new_node->vals[1] = xref.val;
       new_node->branch[1] = (SASIndexNodeHeader *) xref.node;
       new_node->branch[0] = node;
@@ -1547,7 +1556,8 @@ SASIndexNodeInsert (SASIndexNode_t node_t,
 
 /* removes key[k] & branch[k] from this node */
 void
-SASIndexNodeRemove (SASIndexNode_t node_t, short pos)
+SASIndexNodeRemove (SASIndexNode_t node_t, short pos,
+		lock_on_t lock_on)
 {
   SASIndexNodeHeader *node = (SASIndexNodeHeader *) node_t;
   SASIndexNodeHeader *q;
@@ -1563,7 +1573,7 @@ SASIndexNodeRemove (SASIndexNode_t node_t, short pos)
   if (node->keys[pos])
     sas_printf ("key[%hd]=%lx\n", pos, node->keys[pos]->data[0]);
 #endif
-  SASIndexNodeKeyDelete (node_t, pos);
+  SASIndexNodeKeyDelete (node_t, pos, lock_on);
 
   str_ptr = (char *) node;
   end_ptr = str_ptr + node->blockHeader.blockSize;
@@ -1589,7 +1599,8 @@ SASIndexNodeRemove (SASIndexNode_t node_t, short pos)
 	      sas_printf ("Remove@%p copy far pos=%hd key@%p len=%d\n",
 			  node_t, (i - 1), temp_key, key_len);
 #endif
-	      SASIndexNodeKeyCopy ((SASIndexNode_t) node, (i - 1), temp_key);
+	      SASIndexNodeKeyCopy ((SASIndexNode_t) node, (i - 1),
+	    		  temp_key, lock_on);
 	      max_frag = SASIndexNodeMaxFragmentNoLock (node_t);
 	    }
 	}
@@ -1617,7 +1628,8 @@ SASIndexNodeRemove (SASIndexNode_t node_t, short pos)
 }
 
 void
-SASIndexNodeCombine (SASIndexNode_t node_t, short pos)
+SASIndexNodeCombine (SASIndexNode_t node_t, short pos,
+		lock_on_t lock_on)
 {
   SASIndexNodeHeader *node = (SASIndexNodeHeader *) node_t;
   SASIndexNodeHeader *q, *r;
@@ -1631,7 +1643,7 @@ SASIndexNodeCombine (SASIndexNode_t node_t, short pos)
   r = ((SASIndexNodeHeader *) node->branch[pos - 1]);
   r->count++;
   //r->keys[r->count] = node->keys[pos];
-  SASIndexNodeKeyMove (r, r->count, node->keys[pos]);
+  SASIndexNodeKeyMove (r, r->count, node->keys[pos], lock_on);
   node->keys[pos] = NULL;	// Move frees the key string in node
   r->vals[r->count] = node->vals[pos];
   r->branch[r->count] = q->branch[0];
@@ -1644,7 +1656,7 @@ SASIndexNodeCombine (SASIndexNode_t node_t, short pos)
     {
       r->count++;
       // r->keys[r->count] = q->keys[c];
-      SASIndexNodeKeyMove (r, r->count, q->keys[c]);
+      SASIndexNodeKeyMove (r, r->count, q->keys[c], lock_on);
       q->keys[c] = NULL;
       r->vals[r->count] = q->vals[c];
       q->vals[c] = NULL;
@@ -1657,13 +1669,13 @@ SASIndexNodeCombine (SASIndexNode_t node_t, short pos)
 // remove pivot, since it hase been combined
   node->branch[pos] = NULL;
   node->vals[pos] = NULL;
-  SASIndexNodeRemove (node_t, pos);
+  SASIndexNodeRemove (node_t, pos, lock_on);
 // dispose of q, since it is empty
   SASIndexNearDealloc (q);
 }
 
 void
-SASIndexNodeMoveLeft (SASIndexNode_t node_t, short pos)
+SASIndexNodeMoveLeft (SASIndexNode_t node_t, short pos, lock_on_t lock_on)
 {
   SASIndexNodeHeader *node = (SASIndexNodeHeader *) node_t;
   SASIndexNodeHeader *l, *r;
@@ -1680,13 +1692,13 @@ SASIndexNodeMoveLeft (SASIndexNode_t node_t, short pos)
 #endif
   l->count++;
   // l->keys[l->count] = node->keys[pos];
-  SASIndexNodeKeyMove (l, l->count, node->keys[pos]);
+  SASIndexNodeKeyMove (l, l->count, node->keys[pos], lock_on);
   node->keys[pos] = NULL;
   l->vals[l->count] = node->vals[pos];
   l->branch[l->count] = r->branch[0];
 
   //node->keys[pos] = r->keys[1];
-  SASIndexNodeKeyMove (node, pos, r->keys[1]);
+  SASIndexNodeKeyMove (node, pos, r->keys[1], lock_on);
   node->vals[pos] = r->vals[1];
   r->branch[0] = r->branch[1];
   r->count--;
@@ -1711,7 +1723,7 @@ SASIndexNodeMoveLeft (SASIndexNode_t node_t, short pos)
 	      sas_printf ("MoveLeft@%p copy far pos=%hd key@%p len=%d\n",
 			  node_t, (c), temp_key, key_len);
 #endif
-	      SASIndexNodeKeyCopy ((SASIndexNode_t) r, (c), temp_key);
+	      SASIndexNodeKeyCopy ((SASIndexNode_t) r, (c), temp_key, lock_on);
 	      max_frag = SASIndexNodeMaxFragmentNoLock (node_t);
 	    }
 	}
@@ -1727,7 +1739,8 @@ SASIndexNodeMoveLeft (SASIndexNode_t node_t, short pos)
 }
 
 void
-SASIndexNodeMoveRight (SASIndexNode_t node_t, short pos)
+SASIndexNodeMoveRight (SASIndexNode_t node_t, short pos,
+		lock_on_t lock_on)
 {
   SASIndexNodeHeader *node = (SASIndexNodeHeader *) node_t;
   SASIndexNodeHeader *l, *r;
@@ -1763,14 +1776,15 @@ SASIndexNodeMoveRight (SASIndexNode_t node_t, short pos)
 	      sas_printf ("MoveRight@%p copy far pos=%hd key@%p len=%d\n",
 			  node_t, (c + 1), temp_key, key_len);
 #endif
-	      SASIndexNodeKeyCopy ((SASIndexNode_t) r, (c + 1), temp_key);
+	      SASIndexNodeKeyCopy ((SASIndexNode_t) r, (c + 1),
+	    		  temp_key, lock_on);
 	      max_frag = SASIndexNodeMaxFragmentNoLock (node_t);
 	    }
 	}
     };
   // r->keys[1] = node->keys[pos];
   r->keys[1] = NULL;
-  SASIndexNodeKeyMove (r, 1, node->keys[pos]);
+  SASIndexNodeKeyMove (r, 1, node->keys[pos], lock_on);
   node->keys[pos] = NULL;
   r->vals[1] = node->vals[pos];
   r->branch[1] = r->branch[0];
@@ -1782,7 +1796,7 @@ SASIndexNodeMoveRight (SASIndexNode_t node_t, short pos)
 #endif
 
   // node->keys[pos] = l->keys[l->count];
-  SASIndexNodeKeyMove (node, pos, l->keys[l->count]);
+  SASIndexNodeKeyMove (node, pos, l->keys[l->count], lock_on);
   node->vals[pos] = l->vals[l->count];
   r->branch[0] = l->branch[l->count];
 
@@ -1799,7 +1813,7 @@ SASIndexNodeMoveRight (SASIndexNode_t node_t, short pos)
 
  // finds a key and inserts it into this.branch[pos] to restore minimums
 void
-SASIndexNodeRestore (SASIndexNode_t header, short pos)
+SASIndexNodeRestore (SASIndexNode_t header, short pos, lock_on_t lock_on)
 {
   SASIndexNodeHeader *node = (SASIndexNodeHeader *) header;
   short min = node->max_count / 2;
@@ -1811,7 +1825,7 @@ SASIndexNodeRestore (SASIndexNode_t header, short pos)
     {
       if (((SASIndexNodeHeader *) node->branch[pos - 1])->count > min)
 	{			// move key to right
-	  SASIndexNodeMoveRight (header, pos);
+	  SASIndexNodeMoveRight (header, pos, lock_on);
 	}
       else
 	{
@@ -1821,7 +1835,7 @@ SASIndexNodeRestore (SASIndexNode_t header, short pos)
 	      sas_printf ("Restore branch[pos]->count=%hd\n",
 			  ((SASIndexNodeHeader *) node->branch[pos])->count);
 #endif
-	      SASIndexNodeMoveLeft (header, pos);
+	      SASIndexNodeMoveLeft (header, pos, lock_on);
 	    }
 	  else
 	    {
@@ -1835,16 +1849,16 @@ SASIndexNodeRestore (SASIndexNode_t header, short pos)
 		  if (((SASIndexNodeHeader *) node->branch[pos + 1])->count >
 		      min)
 		    {		// move key to left
-		      SASIndexNodeMoveLeft (header, (short) (pos + 1));
+		      SASIndexNodeMoveLeft (header, (short) (pos + 1), lock_on);
 		    }
 		  else
 		    {
-		      SASIndexNodeCombine (header, pos);
+		      SASIndexNodeCombine (header, pos, lock_on);
 		    }
 		}
 	      else
 		{
-		  SASIndexNodeCombine (header, pos);
+		  SASIndexNodeCombine (header, pos, lock_on);
 		}
 	    }
 	}
@@ -1857,18 +1871,18 @@ SASIndexNodeRestore (SASIndexNode_t header, short pos)
 #endif
       if (((SASIndexNodeHeader *) node->branch[1])->count > min)
 	{
-	  SASIndexNodeMoveLeft (header, (short) 1);
+	  SASIndexNodeMoveLeft (header, (short) 1, lock_on);
 	}
       else
 	{
-	  SASIndexNodeCombine (header, (short) 1);
+	  SASIndexNodeCombine (header, (short) 1, lock_on);
 	}
     }
 }
 
 // replaces this.key[k] by its immediate successor
 void
-SASIndexNodeSuccessor (SASIndexNode_t header, short pos)
+SASIndexNodeSuccessor (SASIndexNode_t header, short pos, lock_on_t lock_on)
 {
   SASIndexNodeHeader *node = (SASIndexNodeHeader *) header;
   SASIndexNodeHeader *q;
@@ -1889,7 +1903,7 @@ SASIndexNodeSuccessor (SASIndexNode_t header, short pos)
 	      header, node->keys[pos], q->keys[1]);
 #endif
   // node->keys[k] = q->keys[1];
-  SASIndexNodeKeyCopy (node, pos, q->keys[1]);
+  SASIndexNodeKeyCopy (node, pos, q->keys[1], lock_on);
 //      q->keys[1] = NULL;
   node->vals[pos] = q->vals[1];
 //      q->vals[1] = NULL;
@@ -1904,7 +1918,8 @@ SASIndexNodeSuccessor (SASIndexNode_t header, short pos)
 
 // recursive delete
 int
-SASIndexNodeRecDelete (SASIndexNode_t header, SASIndexKey_t * target)
+SASIndexNodeRecDelete (SASIndexNode_t header, SASIndexKey_t * target,
+		lock_on_t lock_on)
 {
   SASIndexNodeHeader *node = (SASIndexNodeHeader *) header;
   SASIndexNodeHeader *q;
@@ -1933,15 +1948,15 @@ SASIndexNodeRecDelete (SASIndexNode_t header, SASIndexKey_t * target)
     {
       if (node->branch[k - 1] == NULL)	// case: this is a leaf
 	{			// removes key from position k of this
-	  SASIndexNodeRemove (header, k);
+	  SASIndexNodeRemove (header, k, lock_on);
 	}
       else
 	{			// replaces key[k] by its successor
-	  SASIndexNodeSuccessor (header, k);
+	  SASIndexNodeSuccessor (header, k, lock_on);
 	  q = ((SASIndexNodeHeader *) node->branch[k]);
 	  if (q != NULL)
 	    {
-	      found = SASIndexNodeRecDelete (q, node->keys[k]);
+	      found = SASIndexNodeRecDelete (q, node->keys[k], lock_on);
 #if __SASDebugPrint__ > 1
 	      sas_printf ("RecDelete after Sucessor found=%d\n", found);
 	      sas_printf ("RecDelete: subtree=");
@@ -1965,7 +1980,7 @@ SASIndexNodeRecDelete (SASIndexNode_t header, SASIndexKey_t * target)
       q = ((SASIndexNodeHeader *) node->branch[k]);
       if (q != NULL)
 	{
-	  found = SASIndexNodeRecDelete (q, target);
+	  found = SASIndexNodeRecDelete (q, target, lock_on);
 	}
       else
 	{
@@ -1977,7 +1992,7 @@ SASIndexNodeRecDelete (SASIndexNode_t header, SASIndexKey_t * target)
     {
       if (((SASIndexNodeHeader *) node->branch[k])->count < min)
 	{
-	  SASIndexNodeRestore (header, k);
+	  SASIndexNodeRestore (header, k, lock_on);
 	}
     }
 #ifdef __SASDebugPrint__
@@ -1992,7 +2007,7 @@ SASIndexNodeRecDelete (SASIndexNode_t header, SASIndexKey_t * target)
 }
 
 SASIndexNode_t
-SASIndexNodeDelete (SASIndexNode_t header, SASIndexKey_t * target)
+SASIndexNodeDelete (SASIndexNode_t header, SASIndexKey_t * target, lock_on_t lock_on)
 {
   SASIndexNodeHeader *node = (SASIndexNodeHeader *) header;
   SASIndexNodeHeader *result = node;
@@ -2001,7 +2016,7 @@ SASIndexNodeDelete (SASIndexNode_t header, SASIndexKey_t * target)
 #ifdef __SASDebugPrint__
   sas_printf ("Delete target=%lx\n", target->data[0]);
 #endif
-  found = SASIndexNodeRecDelete (header, target);
+  found = SASIndexNodeRecDelete (header, target, lock_on);
   if (found)
     {
       if (node->count == 0)
