@@ -1,3 +1,43 @@
+2014-05-05  Steven Munroe  <sjmunroe@us.ibm.com>
+
+	* /src/sasindex.cpp (SASIndexPercentFree): Replace divide by
+	power of 2 with __builtin_ctzl and shift right.
+	(SASIndexPercentUsed): Like wise.
+	(SASIndexGetRootNode_nolock): New function.
+	(SASIndexGetModCount_nolock): Like wise.
+	(SASIndexGetMaxKey_nolock): Like wise.
+	(SASIndexGetMinKey_nolock): Like wise.
+	(SASIndexContainsKey_nolock): Like wise.
+	(SASIndexGet_nolock): Like wise.
+	(SASIndexIsEmpty_nolock): Like wise.
+	(SASIndexPut_nolock): Like wise.
+	(SASIndexReplace_nolock): Like wise.
+	(SASIndexRemove_nolock): Like wise.
+	(SASIndexPut): Update calls to SASIndexNodeInsert() and
+	SASIndexNodeInitialize().
+	(SASIndexRemove): Update call to SASIndexNodeDelete().
+	* /src/sasindex.h: Add comment.
+	(SASIndexGetModCount_nolock): Declare with comment.
+	(SASIndexGetMaxKey_nolock): Declare with comment.
+	(SASIndexGetMinKey_nolock): Declare with comment.
+	(SASIndexContainsKey_nolock): Declare with comment.
+	(SASIndexGet_nolock): Declare with comment.
+	(SASIndexIsEmpty_nolock): Declare with comment.
+	(SASIndexPut_nolock): Declare with comment.
+	(SASIndexReplace_nolock): Declare with comment.
+	(SASIndexRemove_nolock): Declare with comment.
+	* src/sasindexenum.cpp (SASIndexEnumNext_nolock): New function.
+	* src/sasindexenum.h (SASIndexEnumNext_nolock):
+	Declare with comment.
+	* /src/sasindexpriv.h (SASIndexGetRootNode_nolock):
+	Declare with comment.
+
+	* /src/tests/sasindex_tt.c (sassim_index_random_nolock):
+	New Function.
+	(sassim_index_sequential_nolock): Like wise.
+	(main): Call sassim_index_random_nolock and
+	sassim_index_sequential_nolock.
+
 2014-05-02  Steven Munroe  <sjmunroe@us.ibm.com>
 
 	* /src/sasindex.cpp (SASIndexPut): Update SASIndexNodeInsert

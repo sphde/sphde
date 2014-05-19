@@ -183,6 +183,19 @@ SASIndexNearDealloc (void *memAddr);
 extern __C__ SASIndexNode_t
 SASIndexGetRootNode (SASIndex_t btree);
 
+/*!
+ * \brief Internal function that returns the root SASIndexNode_t node
+ * for \a btree B-Tree.
+ *
+ * The sas_type_t must be SAS_RUNTIME_INDEX. The functions holds a read
+ * lock over B-Tree \a btree.
+ *
+ * @param btree Handle to the SASIndex_t.
+ * @return The root node or 0 if no root is available or if an error occurs.
+ */
+extern __C__ SASIndexNode_t
+SASIndexGetRootNode_nolock (SASIndex_t btree);
+
 extern SASIndexNode_t
 SASIndexSpillAlloc (void *nearObj);
 

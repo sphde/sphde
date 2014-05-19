@@ -32,12 +32,14 @@ static inline int
 SASIndexPercentFree (SASIndexHeader	*heapBlock)
 {
 	int percent = 0;
+	int divisor;
 	block_size_t	heapFree = 0;
 	
 	if (heapBlock->blockHeader.blockFreeSpace != NULL)
 	{
 		heapFree = freeNode_freeSpaceTotal(heapBlock->blockHeader.blockFreeSpace);
-		percent = (int)((heapFree  * 100) / heapBlock->blockHeader.blockSize);
+		divisor = __builtin_ctzl(heapBlock->blockHeader.blockSize);
+		percent = (int)((heapFree  * 100) >> divisor);
 	}
 #if 0
     sas_printf("SASIndexPercentFree(%p) = %d for (%ld, %ld)\n", 
@@ -50,6 +52,7 @@ static inline int
 SASIndexPercentUsed (SASIndexHeader	*heapBlock)
 {
 	int percent = 100;
+	int divisor;
 	block_size_t	heapFree = 0;
 	block_size_t	heapUsed = 0;
 	
@@ -57,7 +60,8 @@ SASIndexPercentUsed (SASIndexHeader	*heapBlock)
 	{
 		heapFree = freeNode_freeSpaceTotal(heapBlock->blockHeader.blockFreeSpace);
 		heapUsed = heapBlock->blockHeader.blockSize - heapFree;
-		percent = (int)((heapUsed  * 100) / heapBlock->blockHeader.blockSize);
+		divisor = __builtin_ctzl(heapBlock->blockHeader.blockSize);
+		percent = (int)((heapUsed  * 100) >> divisor);
 	}
 #if 0
     sas_printf("SASIndexPercentFree(%p) = %d for (%ld, %ld)\n", 
@@ -1069,6 +1073,19 @@ SASIndexGetRootNode(SASIndex_t  heap)
     }
 	return result;
 };
+SASIndexNode_t
+SASIndexGetRootNode_nolock(SASIndex_t  heap)
+{
+    SASIndexHeader	*btree = (SASIndexHeader*)heap;
+	SASIndexNode_t	result	= NULL;
+
+    if (SOMSASCheckBlockSigAndType ((SASBlockHeader*)heap,
+                                    SAS_RUNTIME_INDEX))
+    {
+    	result = btree->root;
+    }
+	return result;
+};
 
 long
 SASIndexGetModCount(SASIndex_t  heap)
@@ -1082,6 +1099,20 @@ SASIndexGetModCount(SASIndex_t  heap)
     	SASLock(heap, SasUserLock__READ);
     	result = btree->common->modCount;
 		SASUnlock(heap);
+    }
+	return result;
+}
+
+long
+SASIndexGetModCount_nolock(SASIndex_t  heap)
+{
+    SASIndexHeader	*btree = (SASIndexHeader*)heap;
+	long	result	= 0L;
+
+    if (SOMSASCheckBlockSigAndType ((SASBlockHeader*)heap,
+                                    SAS_RUNTIME_INDEX))
+    {
+    	result = btree->common->modCount;
     }
 	return result;
 }
@@ -1103,6 +1134,20 @@ SASIndexGetMaxKey(SASIndex_t  heap)
 }
 
 SASIndexKey_t*
+SASIndexGetMaxKey_nolock(SASIndex_t  heap)
+{
+    SASIndexHeader	*btree = (SASIndexHeader*)heap;
+	SASIndexKey_t	*result	= NULL;
+
+    if (SOMSASCheckBlockSigAndType ((SASBlockHeader*)heap,
+                                    SAS_RUNTIME_INDEX))
+    {
+    	result = btree->common->max_key;
+    }
+	return result;
+}
+
+SASIndexKey_t*
 SASIndexGetMinKey(SASIndex_t  heap)
 {
     SASIndexHeader	*btree = (SASIndexHeader*)heap;
@@ -1114,6 +1159,20 @@ SASIndexGetMinKey(SASIndex_t  heap)
     	SASLock(heap, SasUserLock__READ);
     	result = btree->common->min_key;
 		SASUnlock(heap);
+    }
+	return result;
+};
+
+SASIndexKey_t*
+SASIndexGetMinKey_nolock(SASIndex_t  heap)
+{
+    SASIndexHeader	*btree = (SASIndexHeader*)heap;
+	SASIndexKey_t	*result	= NULL;
+
+    if (SOMSASCheckBlockSigAndType ((SASBlockHeader*)heap,
+                                    SAS_RUNTIME_INDEX))
+    {
+    	result = btree->common->min_key;
     }
 	return result;
 };
@@ -1134,6 +1193,24 @@ SASIndexContainsKey (SASIndex_t  heap, SASIndexKey_t *key)
 		    found = SASIndexNodeSearch(btree->root, key, &ref);
 		}
 		SASUnlock(heap);
+    }
+	return found;
+}
+
+int
+SASIndexContainsKey_nolock (SASIndex_t  heap, SASIndexKey_t *key)
+{
+    SASIndexHeader	*btree = (SASIndexHeader*)heap;
+	__IDXnodePosRef ref = {NULL, 0};
+	int found = false;
+
+    if (SOMSASCheckBlockSigAndType ((SASBlockHeader*)heap,
+                                    SAS_RUNTIME_INDEX))
+    {
+		if (btree->root != NULL)
+		{
+		    found = SASIndexNodeSearch(btree->root, key, &ref);
+		}
     }
 	return found;
 }
@@ -1163,6 +1240,29 @@ SASIndexGet (SASIndex_t  heap, SASIndexKey_t *key)
 	return result;
 }
 
+void*
+SASIndexGet_nolock (SASIndex_t  heap, SASIndexKey_t *key)
+{
+    SASIndexHeader	*btree = (SASIndexHeader*)heap;
+	void *result = NULL;
+	__IDXnodePosRef ref = {NULL, 0};
+	int found;
+
+    if (SOMSASCheckBlockSigAndType ((SASBlockHeader*)heap,
+                                    SAS_RUNTIME_INDEX))
+    {
+		if (btree->root != NULL)
+		{
+		    found = SASIndexNodeSearch(btree->root, key, &ref);
+		    if (found)
+		    {
+				result = SASIndexNodeGetValIndexed(ref.node, ref.pos);
+		    }
+		}
+    }
+	return result;
+}
+
 int
 SASIndexIsEmpty(SASIndex_t  heap)
 {
@@ -1175,6 +1275,20 @@ SASIndexIsEmpty(SASIndex_t  heap)
     	SASLock(heap, SasUserLock__READ);
     	result = (btree->common->count == 0);
 		SASUnlock(heap);
+    }
+	return result;
+}
+
+int
+SASIndexIsEmpty_nolock(SASIndex_t  heap)
+{
+    SASIndexHeader	*btree = (SASIndexHeader*)heap;
+    int	result = false;
+
+    if (SOMSASCheckBlockSigAndType ((SASBlockHeader*)heap,
+                                    SAS_RUNTIME_INDEX))
+    {
+    	result = (btree->common->count == 0);
     }
 	return result;
 }
@@ -1265,7 +1379,7 @@ SASIndexPut (SASIndex_t  heap, SASIndexKey_t *key, void *value)
 		if (btree->root != NULL)
 		{
 			SASIndexNode_t node;
-		    node = SASIndexNodeInsert(btree->root, key, value, LOCK_ON);
+		    node = SASIndexNodeInsert(btree->root, key, value, LOCK_OFF);
 		    if (node != NULL)
 			{
 			    btree->root = node;
@@ -1278,7 +1392,7 @@ SASIndexPut (SASIndex_t  heap, SASIndexKey_t *key, void *value)
 		    } 
 		} else {
 		    btree->root = SASIndexAlloc(heap);
-		    SASIndexNodeInitialize(btree->root, key, value, LOCK_ON);
+		    SASIndexNodeInitialize(btree->root, key, value, LOCK_OFF);
 		    SASIndexUpdateMin(heap, key);
 		    SASIndexUpdateMax(heap, key);
 			btree->common->modCount++;
@@ -1286,6 +1400,43 @@ SASIndexPut (SASIndex_t  heap, SASIndexKey_t *key, void *value)
 		};
 		btree->common->count++;
 		SASUnlock(heap);
+    }
+	return result; /* False indicates duplicate key */
+}
+
+int
+SASIndexPut_nolock (SASIndex_t  heap, SASIndexKey_t *key, void *value)
+{
+    SASIndexHeader	*btree = (SASIndexHeader*)heap;
+    int result = false;
+
+    if (SOMSASCheckBlockSigAndType ((SASBlockHeader*)heap,
+                                    SAS_RUNTIME_INDEX))
+    {
+
+		if (btree->root != NULL)
+		{
+			SASIndexNode_t node;
+		    node = SASIndexNodeInsert(btree->root, key, value, LOCK_OFF);
+		    if (node != NULL)
+			{
+			    btree->root = node;
+				btree->common->modCount++;
+			    if ( SASIndexKeyCompare(key, btree->common->min_key) < 0 )
+			    	SASIndexUpdateMin(heap, key);
+			    if ( SASIndexKeyCompare(key, btree->common->max_key) > 0 )
+			    	SASIndexUpdateMax(heap, key);
+			    result = true;
+		    }
+		} else {
+		    btree->root = SASIndexAlloc(heap);
+		    SASIndexNodeInitialize(btree->root, key, value, LOCK_OFF);
+		    SASIndexUpdateMin(heap, key);
+		    SASIndexUpdateMax(heap, key);
+			btree->common->modCount++;
+			result = true;
+		};
+		btree->common->count++;
     }
 	return result; /* False indicates duplicate key */
 }
@@ -1320,6 +1471,33 @@ SASIndexReplace (SASIndex_t  heap, SASIndexKey_t *key, void *value)
 }
 
 void *
+SASIndexReplace_nolock (SASIndex_t  heap, SASIndexKey_t *key, void *value)
+{
+    SASIndexHeader	*btree = (SASIndexHeader*)heap;
+	__IDXnodePosRef ref = {NULL, 0};
+    void	*result = NULL;
+
+    if (SOMSASCheckBlockSigAndType ((SASBlockHeader*)heap,
+                                    SAS_RUNTIME_INDEX))
+    {
+		btree->common->modCount++;
+
+		if (btree->root != NULL)
+		{
+			int found;
+		    found = SASIndexNodeSearch(btree->root, key, &ref);
+		    //found = getNode(key, &ref);
+		    if (found)
+		    {
+				result = SASIndexNodePutValIndexed(ref.node, ref.pos, value);
+		    }
+		}
+		btree->common->count++;
+    }
+	return result; // return prev value if already exist
+}
+
+void *
 SASIndexRemove (SASIndex_t  heap, SASIndexKey_t *key)
 {
     SASIndexHeader	*btree = (SASIndexHeader*)heap;
@@ -1344,7 +1522,7 @@ SASIndexRemove (SASIndex_t  heap, SASIndexKey_t *key)
 				result = SASIndexNodeGetValIndexed(ref.node, ref.pos);
 		    }
 			  
-		    newRoot = SASIndexNodeDelete(btree->root, key, LOCK_ON);
+		    newRoot = SASIndexNodeDelete(btree->root, key, LOCK_OFF);
 		    if ( newRoot != btree->root )
 		    {   //Delete the old root which is empty
 				SASIndexNearDealloc(btree->root);
@@ -1383,6 +1561,72 @@ SASIndexRemove (SASIndex_t  heap, SASIndexKey_t *key)
 		    btree->common->count = 0;
 		}
 		SASUnlock(heap);
+    }
+	return result; // return prev value if already exist
+}
+
+void *
+SASIndexRemove_nolock (SASIndex_t  heap, SASIndexKey_t *key)
+{
+    SASIndexHeader	*btree = (SASIndexHeader*)heap;
+	SASIndexNode_t newRoot;
+	__IDXnodePosRef ref = {NULL, 0};
+    void	*result = NULL;
+    SASIndexNodeHeader *node;
+
+    if (SOMSASCheckBlockSigAndType ((SASBlockHeader*)heap,
+                                    SAS_RUNTIME_INDEX))
+    {
+		btree->common->modCount++;
+
+		if (btree->root != NULL)
+		{
+			int found;
+		    found = SASIndexNodeSearch(btree->root, key, &ref);
+		    //found = getNode(key, &ref);
+		    if (found)
+		    {
+				result = SASIndexNodeGetValIndexed(ref.node, ref.pos);
+		    }
+
+		    newRoot = SASIndexNodeDelete(btree->root, key, LOCK_OFF);
+		    if ( newRoot != btree->root )
+		    {   //Delete the old root which is empty
+				SASIndexNearDealloc(btree->root);
+				btree->root = newRoot;
+		    }
+		    if ( btree->root != NULL )
+		    {
+				btree->common->count--;
+				if (btree->common->count > 0)
+				{
+				    if(SASIndexKeyCompare(key, btree->common->min_key) == 0)
+				    {
+				        node = (SASIndexNodeHeader *) btree->root;
+				        if (node->branch[0] != NULL)
+				        {
+				            node = node->branch[0];
+				        }
+				        SASIndexUpdateMin(heap, node->keys[1]);
+				    }
+				    if(SASIndexKeyCompare(key, btree->common->max_key) == 0)
+				    {
+				        node = (SASIndexNodeHeader *) btree->root;
+				        if(node->branch[node->count] != NULL)
+				        {
+				            node = node->branch[node->count];
+				        }
+				        SASIndexUpdateMax(heap ,node->keys[(node->count)]);
+				    }
+				}
+		    } else {
+				btree->common->count = 0;
+				SASIndexUpdateMax(heap, NULL);
+				SASIndexUpdateMin(heap, NULL);
+		    }
+		} else {
+		    btree->common->count = 0;
+		}
     }
 	return result; // return prev value if already exist
 }

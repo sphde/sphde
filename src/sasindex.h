@@ -67,6 +67,36 @@
  * The enumeration API from sasindexenum.h can be use to iterate
  * over the (in whole or part) of contents of BTree in key order.
  *
+ * The functions above apply SASLock and SASUnlock around each Index
+ * operation to insure consistency of the Index.
+ *
+ * If at process needs exclusive access or needs to scan or populate an
+ * Index quickly, the application can SASLock the SASIndex_t, then use
+ * the *_nolock forms of the function above for faster access.
+ * \code
+ * SASIndex_t indexBTree;
+ * SASIndexEnum_t senum;
+ * unsigned long long *keyref;
+ *
+ * SASLock (indexBTree, SasUserLock__READ);
+ * senum = SASIndexEnumCreate_nolock (index);
+ * if (!senum)
+ *   {
+ *     printf ("SASIndexEnumCreate (%p) failed", index);
+ *     return 1;
+ *  }
+ *
+ * while (SASIndexEnumHasMore (senum))
+ *  {
+ *    keyref = (unsigned long long *) SASIndexEnumNext_nolock (senum);
+ *    if (keyref)
+ *      {
+ *      // process reference value associated with next enum
+ *	    }
+ *   }
+ * SASUnlock (indexBTree);
+ * \endcode
+ *
  * Finally, a created SAS binary B-Tree \a SASIndex_t can be destroy
  * with ::SASIndexDestroy.
  */
@@ -169,6 +199,25 @@ extern __C__ long
 SASIndexGetModCount (SASIndex_t btree);
 
 /*!
+ * \brief Return the number or insert/replace/remove operations performed on
+ * \a btree.
+ *
+ * The sas_type_t must be SAS_RUNTIME_INDEX.
+ * An initialized SAS B-Tree starts with mod count 1 and it is incremented
+ * each time a insert/replace/remove operation is performed.
+ *
+ * This nolock form should only be used when the referenced SASIndex_t
+ * is known to be locked by the application or contained within a
+ * larger structure with a controlling lock.
+ *
+ * @param btree Handle to the SASIndex_t.
+ * @return The number of insert/replace/remove operations performed on
+ * \a btree.
+ */
+extern __C__ long
+SASIndexGetModCount_nolock (SASIndex_t btree);
+
+/*!
  * \brief Return the maximum key string from \a btree.
  *
  * The sas_type_t must be SAS_RUNTIME_INDEX. The function holds a read
@@ -184,6 +233,26 @@ SASIndexGetModCount (SASIndex_t btree);
  */
 extern __C__ SASIndexKey_t *
 SASIndexGetMaxKey (SASIndex_t btree);
+
+/*!
+ * \brief Return the maximum key string from \a btree.
+ *
+ * The sas_type_t must be SAS_RUNTIME_INDEX.
+ * The maximum key is the right most entry of the right most node.
+ *
+ * \note this value it stored in the header of the SASIndex_t
+ * initial block and should never be modified by the application.
+ *
+ * This nolock form should only be used when the referenced SASIndex_t
+ * is known to be locked by the application or contained within a
+ * larger structure with a controlling lock.
+ *
+ * @param btree Handle to the SASIndex_t.
+ * @return handle to maximum SASIndexKey_t from B-Tree \a btree or 0 if
+ * the B-Tree does not have any key or if an error occurs.
+ */
+extern __C__ SASIndexKey_t *
+SASIndexGetMaxKey_nolock (SASIndex_t btree);
 
 /*!
  * \brief Return the minimum key string from \a btree.
@@ -203,6 +272,26 @@ extern __C__ SASIndexKey_t *
 SASIndexGetMinKey (SASIndex_t btree);
 
 /*!
+ * \brief Return the minimum key string from \a btree.
+ *
+ * The sas_type_t must be SAS_RUNTIME_INDEX.
+ * The minimum key is the left most entry of the left most node.
+ *
+ * This nolock form should only be used when the referenced SASIndex_t
+ * is known to be locked by the application or contained within a
+ * larger structure with a controlling lock.
+ *
+ * \note this value it stored in the header of the SASIndex_t
+ * initial block and should never be modified by the application.
+ *
+ * @param btree Handle to the SASIndex_t.
+ * @return handle to maximum SASIndexKey_t from B-Tree \a btree or 0 if
+ * the B-Tree does not have any key or if an error occurs.
+ */
+extern __C__ SASIndexKey_t *
+SASIndexGetMinKey_nolock (SASIndex_t btree);
+
+/*!
  * \brief Return true if the SAS B-Tree \a btree contains the key \a key.
  *
  * The sas_type_t must be SAS_RUNTIME_INDEX. The function holds a
@@ -215,6 +304,24 @@ SASIndexGetMinKey (SASIndex_t btree);
  */
 extern __C__ int
 SASIndexContainsKey (SASIndex_t btree, SASIndexKey_t * key);
+
+/*!
+ * \brief Return true if the SAS B-Tree \a btree contains the key \a key.
+ *
+ * The sas_type_t must be SAS_RUNTIME_INDEX.
+ * This function searches the B-Tree for a matching key and returns
+ * true if found.
+ *
+ * This nolock form should only be used when the referenced SASIndex_t
+ * is known to be locked by the application or contained within a
+ * larger structure with a controlling lock.
+ *
+ * @param btree Handle to the SASIndex_t.
+ * @param key Null terminated key string to search.
+ * @return 1 if the key is within \a btree or 0 otherwise.
+ */
+extern __C__ int
+SASIndexContainsKey_nolock (SASIndex_t btree, SASIndexKey_t * key);
 
 /*!
  * \brief Return the memory address value associated with \a key in
@@ -234,6 +341,26 @@ extern __C__ void *
 SASIndexGet (SASIndex_t btree, SASIndexKey_t * key);
 
 /*!
+ * \brief Return the memory address value associated with \a key in
+ * SAS B-Tree \a btree.
+ *
+ * The sas_type_t must be SAS_RUNTIME_INDEX.
+ * This function searches the B-Tree for a matching key and if found,
+ * returns the associated memory address value.
+ *
+ * This nolock form should only be used when the referenced SASIndex_t
+ * is known to be locked by the application or contained within a
+ * larger structure with a controlling lock.
+ *
+ * @param btree Handle to the SASIndex_t.
+ * @param key handle to maximum SASIndexKey_t key to search.
+ * @return The associated memory address with \a key or 0 if the B-Tree \a
+ * btree does not contain the key or if an error occurs.
+ */
+extern __C__ void *
+SASIndexGet_nolock (SASIndex_t btree, SASIndexKey_t * key);
+
+/*!
  * \brief Return true if the SAS B-Tree \a btree is empty.
  *
  * The sas_type_t must be SAS_RUNTIME_INDEX. The function holds a read
@@ -244,6 +371,21 @@ SASIndexGet (SASIndex_t btree, SASIndexKey_t * key);
  */
 extern __C__ int
 SASIndexIsEmpty (SASIndex_t btree);
+
+/*!
+ * \brief Return true if the SAS B-Tree \a btree is empty.
+ *
+ * The sas_type_t must be SAS_RUNTIME_INDEX.
+ *
+ * This nolock form should only be used when the referenced SASIndex_t
+ * is known to be locked by the application or contained within a
+ * larger structure with a controlling lock.
+ *
+ * @param btree Handle to the SASIndex_t.
+ * @return 1 if the B-Tree is not empty or 0 otherwise.
+ */
+extern __C__ int
+SASIndexIsEmpty_nolock (SASIndex_t btree);
 
 /*!
  * \brief Add a new element \a value with key \a key in the SAS B-Tree
@@ -265,6 +407,28 @@ extern __C__ int
 SASIndexPut (SASIndex_t btree, SASIndexKey_t * key, void *value);
 
 /*!
+ * \brief Add a new element \a value with key \a key in the SAS B-Tree
+ * \a btree.
+ *
+ * The sas_type_t must be SAS_RUNTIME_INDEX.
+ * This function inserts the key and associated memory address value
+ * into the B-Tree.
+ * This B-Tree implementation does not allow duplicated key values.
+ *
+ * This nolock form should only be used when the referenced SASIndex_t
+ * is known to be locked by the application or contained within a
+ * larger structure with a controlling lock.
+ *
+ * @param btree Handle to the SASIndex_t.
+ * @param key Key to use as index for the value.
+ * @param value Memory address to insert in the B-Tree.
+ * @return 1 if the operation succeeds or 0 otherwise.
+ * For example if the key already exist in this B-Tree.
+ */
+extern __C__ int
+SASIndexPut_nolock (SASIndex_t btree, SASIndexKey_t * key, void *value);
+
+/*!
  * \brief Replace the associated value of the element with key \a key
  * in SAS B-Tree \a btree with the value \a value.
  *
@@ -284,6 +448,28 @@ extern __C__ void *
 SASIndexReplace (SASIndex_t btree, SASIndexKey_t * key, void *value);
 
 /*!
+ * \brief Replace the associated value of the element with key \a key
+ * in SAS B-Tree \a btree with the value \a value.
+ *
+ * The sas_type_t must be SAS_RUNTIME_INDEX.
+ * This function searches the B-Tree for a matching key and if found,
+ * replaces the associated memory address value with \a value, and
+ * returns the previous associated value.
+ *
+ * This nolock form should only be used when the referenced SASIndex_t
+ * is known to be locked by the application or contained within a
+ * larger structure with a controlling lock.
+ *
+ * @param btree Handle to the SASIndex_t.
+ * @param key Key to use as index for the value.
+ * @param value Memory address to replace in the B-Tree.
+ * @return The address of the previous associated value for the
+ * matching key, or 0 if an error occurs.
+ */
+extern __C__ void *
+SASIndexReplace_nolock (SASIndex_t btree, SASIndexKey_t * key, void *value);
+
+/*!
  * \brief Remove the key \a key and its associated value from SAS B-Tree \a btree.
  *
  * The sas_type_t must be SAS_RUNTIME_INDEX. The function holds a write
@@ -301,6 +487,28 @@ SASIndexReplace (SASIndex_t btree, SASIndexKey_t * key, void *value);
  */
 extern __C__ void *
 SASIndexRemove (SASIndex_t btree, SASIndexKey_t * key);
+
+/*!
+ * \brief Remove the key \a key and its associated value from SAS B-Tree \a btree.
+ *
+ * The sas_type_t must be SAS_RUNTIME_INDEX.
+ * This function searches the B-Tree for a matching key and if found,
+ * removes the key and associates value from this B-Tree.
+ *
+ * This nolock form should only be used when the referenced SASIndex_t
+ * is known to be locked by the application or contained within a
+ * larger structure with a controlling lock.
+ *
+ * \note removing the key and associated value from the B-Tree does not
+ * remove or alter the data at that memory address. It only removes the
+ * associated between the and key and the address from this B-Tree.
+ *
+ * @param btree Handle to the SASIndex_t.
+ * @param key Key value to be removed from this B-Tree.
+ * @return The address of the previous item or 0 if an error occurs.
+ */
+extern __C__ void *
+SASIndexRemove_nolock (SASIndex_t btree, SASIndexKey_t * key);
 
 /*!
  * \brief Internal function to initialize storage as a B-tree.

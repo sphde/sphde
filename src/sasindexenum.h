@@ -103,4 +103,17 @@ SASIndexEnumHasMore (SASIndexEnum_t	indexenum);
 extern __C__ void*
 SASIndexEnumNext(SASIndexEnum_t	indexenum);
 
+/** \brief Move the enumeration to the next binary BTree Index key entry
+*   and return the associated address value.
+*
+*   This nolock form should only be used when the referenced SASIndex_t
+*   is known to be locked by the application or contained within a
+*   larger structure with a controlling lock.
+*
+*	@param indexenum binary BTree enumeration.
+*	@return the address value associated for the next String BTree enumeration.
+*/
+extern __C__ void*
+SASIndexEnumNext_nolock(SASIndexEnum_t	indexenum);
+
 #endif /* __SAS_INDEXENUM_H */

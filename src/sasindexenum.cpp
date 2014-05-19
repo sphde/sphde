@@ -193,3 +193,117 @@ SASIndexEnumNext (SASIndexEnum_t idxenum)
 
   return result;
 }
+
+void *
+SASIndexEnumNext_nolock (SASIndexEnum_t idxenum)
+{
+  __IDXEnumeration *indexenum = (__IDXEnumeration *) idxenum;
+  void *result = NULL;
+  bool found = false;
+  SASIndexKey_t *maxkey;
+
+  maxkey = SASIndexGetMaxKey_nolock (indexenum->tree);
+#if __SASDebugPrint__ > 1
+  sas_printf ("SASIndexEnumNext; enum->tree=%p maxkey=%p\n",
+		  indexenum->tree, maxkey);
+#endif
+  if (maxkey != NULL)
+    {
+      indexenum->hasmore =
+	(SASIndexKeyCompare (indexenum->curkey, maxkey) < 0);
+      if (indexenum->hasmore)
+	{
+	  SASIndexNode_t curnode = indexenum->ref.node;
+	  long treemod = SASIndexGetModCount_nolock (indexenum->tree);
+
+	  if ((curnode != NULL) && (treemod == indexenum->curmod))
+	    {
+	      short curpos = indexenum->ref.pos;
+	      SASIndexNodeHeader *curSBnode = (SASIndexNodeHeader *) curnode;
+	      if (curpos < curSBnode->count)
+		{
+		  if (curSBnode->branch[curpos] == NULL)
+		    {
+		      curpos++;
+		      indexenum->ref.pos = curpos;
+		      result = curSBnode->vals[curpos];
+		      indexenum->curkey = curSBnode->keys[curpos];
+		      indexenum->hasmore =
+			(SASIndexKeyCompare (indexenum->curkey, maxkey) < 0);
+		      found = true;
+		    }
+		  else
+		    {
+		      found =
+			SASIndexNodeSearchGT (curnode, indexenum->curkey,
+					      &indexenum->ref);
+		      if (found)
+			{
+			  curnode = indexenum->ref.node;
+			  curSBnode = (SASIndexNodeHeader *) curnode;
+			  curpos = indexenum->ref.pos;
+			  result = curSBnode->vals[curpos];
+			  indexenum->curkey = curSBnode->keys[curpos];
+			  indexenum->hasmore =
+			    (SASIndexKeyCompare (indexenum->curkey, maxkey) <
+			     0);
+			}
+		    }
+		}
+	    }
+	  if (!found)
+	    {
+#if __SASDebugPrint__ > 1
+		  sas_printf ("SASIndexEnumNext; !found enum->tree=%p curkey=%p=%ix\n",
+				  indexenum->tree, indexenum->curkey, indexenum->curkey->data[0]);
+#endif
+	      SASIndexNode_t curnode = SASIndexGetRootNode_nolock (indexenum->tree);
+	      if (indexenum->ref.node == NULL)
+	      {
+		      found = SASIndexNodeSearchGE (curnode, indexenum->curkey,
+					      &indexenum->ref);
+#if __SASDebugPrint__ > 1
+		      sas_printf ("SASIndexEnumNext; !found curnode=%p SearchGE=%d\n",
+				  curnode, found);
+#endif
+	      } else {
+	          found = SASIndexNodeSearchGT (curnode, indexenum->curkey,
+				      &indexenum->ref);
+#if __SASDebugPrint__ > 1
+	          sas_printf ("SASIndexEnumNext; !found curnode=%p SearchGT=%d\n",
+				  curnode, found);
+#endif
+	      }
+	      if (found)
+		{
+		  short curpos = indexenum->ref.pos;
+		  SASIndexNodeHeader *curSBnode =
+		    (SASIndexNodeHeader *) indexenum->ref.node;
+		  result = curSBnode->vals[curpos];
+		  indexenum->curkey = curSBnode->keys[curpos];
+		  indexenum->curmod = treemod;
+		  indexenum->hasmore =
+		    (SASIndexKeyCompare (indexenum->curkey, maxkey) < 0);
+#if __SASDebugPrint__ > 1
+		  sas_printf ("SASIndexEnumNext; curpos=%hd node=%p result=%p\n",
+				  curpos, curSBnode, result);
+#endif
+		}
+	      else
+		{
+		  indexenum->hasmore = false;
+		}
+	    }
+	}
+#ifdef __SASDebugPrint__
+    }
+  else
+    {
+      sas_printf ("SASIndexEnumNext; enum->tree=%p invalid\n",
+		  indexenum->tree);
+#endif
+    }
+//      sas_printf("{%s,%s,%d}",indexenum->curkey, maxkey, indexenum->hasmore);
+
+  return result;
+}
