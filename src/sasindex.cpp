@@ -10,6 +10,7 @@
  */
 
 #include <stdlib.h>
+#include <stddef.h>
 #include <string.h>
 #include "sasalloc.h"
 #include "freenode.h"
@@ -1429,7 +1430,7 @@ SASIndexPut_nolock (SASIndex_t  heap, SASIndexKey_t *key, void *value)
 			    result = true;
 		    }
 		} else {
-		    btree->root = SASIndexAlloc(heap);
+		    btree->root = SASIndexAllocNoLock(heap);
 		    SASIndexNodeInitialize(btree->root, key, value, LOCK_OFF);
 		    SASIndexUpdateMin(heap, key);
 		    SASIndexUpdateMax(heap, key);

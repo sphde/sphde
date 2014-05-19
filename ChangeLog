@@ -1,3 +1,14 @@
+2014-05-08  Steven Munroe  <sjmunroe@us.ibm.com>
+
+	* /src/sasindex.cpp: Include stddef.h.
+	(SASIndexPut_nolock): Change SASIndexAlloc call to
+	SASIndexAllocNoLock.
+	* /src/sasindexnode.cpp (SASIndexNodeSplit): Condition call to
+	SASIndexNearAlloc() or SASIndexNearAllocNoLock() on lock_on
+	parm.
+	(SASIndexNodeInsert):  Condition call to SASIndexNearAlloc()
+	or SASIndexNearAllocNoLock() on lock_on parm.
+
 2014-05-05  Steven Munroe  <sjmunroe@us.ibm.com>
 
 	* /src/sasindex.cpp (SASIndexPercentFree): Replace divide by

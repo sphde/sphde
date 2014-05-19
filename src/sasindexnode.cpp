@@ -1355,7 +1355,11 @@ SASIndexNodeSplit (SASIndexNode_t node_t,
   sas_printf ("Split@%p x=%p k=%hd median=%hd\n", node, xref->key, k, median);
 #endif
 
-  yr = (SASIndexNodeHeader *) SASIndexNearAlloc (node_t);
+  if (lock_on == LOCK_ON)
+    yr = (SASIndexNodeHeader *) SASIndexNearAlloc (node_t);
+  else
+    yr = (SASIndexNodeHeader *) SASIndexNearAllocNoLock (node_t);
+
   SASIndexNodeHeader **yrBranch = yr->branch;
   void **yrVals = yr->vals;
 
@@ -1529,7 +1533,13 @@ SASIndexNodeInsert (SASIndexNode_t node_t,
   if (pushup)
     {
       SASIndexNodeHeader *new_node;
-      result = SASIndexNearAlloc (node_t);
+
+
+      if (lock_on == LOCK_ON)
+        result = SASIndexNearAlloc (node_t);
+      else
+        result = SASIndexNearAllocNoLock (node_t);
+
       new_node = (SASIndexNodeHeader *) result;
       new_node->count = 1;
 #if __SASDebugPrint__ > 1
