@@ -1,15 +1,5 @@
-// stdio for SAS loaded modules
-/* This include is used by SAS loaded code to call standard IO functions.
-	The implementation of this interface introduces a level of indirection
-	the decouples the SAS module from the process local dependences of the
-	c runtime for standard IO. 
-*/
-
-#ifndef __SJM_sasio_H
-#define __SJM_sasio_H
-
 /*
- * Copyright (c) 2009, 2011 IBM Corporation.
+ * Copyright (c) 2009-2014 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,6 +10,16 @@
  */
 
  
+// stdio for SAS loaded modules
+/* This include is used by SAS loaded code to call standard IO functions.
+	The implementation of this interface introduces a level of indirection
+	the decouples the SAS module from the process local dependences of the
+	c runtime for standard IO. 
+*/
+
+#ifndef __SJM_sasio_H
+#define __SJM_sasio_H
+
 #include <stdlib.h>
 #include <stdio.h>
 

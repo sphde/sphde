@@ -1,9 +1,5 @@
-#ifndef __SAS_MSYNC_H
-#define __SAS_MSYNC_H
-
-// utility function for managing shared memory sync with disk
 /*
- * Copyright (c) 2009, 2011 IBM Corporation.
+ * Copyright (c) 2009-2014 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,6 +8,9 @@
  * Contributors:
  *     IBM Corporation, Steven Munroe - initial API and implementation
  */
+
+#ifndef __SAS_MSYNC_H
+#define __SAS_MSYNC_H
 
 /**! \file sasmsync.h
 *  \brief API to manage the resources of the Shared Address Space.

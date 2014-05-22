@@ -1,13 +1,5 @@
 /*
-* This class is primarily intended for use by SasUserLockTest.C to
-* provide a thread-safe cout object.
-*
-*/
-#ifndef __SASOSTREAM_H
-#define __SASOSTREAM_H
-
-/*
- * Copyright (c) 1995, 2011 IBM Corporation.
+ * Copyright (c) 1995-2014 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,6 +9,14 @@
  *     IBM Corporation, Maynard Johnson - initial API and implementation
  */
 
+
+/*
+* This class is primarily intended for use by SasUserLockTest.C to
+* provide a thread-safe cout object.
+*
+*/
+#ifndef __SASOSTREAM_H
+#define __SASOSTREAM_H
 
 #include <stdio.h>
 #include "sasulock.h"
