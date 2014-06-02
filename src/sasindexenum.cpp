@@ -204,7 +204,7 @@ SASIndexEnumNext_nolock (SASIndexEnum_t idxenum)
 
   maxkey = SASIndexGetMaxKey_nolock (indexenum->tree);
 #if __SASDebugPrint__ > 1
-  sas_printf ("SASIndexEnumNext; enum->tree=%p maxkey=%p\n",
+  sas_printf ("SASIndexEnumNext_nolock; enum->tree=%p maxkey=%p\n",
 		  indexenum->tree, maxkey);
 #endif
   if (maxkey != NULL)
@@ -254,7 +254,7 @@ SASIndexEnumNext_nolock (SASIndexEnum_t idxenum)
 	  if (!found)
 	    {
 #if __SASDebugPrint__ > 1
-		  sas_printf ("SASIndexEnumNext; !found enum->tree=%p curkey=%p=%ix\n",
+		  sas_printf ("SASIndexEnumNext_nolock; !found enum->tree=%p curkey=%p=%ix\n",
 				  indexenum->tree, indexenum->curkey, indexenum->curkey->data[0]);
 #endif
 	      SASIndexNode_t curnode = SASIndexGetRootNode_nolock (indexenum->tree);
@@ -263,14 +263,14 @@ SASIndexEnumNext_nolock (SASIndexEnum_t idxenum)
 		      found = SASIndexNodeSearchGE (curnode, indexenum->curkey,
 					      &indexenum->ref);
 #if __SASDebugPrint__ > 1
-		      sas_printf ("SASIndexEnumNext; !found curnode=%p SearchGE=%d\n",
+		      sas_printf ("SASIndexEnumNext_nolock; !found curnode=%p SearchGE=%d\n",
 				  curnode, found);
 #endif
 	      } else {
 	          found = SASIndexNodeSearchGT (curnode, indexenum->curkey,
 				      &indexenum->ref);
 #if __SASDebugPrint__ > 1
-	          sas_printf ("SASIndexEnumNext; !found curnode=%p SearchGT=%d\n",
+	          sas_printf ("SASIndexEnumNext_nolock; !found curnode=%p SearchGT=%d\n",
 				  curnode, found);
 #endif
 	      }
@@ -285,7 +285,7 @@ SASIndexEnumNext_nolock (SASIndexEnum_t idxenum)
 		  indexenum->hasmore =
 		    (SASIndexKeyCompare (indexenum->curkey, maxkey) < 0);
 #if __SASDebugPrint__ > 1
-		  sas_printf ("SASIndexEnumNext; curpos=%hd node=%p result=%p\n",
+		  sas_printf ("SASIndexEnumNext_nolock; curpos=%hd node=%p result=%p\n",
 				  curpos, curSBnode, result);
 #endif
 		}
@@ -299,7 +299,7 @@ SASIndexEnumNext_nolock (SASIndexEnum_t idxenum)
     }
   else
     {
-      sas_printf ("SASIndexEnumNext; enum->tree=%p invalid\n",
+      sas_printf ("SASIndexEnumNext_nolock; enum->tree=%p invalid\n",
 		  indexenum->tree);
 #endif
     }

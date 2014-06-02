@@ -197,7 +197,7 @@ extern __C__ SASIndexNode_t
 SASIndexGetRootNode_nolock (SASIndex_t btree);
 
 extern SASIndexNode_t
-SASIndexSpillAlloc (void *nearObj);
+SASIndexSpillAlloc (void *nearObj, lock_on_t lock_on);
 
 extern void
 SASIndexDestroyNoLock (SASIndex_t btree);

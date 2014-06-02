@@ -1,3 +1,15 @@
+2014-06-02 Rajalakshmi Srinivasaraghavan <raji@linux.vnet.ibm.com>
+
+	* src/sasindex.cpp (SASIndexSpillAlloc): Add lock_on_t parm.
+	Conditionally call SASLock/SASUnlock.
+	(SASIndexSpillAllocExtended): Add lock_on_t parm.
+	Conditionally call SASLock/SASUnlock.
+	* src/sasindex.h: Minor comment change.
+	* src/sasindexenum.cpp: Update debug statements to print lock_on.
+	* src/sasindexnode.cpp: Update debug statements to print lock_on.
+	(SASIndexNodeNearAlloc): Pass lock_on to SASIndexSpillAlloc().
+	* src/sasindexpriv.h (SASIndexSpillAlloc): Add lock_on_t parm.
+
 2014-05-08  Steven Munroe  <sjmunroe@us.ibm.com>
 
 	* /src/sasindex.cpp: Include stddef.h.

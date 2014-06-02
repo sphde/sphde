@@ -79,7 +79,7 @@
  * unsigned long long *keyref;
  *
  * SASLock (indexBTree, SasUserLock__READ);
- * senum = SASIndexEnumCreate_nolock (index);
+ * senum = SASIndexEnumCreate (index);
  * if (!senum)
  *   {
  *     printf ("SASIndexEnumCreate (%p) failed", index);

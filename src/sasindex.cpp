@@ -704,7 +704,7 @@ SASIndexSpillInternal (SASIndexHeader *headerBlock)
 }
 
 SASIndexNode_t 
-SASIndexSpillAllocExtended (SASIndex_t heap)
+SASIndexSpillAllocExtended (SASIndex_t heap, lock_on_t lock_on)
 {
     SASBlockHeader	*headerBlock = (SASBlockHeader*)heap;
     SASIndexNode_t newHeap = NULL;
@@ -713,7 +713,7 @@ SASIndexSpillAllocExtended (SASIndex_t heap)
               SAS_RUNTIME_INDEX) )
     {
     	SASIndexHeader	*heapHeader = (SASIndexHeader*)heap;
-    	SASLock(heap, SasUserLock__WRITE);
+        if (lock_on) SASLock(heap, SasUserLock__WRITE);
 		if (SASIndexIsExpanding(heapHeader))
 		{
 	    	SASCompoundExpandList	*list = heapHeader->expandList;
@@ -723,7 +723,7 @@ SASIndexSpillAllocExtended (SASIndex_t heap)
 	    	block_size_t	last_lock = 0;
 	    	lastHeader = list->heap[list->count-1];
 	    	if (lastHeader != heapHeader)
-	    		SASLock(lastHeader, SasUserLock__WRITE);
+                    if (lock_on) SASLock(lastHeader, SasUserLock__WRITE);
 	    	
 	    	if (SASIndexPercentUsed(lastHeader) >= DEFAULT_LOAD_FACTOR)
 	    	{
@@ -732,7 +732,7 @@ SASIndexSpillAllocExtended (SASIndex_t heap)
 				{
 					SASIndexHeader	*expandBlock = list->heap[i];
 					if ( i > 0 )
-	    				SASLock(expandBlock, SasUserLock__WRITE);
+                                        if (lock_on) SASLock(expandBlock, SasUserLock__WRITE);
 			    	if ( SASIndexPercentUsed (expandBlock) 
 			    	       < DEFAULT_LOAD_FACTOR )
 			    	{
@@ -756,15 +756,15 @@ SASIndexSpillAllocExtended (SASIndex_t heap)
 	    	{
 				for ( i = 1; i <= last_lock; i++ )
 				{
-	    			SASUnlock(list->heap[i]);
+                                if (lock_on) SASUnlock(list->heap[i]);
 				}
 	    	} 
 	    	if (lastHeader != heapHeader)
-				SASUnlock(lastHeader);
+				if (lock_on) SASUnlock(lastHeader);
 		} else {
 			newHeap = SASIndexSpillInternal (heapHeader);
 		} 
-		SASUnlock(heap);
+		if (lock_on) SASUnlock(heap);
 #ifdef __SASDebugPrint__
     } else {
     	sas_printf("SASIndexSpillAllocExtended(%p) type check failed\n", heap);
@@ -774,7 +774,7 @@ SASIndexSpillAllocExtended (SASIndex_t heap)
 }
 		
 SASIndexNode_t 
-SASIndexSpillAlloc(void *nearObj)
+SASIndexSpillAlloc(void *nearObj, lock_on_t lock_on)
 {
 	SASBlockHeader *nearHeader = SASFindHeader (nearObj);
     SASIndexHeader	*compoundHeader = NULL;
@@ -792,7 +792,7 @@ SASIndexSpillAlloc(void *nearObj)
 			else
 				compoundHeader = (SASIndexHeader*)nearHeader;
 				
-    		SASLock(compoundHeader, SasUserLock__WRITE);
+                    if (lock_on) SASLock(compoundHeader, SasUserLock__WRITE);
 				   
 		    if (SOMSASCheckBlockSigAndType ((SASBlockHeader*)compoundHeader, 
 			                                SAS_RUNTIME_INDEX) )
@@ -814,14 +814,14 @@ SASIndexSpillAlloc(void *nearObj)
 				                 nearObj, compoundHeader, baseHeader);
 #endif
 				spill_lst = compoundHeader->spillList;
-				SASLock(spill_lst, SasUserLock__WRITE);
+				if (lock_on) SASLock(spill_lst, SasUserLock__WRITE);
 				if (spill_lst->count < spill_lst->max_count)
 				{
 					if (SASIndexAvail(compoundHeader))
 					{
 						newHeap = SASIndexSpillInternal (compoundHeader);
 					} else {
-						newHeap = SASIndexSpillAllocExtended ((SASIndex_t)baseHeader);
+						newHeap = SASIndexSpillAllocExtended ((SASIndex_t)baseHeader, lock_on);
 					}
 					if (newHeap != NULL)
 					{
@@ -830,14 +830,14 @@ SASIndexSpillAlloc(void *nearObj)
 						spill_lst->count++;
 					}
 				}
-				SASUnlock(spill_lst);
+				if (lock_on) SASUnlock(spill_lst);
 #ifdef __SASDebugPrint__
 		    } else {
 		    	sas_printf("SASIndexSpillAlloc(%p)->%p type check failed\n", 
 				                 nearObj, compoundHeader);
 #endif
 		    }
-		    SASUnlock(compoundHeader);
+		    if (lock_on) SASUnlock(compoundHeader);
 		}
 #ifdef __SASDebugPrint__
     } else {
@@ -1593,7 +1593,7 @@ SASIndexRemove_nolock (SASIndex_t  heap, SASIndexKey_t *key)
 		    newRoot = SASIndexNodeDelete(btree->root, key, LOCK_OFF);
 		    if ( newRoot != btree->root )
 		    {   //Delete the old root which is empty
-				SASIndexNearDealloc(btree->root);
+				SASIndexNearDeallocNoLock(btree->root);
 				btree->root = newRoot;
 		    }
 		    if ( btree->root != NULL )
