@@ -107,6 +107,12 @@
  * \brief Handle to an instance of String B-tree element.
  */
 typedef void *SASStringBTreeNode_t;
+#ifndef LOCK_ON_T
+#define LOCK_ON_T
+typedef int lock_on_t;
+const lock_on_t LOCK_ON = 1;
+const lock_on_t LOCK_OFF = 0;
+#endif
 
 /*!
  * Result from search functions.
@@ -166,7 +172,7 @@ SASStringBTreeNodeCreate (block_size_t heap_size);
  * @param heap Handle of the SASStringBTreeNode_t to be destroyed.
  */
 extern __C__ void
-SASStringBTreeNodeDestroy (SASStringBTreeNode_t heap);
+SASStringBTreeNodeDestroy (SASStringBTreeNode_t heap, lock_on_t lock_on);
 
 /*!
  * \brief Return the total available free space on SAS B-Tree element.
@@ -177,7 +183,7 @@ SASStringBTreeNodeDestroy (SASStringBTreeNode_t heap);
  * @return The total available free space in bytes.
  */
 extern __C__ block_size_t
-SASStringBTreeNodeFreeSpace (SASStringBTreeNode_t heap);
+SASStringBTreeNodeFreeSpace (SASStringBTreeNode_t heap, lock_on_t lock_on);
 
 /*!
  * \brief Return the total number of free blocks available.
@@ -213,7 +219,8 @@ SASStringBTreeNodeMaxFragmentNoLock (SASStringBTreeNode_t heap);
  * @return The allocated memory region or 0 if an error occurs.
  */
 extern __C__ void *
-SASStringBTreeNodeAlloc (SASStringBTreeNode_t heap, block_size_t alloc_size);
+SASStringBTreeNodeAlloc (SASStringBTreeNode_t heap, block_size_t alloc_size,
+				lock_on_t lock_on);
 
 /*!
  * \brief Free the memory address \a free_block of size \a alloc_size from
@@ -230,7 +237,7 @@ SASStringBTreeNodeAlloc (SASStringBTreeNode_t heap, block_size_t alloc_size);
  */
 extern __C__ int
 SASStringBTreeNodeFree (SASStringBTreeNode_t heap, void *free_block,
-			block_size_t alloc_size);
+			block_size_t alloc_size, lock_on_t lock_on);
 
 /*!
  * \brief Allocate \a allocSize bytes from SAS B-Tree element \a nearObj.
@@ -243,7 +250,7 @@ SASStringBTreeNodeFree (SASStringBTreeNode_t heap, void *free_block,
  * @return The allocated memory region or 0 if an error occurs.
  */
 extern __C__ void *
-SASStringBTreeNodeNearAlloc (void *nearObj, long allocSize);
+SASStringBTreeNodeNearAlloc (void *nearObj, long allocSize, lock_on_t lock_on);
 
 /*!
  * \brief Destroy the SAS B-Tree element \a heap.
@@ -457,7 +464,7 @@ SASStringBTreeNodeSearchLE (SASStringBTreeNode_t header, char *target,
  */
 extern __C__ void
 SASStringBTreeNodeInitialize (SASStringBTreeNode_t header, char *newkey,
-			      void *newval);
+			      void *newval, lock_on_t lock_on);
 
 /*!
  * \brief Insert a new node in SAS B-Tree element \a element using \a newkey
@@ -470,7 +477,7 @@ SASStringBTreeNodeInitialize (SASStringBTreeNode_t header, char *newkey,
  */
 extern __C__ SASStringBTreeNode_t
 SASStringBTreeNodeInsert (SASStringBTreeNode_t header, char *newkey,
-			  void *newval);
+			  void *newval, lock_on_t lock_on);
 
 /*!
  * \brief Remove the SAS B-tree node with key \a target from SAS B-tree node
@@ -482,6 +489,7 @@ SASStringBTreeNodeInsert (SASStringBTreeNode_t header, char *newkey,
  * element itself.
  */
 extern __C__ SASStringBTreeNode_t
-SASStringBTreeNodeDelete (SASStringBTreeNode_t header, char *target);
+SASStringBTreeNodeDelete (SASStringBTreeNode_t header, char *target,
+				lock_on_t lock_on);
 
 #endif /* __SAS_STRINGBTREENODE_H */

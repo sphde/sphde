@@ -10,6 +10,7 @@
  */
 
 #include <stdlib.h>
+#include <stddef.h>
 #include <string.h>
 #include "sasalloc.h"
 #include "freenode.h"
@@ -31,13 +32,15 @@ static inline int
 SASStringBTreePercentFree (SASStringBTreeHeader * heapBlock)
 {
   int percent = 0;
+  int divisor;
   block_size_t heapFree = 0;
 
   if (heapBlock->blockHeader.blockFreeSpace != NULL)
     {
       heapFree =
 	freeNode_freeSpaceTotal (heapBlock->blockHeader.blockFreeSpace);
-      percent = (int) ((heapFree * 100) / heapBlock->blockHeader.blockSize);
+      divisor = __builtin_ctzl(heapBlock->blockHeader.blockSize);
+      percent = (int)((heapFree  * 100) >> divisor);
     }
 #if 0
   sas_printf ("SASStringBTreePercentFree(%p) = %d for (%ld, %ld)\n",
@@ -50,6 +53,7 @@ static inline int
 SASStringBTreePercentUsed (SASStringBTreeHeader * heapBlock)
 {
   int percent = 100;
+  int divisor;
   block_size_t heapFree = 0;
   block_size_t heapUsed = 0;
 
@@ -58,7 +62,8 @@ SASStringBTreePercentUsed (SASStringBTreeHeader * heapBlock)
       heapFree =
 	freeNode_freeSpaceTotal (heapBlock->blockHeader.blockFreeSpace);
       heapUsed = heapBlock->blockHeader.blockSize - heapFree;
-      percent = (int) ((heapUsed * 100) / heapBlock->blockHeader.blockSize);
+      divisor = __builtin_ctzl(heapBlock->blockHeader.blockSize);
+      percent = (int)((heapUsed  * 100) >> divisor);
     }
 #if 0
   sas_printf ("SASStringBTreePercentFree(%p) = %d for (%ld, %ld)\n",
@@ -760,7 +765,7 @@ SASStringBTreeSpillInternal (SASStringBTreeHeader * headerBlock)
 }
 
 SASStringBTreeNode_t
-SASStringBTreeSpillAllocExtended (SASStringBTree_t heap)
+SASStringBTreeSpillAllocExtended (SASStringBTree_t heap, lock_on_t lock_on)
 {
   SASBlockHeader *headerBlock = (SASBlockHeader *) heap;
   SASStringBTreeNode_t newHeap = NULL;
@@ -768,7 +773,7 @@ SASStringBTreeSpillAllocExtended (SASStringBTree_t heap)
   if (SOMSASCheckBlockSigAndType (headerBlock, SAS_RUNTIME_STRINGBTREE))
     {
       SASStringBTreeHeader *heapHeader = (SASStringBTreeHeader *) heap;
-      SASLock (heap, SasUserLock__WRITE);
+      if (lock_on) SASLock (heap, SasUserLock__WRITE);
       if (SASStringBTreeIsExpanding (heapHeader))
 	{
 	  SASCompoundExpandList *list = heapHeader->expandList;
@@ -778,7 +783,7 @@ SASStringBTreeSpillAllocExtended (SASStringBTree_t heap)
 	  block_size_t last_lock = 0;
 	  lastHeader = list->heap[list->count - 1];
 	  if (lastHeader != heapHeader)
-	    SASLock (lastHeader, SasUserLock__WRITE);
+	    if (lock_on) SASLock (lastHeader, SasUserLock__WRITE);
 
 	  if (SASStringBTreePercentUsed (lastHeader) >= DEFAULT_LOAD_FACTOR)
 	    {
@@ -787,7 +792,7 @@ SASStringBTreeSpillAllocExtended (SASStringBTree_t heap)
 		{
 		  SASStringBTreeHeader *expandBlock = list->heap[i];
 		  if (i > 0)
-		    SASLock (expandBlock, SasUserLock__WRITE);
+		    if (lock_on) SASLock (expandBlock, SasUserLock__WRITE);
 		  if (SASStringBTreePercentUsed (expandBlock)
 		      < DEFAULT_LOAD_FACTOR)
 		    {
@@ -813,17 +818,17 @@ SASStringBTreeSpillAllocExtended (SASStringBTree_t heap)
 	    {
 	      for (i = 1; i <= last_lock; i++)
 		{
-		  SASUnlock (list->heap[i]);
+		  if (lock_on) SASUnlock (list->heap[i]);
 		}
 	    }
 	  if (lastHeader != heapHeader)
-	    SASUnlock (lastHeader);
+	    if (lock_on) SASUnlock (lastHeader);
 	}
       else
 	{
 	  newHeap = SASStringBTreeSpillInternal (heapHeader);
 	}
-      SASUnlock (heap);
+      if (lock_on) SASUnlock (heap);
 #ifdef __SASDebugPrint__
     }
   else
@@ -836,7 +841,7 @@ SASStringBTreeSpillAllocExtended (SASStringBTree_t heap)
 }
 
 SASStringBTreeNode_t
-SASStringBTreeSpillAlloc (void *nearObj)
+SASStringBTreeSpillAlloc (void *nearObj, lock_on_t lock_on)
 {
   SASBlockHeader *nearHeader = SASFindHeader (nearObj);
   SASStringBTreeHeader *compoundHeader = NULL;
@@ -854,7 +859,7 @@ SASStringBTreeSpillAlloc (void *nearObj)
 	  else
 	    compoundHeader = (SASStringBTreeHeader *) nearHeader;
 
-	  SASLock (compoundHeader, SasUserLock__WRITE);
+	  if (lock_on) SASLock (compoundHeader, SasUserLock__WRITE);
 
 	  if (SOMSASCheckBlockSigAndType ((SASBlockHeader *) compoundHeader,
 					  SAS_RUNTIME_STRINGBTREE))
@@ -879,7 +884,7 @@ SASStringBTreeSpillAlloc (void *nearObj)
 			  nearObj, compoundHeader, baseHeader);
 #endif
 	      spill_lst = compoundHeader->spillList;
-	      SASLock (spill_lst, SasUserLock__WRITE);
+	      if (lock_on) SASLock (spill_lst, SasUserLock__WRITE);
 	      if (spill_lst->count < spill_lst->max_count)
 		{
 		  if (SASStringBTreeAvail (compoundHeader))
@@ -890,7 +895,7 @@ SASStringBTreeSpillAlloc (void *nearObj)
 		    {
 		      newHeap =
 			SASStringBTreeSpillAllocExtended ((SASStringBTree_t)
-							  baseHeader);
+							  baseHeader, lock_on);
 		    }
 		  if (newHeap != NULL)
 		    {
@@ -899,7 +904,7 @@ SASStringBTreeSpillAlloc (void *nearObj)
 		      spill_lst->count++;
 		    }
 		}
-	      SASUnlock (spill_lst);
+	      if (lock_on) SASUnlock (spill_lst);
 #ifdef __SASDebugPrint__
 	    }
 	  else
@@ -909,7 +914,7 @@ SASStringBTreeSpillAlloc (void *nearObj)
 		 nearObj, compoundHeader);
 #endif
 	    }
-	  SASUnlock (compoundHeader);
+	  if (lock_on) SASUnlock (compoundHeader);
 	}
 #ifdef __SASDebugPrint__
     }
@@ -1198,6 +1203,20 @@ SASStringBTreeGetModCount (SASStringBTree_t heap)
   return result;
 }
 
+long
+SASStringBTreeGetModCount_nolock (SASStringBTree_t heap)
+{
+  SASStringBTreeHeader *btree = (SASStringBTreeHeader *) heap;
+  long result = 0L;
+
+  if (SOMSASCheckBlockSigAndType ((SASBlockHeader *) heap,
+                                  SAS_RUNTIME_STRINGBTREE))
+    {
+      result = btree->common->modCount;
+    }
+  return result;
+}
+
 char *
 SASStringBTreeGetMaxKey (SASStringBTree_t heap)
 {
@@ -1210,6 +1229,20 @@ SASStringBTreeGetMaxKey (SASStringBTree_t heap)
       SASLock (heap, SasUserLock__READ);
       result = btree->common->max_key;
       SASUnlock (heap);
+    }
+  return result;
+}
+
+char *
+SASStringBTreeGetMaxKey_nolock (SASStringBTree_t heap)
+{
+  SASStringBTreeHeader *btree = (SASStringBTreeHeader *) heap;
+  char *result = NULL;
+
+  if (SOMSASCheckBlockSigAndType ((SASBlockHeader *) heap,
+                                  SAS_RUNTIME_STRINGBTREE))
+    {
+      result = btree->common->max_key;
     }
   return result;
 }
@@ -1230,6 +1263,20 @@ SASStringBTreeGetMinKey (SASStringBTree_t heap)
   return result;
 };
 
+char *
+SASStringBTreeGetMinKey_nolock (SASStringBTree_t heap)
+{
+  SASStringBTreeHeader *btree = (SASStringBTreeHeader *) heap;
+  char *result = NULL;
+
+  if (SOMSASCheckBlockSigAndType ((SASBlockHeader *) heap,
+                                  SAS_RUNTIME_STRINGBTREE))
+    {
+      result = btree->common->min_key;
+    }
+  return result;
+};
+
 int
 SASStringBTreeContainsKey (SASStringBTree_t heap, char *key)
 {
@@ -1246,6 +1293,24 @@ SASStringBTreeContainsKey (SASStringBTree_t heap, char *key)
 	  found = SASStringBTreeNodeSearch (btree->root, key, &ref);
 	}
       SASUnlock (heap);
+    }
+  return found;
+}
+
+int
+SASStringBTreeContainsKey_nolock (SASStringBTree_t heap, char *key)
+{
+  SASStringBTreeHeader *btree = (SASStringBTreeHeader *) heap;
+  SBTnodePosRef ref = { NULL, 0 };
+  int found = false;
+
+  if (SOMSASCheckBlockSigAndType ((SASBlockHeader *) heap,
+                                  SAS_RUNTIME_STRINGBTREE))
+    {
+      if (btree->root != NULL)
+        {
+          found = SASStringBTreeNodeSearch (btree->root, key, &ref);
+        }
     }
   return found;
 }
@@ -1275,6 +1340,29 @@ SASStringBTreeGet (SASStringBTree_t heap, char *key)
   return result;
 }
 
+void *
+SASStringBTreeGet_nolock (SASStringBTree_t heap, char *key)
+{
+  SASStringBTreeHeader *btree = (SASStringBTreeHeader *) heap;
+  void *result = NULL;
+  SBTnodePosRef ref = { NULL, 0 };
+  int found;
+
+  if (SOMSASCheckBlockSigAndType ((SASBlockHeader *) heap,
+                                  SAS_RUNTIME_STRINGBTREE))
+    {
+      if (btree->root != NULL)
+        {
+          found = SASStringBTreeNodeSearch (btree->root, key, &ref);
+          if (found)
+            {
+              result = SASStringBTreeNodeGetValIndexed (ref.node, ref.pos);
+            }
+        }
+    }
+  return result;
+}
+
 int
 SASStringBTreeIsEmpty (SASStringBTree_t heap)
 {
@@ -1287,6 +1375,20 @@ SASStringBTreeIsEmpty (SASStringBTree_t heap)
       SASLock (heap, SasUserLock__READ);
       result = (btree->common->count == 0);
       SASUnlock (heap);
+    }
+  return result;
+}
+
+int
+SASStringBTreeIsEmpty_nolock (SASStringBTree_t heap)
+{
+  SASStringBTreeHeader *btree = (SASStringBTreeHeader *) heap;
+  int result = false;
+
+  if (SOMSASCheckBlockSigAndType ((SASBlockHeader *) heap,
+                                  SAS_RUNTIME_STRINGBTREE))
+    {
+      result = (btree->common->count == 0);
     }
   return result;
 }
@@ -1398,7 +1500,7 @@ SASStringBTreePut (SASStringBTree_t heap, char *key, void *value)
       if (btree->root != NULL)
 	{
 	  SASStringBTreeNode_t node;
-	  node = SASStringBTreeNodeInsert (btree->root, key, value);
+	  node = SASStringBTreeNodeInsert (btree->root, key, value, LOCK_OFF);
 	  if (node != NULL)
 	    {
 	      btree->root = node;
@@ -1413,7 +1515,7 @@ SASStringBTreePut (SASStringBTree_t heap, char *key, void *value)
       else
 	{
 	  btree->root = SASStringBTreeAlloc (heap);
-	  SASStringBTreeNodeInitialize (btree->root, key, value);
+	  SASStringBTreeNodeInitialize (btree->root, key, value, LOCK_OFF);
 	  SASStringBTreeUpdateMin (heap, key);
 	  SASStringBTreeUpdateMax (heap, key);
 	  btree->common->modCount++;
@@ -1423,6 +1525,44 @@ SASStringBTreePut (SASStringBTree_t heap, char *key, void *value)
       SASUnlock (heap);
     }
   return result;		/* False indicates duplicate key */
+}
+
+int
+SASStringBTreePut_nolock (SASStringBTree_t heap, char *key, void *value)
+{
+  SASStringBTreeHeader *btree = (SASStringBTreeHeader *) heap;
+  int result = false;
+
+  if (SOMSASCheckBlockSigAndType ((SASBlockHeader *) heap,
+                                  SAS_RUNTIME_STRINGBTREE))
+    {
+      if (btree->root != NULL)
+        {
+          SASStringBTreeNode_t node;
+          node = SASStringBTreeNodeInsert (btree->root, key, value, LOCK_OFF);
+          if (node != NULL)
+            {
+              btree->root = node;
+              btree->common->modCount++;
+              if (strcmp (key, btree->common->min_key) < 0)
+                SASStringBTreeUpdateMin (heap, key);
+              if (strcmp (key, btree->common->max_key) > 0)
+                SASStringBTreeUpdateMax (heap, key);
+              result = true;
+            }
+        }
+      else
+        {
+          btree->root = SASStringBTreeAllocNoLock (heap);
+          SASStringBTreeNodeInitialize (btree->root, key, value, LOCK_OFF);
+          SASStringBTreeUpdateMin (heap, key);
+          SASStringBTreeUpdateMax (heap, key);
+          btree->common->modCount++;
+          result = true;
+        };
+      btree->common->count++;
+    }
+  return result;                /* False indicates duplicate key */
 }
 
 void *
@@ -1456,6 +1596,34 @@ SASStringBTreeReplace (SASStringBTree_t heap, char *key, void *value)
 }
 
 void *
+SASStringBTreeReplace_nolock (SASStringBTree_t heap, char *key, void *value)
+{
+  SASStringBTreeHeader *btree = (SASStringBTreeHeader *) heap;
+  SBTnodePosRef ref = { NULL, 0 };
+  void *result = NULL;
+
+  if (SOMSASCheckBlockSigAndType ((SASBlockHeader *) heap,
+                                  SAS_RUNTIME_STRINGBTREE))
+    {
+      btree->common->modCount++;
+
+      if (btree->root != NULL)
+        {
+          int found;
+          found = SASStringBTreeNodeSearch (btree->root, key, &ref);
+	  //found = getNode(key, &ref);
+          if (found)
+            {
+              result =
+                SASStringBTreeNodePutValIndexed (ref.node, ref.pos, value);
+            }
+        }
+      btree->common->count++;
+    }
+  return result;                // return prev value if already exist
+}
+
+void *
 SASStringBTreeRemove (SASStringBTree_t heap, char *key)
 {
   SASStringBTreeHeader *btree = (SASStringBTreeHeader *) heap;
@@ -1480,7 +1648,7 @@ SASStringBTreeRemove (SASStringBTree_t heap, char *key)
 	      result = SASStringBTreeNodeGetValIndexed (ref.node, ref.pos);
 	    }
 
-	  newRoot = SASStringBTreeNodeDelete (btree->root, key);
+	  newRoot = SASStringBTreeNodeDelete (btree->root, key, LOCK_OFF);
 	  if (newRoot != btree->root)
 	    {			//Delete the old root which is empty
 	      SASStringBTreeNearDealloc (btree->root);
@@ -1522,6 +1690,73 @@ SASStringBTreeRemove (SASStringBTree_t heap, char *key)
     }
   return result;		// return prev value if already exist
 }
+
+void *
+SASStringBTreeRemove_nolock (SASStringBTree_t heap, char *key)
+{
+  SASStringBTreeHeader *btree = (SASStringBTreeHeader *) heap;
+  SASStringBTreeNode_t newRoot;
+  SBTnodePosRef ref = { NULL, 0 };
+  void *result = NULL;
+  SASStringBTreeNodeHeader *node;
+
+  if (SOMSASCheckBlockSigAndType ((SASBlockHeader *) heap,
+                                  SAS_RUNTIME_STRINGBTREE))
+    {
+      btree->common->modCount++;
+
+      if (btree->root != NULL)
+        {
+          int found;
+          found = SASStringBTreeNodeSearch (btree->root, key, &ref);
+	  //found = getNode(key, &ref);
+          if (found)
+            {
+              result = SASStringBTreeNodeGetValIndexed (ref.node, ref.pos);
+            }
+
+          newRoot = SASStringBTreeNodeDelete (btree->root, key, LOCK_OFF);
+          if (newRoot != btree->root)
+	    {			//Delete the old root which is empty
+              SASStringBTreeNearDeallocNoLock (btree->root);
+              btree->root = newRoot;
+            }
+          if (btree->root != NULL)
+            {
+              btree->common->count--;
+              if (btree->common->count > 0)
+                {
+                  if(strcmp(key, btree->common->min_key) == 0)
+                    {
+                       node = (SASStringBTreeNodeHeader *) btree->root;
+                       if (node->branch[0] != NULL)
+                          node = node->branch[0];
+                       SASStringBTreeUpdateMin(heap, node->keys[1]);
+                    }
+                  if(strcmp(key, btree->common->max_key) == 0)
+                    {
+                       node = (SASStringBTreeNodeHeader *) btree->root;
+                       if (node->branch[node->count] != NULL)
+                          node = node->branch[node->count];
+                       SASStringBTreeUpdateMax(heap, node->keys[(node->count)]);
+                    }
+                }
+            }
+          else
+            {
+              btree->common->count = 0;
+              SASStringBTreeUpdateMax (heap, NULL);
+              SASStringBTreeUpdateMin (heap, NULL);
+            }
+        }
+      else
+        {
+          btree->common->count = 0;
+        }
+    }
+  return result;                // return prev value if already exist
+}
+
 
 #if 0
 void

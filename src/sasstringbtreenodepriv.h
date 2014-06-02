@@ -53,6 +53,6 @@ SASStringBTreeSpillInit (void* heap_seg,  sas_type_t sasType,
 
 extern __C__ int
 SASStringBTreeNodeNearDealloc(SASStringBTreeNode_t heap, void* free_block, 
-                               block_size_t alloc_size);
+                               block_size_t alloc_size, lock_on_t lock_on);
 
 #endif /* __SAS_STRINGBTREENODE_PRIVH */

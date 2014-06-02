@@ -15,7 +15,6 @@
 
 
 #include "sasstringbtreenode.h"
-
 /*!
  * \file  sasstringbtree.h
  * \brief Shared Address Space B-tree.
@@ -59,11 +58,41 @@
  * string/pointer tuple from SBT. Others useful functions are 
  * ::SASStringBTreeContainsKey, which returns if a key exists; and
  * ::SASStringBTreeGet, which returns the value of a key.
- * 
+ *
  * The enumeration API from sasstringbtreeenum.h can be use to iterate
  * over the (in whole or part) of contents of BTree in key order.
  *
- * Finally, a created SAS B-Tree can be destroy with ::SASStringBTreeDestroy.
+ * The functions above apply SASLock and SASUnlock around each string
+ * operation to insure consistency of the string.
+ *
+ * If at process needs exclusive access or needs to scan or populate a
+ * string quickly, the application can SASLock the SASStringBTree_t, then use
+ * the *_nolock forms of the function above for faster access.
+ * \code
+ * SASStringBTree_t stringBTree;
+ * SASStringBTreeEnum_t senum;
+ * char *keyref;
+ *
+ * SASLock (stringBTree, SasUserLock__READ);
+ * senum = SASStringBTreeEnumCreate (stringBTree);
+ * if (!senum)
+ * {
+ *   printf ("SASStringBTreeEnumCreate (%p) failed", stringBTree);
+ *   return 1;
+ * }
+ *
+ * while (SASStringBTreeEnumHasMore (senum))
+ *   {
+ *     keyref = ((char *) SASStringBTreeEnumNext_nolock (senum);
+ *     if (keyref)
+ *     {
+ *       // process reference value associated with next enum
+ *     }
+ *   }
+ * SASUnlock (stringBTree);
+ * \endcode
+ *
+ * Finally, a created SAS B-Tree can be destroy with ::SASStringBTreeDestroy
  */
 
 /*!
@@ -255,6 +284,7 @@ SASStringBTreeGetRootNode (SASStringBTree_t btree);
 extern __C__ SASStringBTreeNode_t
 SASStringBTreeGetRootNodeNoLock (SASStringBTree_t btree);
 
+
 /*!
  * \brief Return the number or insert/replace/remove operations performed on
  * \a btree.
@@ -270,6 +300,25 @@ SASStringBTreeGetRootNodeNoLock (SASStringBTree_t btree);
  */
 extern __C__ long
 SASStringBTreeGetModCount (SASStringBTree_t btree);
+
+/*!
+ * \brief Return the number or insert/replace/remove operations performed on
+ * \a btree.
+ *
+ * The sas_type_t must be SAS_RUNTIME_STRINGTREE.
+ * An initialized SAS B-Tree starts with mod count 1 and it is incremented
+ * each time a insert/replace/remove operation is performed.
+ *
+ * This nolock form should only be used when the referenced SASStringBTree_t
+ * is known to be locked by the application or contained within a
+ * larger structure with a controlling lock.
+ *
+ * @param btree Handle to the SASStringBTree_t.
+ * @return The number of insert/replace/remove operations performed on
+ * \a btree.
+ */
+extern __C__ long
+SASStringBTreeGetModCount_nolock (SASStringBTree_t btree);
 
 /*!
  * \brief Return the maximum key string from \a btree.
@@ -289,6 +338,26 @@ extern __C__ char *
 SASStringBTreeGetMaxKey (SASStringBTree_t btree);
 
 /*!
+ * \brief Return the maximum key string from \a btree.
+ *
+ * The sas_type_t must be SAS_RUNTIME_STRINGTREE.
+ * The maximum key is the right most entry of the right most node.
+ *
+ * \note this value it stored in the header of the SASStringBTree_t
+ * initial block and should never be modified by the application.
+ *
+ * This nolock form should only be used when the referenced SASStringBTree_t
+ * is known to be locked by the application or contained within a
+ * larger structure with a controlling lock.
+ *
+ * @param btree Handle to the SASStringBTree_t.
+ * @return Null terminated maximum key string from B-Tree \a btree or 0 if
+ * the B-Tree does not have any key or if an error occurs.
+ */
+extern __C__ char *
+SASStringBTreeGetMaxKey_nolock (SASStringBTree_t btree);
+
+/*!
  * \brief Return the minimum key string from \a btree.
  *
  * The sas_type_t must be SAS_RUNTIME_STRINGTREE. The function holds a read
@@ -306,6 +375,26 @@ extern __C__ char *
 SASStringBTreeGetMinKey (SASStringBTree_t btree);
 
 /*!
+ * \brief Return the minimum key string from \a btree.
+ *
+ * The sas_type_t must be SAS_RUNTIME_STRINGTREE.
+ * The minimum key is the left most entry of the left most node.
+ *
+ * \note this value it stored in the header of the SASStringBTree_t
+ * initial block and should never be modified by the application.
+ *
+ * This nolock form should only be used when the referenced SASStringBTree_t
+ * is known to be locked by the application or contained within a
+ * larger structure with a controlling lock.
+ *
+ * @param btree Handle to the SASStringBTree_t.
+ * @return Null terminated minimum key string from B-Tree \a btree or 0 if
+ * the B-Tree does not have any key or if an error occurs.
+ */
+extern __C__ char *
+SASStringBTreeGetMinKey_nolock (SASStringBTree_t btree);
+
+/*!
  * \brief Return true if the SAS B-Tree \a btree contains the key \a key.
  *
  * The sas_type_t must be SAS_RUNTIME_STRINGTREE. The function holds a
@@ -318,6 +407,23 @@ SASStringBTreeGetMinKey (SASStringBTree_t btree);
  */
 extern __C__ int
 SASStringBTreeContainsKey (SASStringBTree_t btree, char *key);
+
+/*!
+ * \brief Return true if the SAS B-Tree \a btree contains the key \a key.
+ *
+ * The sas_type_t must be SAS_RUNTIME_STRINGTREE.
+ * This function searches the B-Tree for a matching key and returns true if found.
+ *
+ * This nolock form should only be used when the referenced SASStringBTree_t
+ * is known to be locked by the application or contained within a
+ * larger structure with a controlling lock.
+ *
+ * @param btree Handle to the SASStringBTree_t.
+ * @param key Null terminated key string to search.
+ * @return 1 if the key is within \a btree or 0 otherwise.
+ */
+extern __C__ int
+SASStringBTreeContainsKey_nolock (SASStringBTree_t btree, char *key);
 
 /*!
  * \brief Return the memory address value associated with \a key in
@@ -337,6 +443,26 @@ extern __C__ void *
 SASStringBTreeGet (SASStringBTree_t btree, char *key);
 
 /*!
+ * \brief Return the memory address value associated with \a key in
+ * SAS B-Tree \a btree.
+ *
+ * The sas_type_t must be SAS_RUNTIME_STRINGTREE.
+ * This function searches the B-Tree for a matching key and if found,
+ * returns the associated memory address value.
+ *
+ * This nolock form should only be used when the referenced SASStringBTree_t
+ * is known to be locked by the application or contained within a
+ * larger structure with a controlling lock.
+ *
+ * @param btree Handle to the SASStringBTree_t.
+ * @param key Null terminated key string to search.
+ * @return The associated memory address with \a key or 0 if the B-Tree \a
+ * btree does not contain the key or if an error occurs.
+ */
+extern __C__ void *
+SASStringBTreeGet_nolock (SASStringBTree_t btree, char *key);
+
+/*!
  * \brief Return true if the SAS B-Tree \a btree is empty.
  *
  * The sas_type_t must be SAS_RUNTIME_STRINGTREE. The function holds a read
@@ -349,6 +475,21 @@ extern __C__ int
 SASStringBTreeIsEmpty (SASStringBTree_t btree);
 
 /*!
+ * \brief Return true if the SAS B-Tree \a btree is empty.
+ *
+ * The sas_type_t must be SAS_RUNTIME_STRINGTREE.
+ *
+ * This nolock form should only be used when the referenced SASStringBTree_t
+ * is known to be locked by the application or contained within a
+ * larger structure with a controlling lock.
+ *
+ * @param btree Handle to the SASStringBTree_t.
+ * @return 1 if the B-Tree is not empty or 0 otherwise.
+ */
+extern __C__ int
+SASStringBTreeIsEmpty_nolock (SASStringBTree_t btree);
+
+/*!
  * \brief Return the number of elements in the SAS B-Tree \a btree.
  *
  * The sas_type_t must be SAS_RUNTIME_STRINGTREE. The function holds a read
@@ -359,6 +500,7 @@ SASStringBTreeIsEmpty (SASStringBTree_t btree);
  */
 extern __C__ long
 SASStringBTreeGetCurCount (SASStringBTree_t btree);
+
 
 /*!
  * \brief Add a new element \a value with key \a key in the SAS B-Tree 
@@ -380,6 +522,29 @@ extern __C__ int
 SASStringBTreePut (SASStringBTree_t btree, char *key, void *value);
 
 /*!
+ * \brief Add a new element \a value with key \a key in the SAS B-Tree
+ * \a btree.
+ *
+ * The sas_type_t must be SAS_RUNTIME_STRINGTREE.
+ * This function inserts the key and associated memory address value
+ * into the B-Tree.
+ * This B-Tree implementation does not allow duplicated key values.
+ *
+ * This nolock form should only be used when the referenced SASStringBTree_t
+ * is known to be locked by the application or contained within a
+ * larger structure with a controlling lock.
+ *
+ * @param btree Handle to the SASStringBTree_t.
+ * @param key Key to use as index for the value.
+ * @param value Memory address to insert in the B-Tree.
+ * @return 1 if the operation succeeds or 0 otherwise.
+ * For example if the key already exist in this B-Tree.
+ */
+extern __C__ int
+SASStringBTreePut_nolock (SASStringBTree_t btree, char *key, void *value);
+
+
+/*!
  * \brief Replace the associated value of the element with key \a key
  * in SAS B-Tree \a btree with the value \a value.
  *
@@ -399,6 +564,29 @@ extern __C__ void *
 SASStringBTreeReplace (SASStringBTree_t btree, char *key, void *value);
 
 /*!
+ * \brief Replace the associated value of the element with key \a key
+ * in SAS B-Tree \a btree with the value \a value.
+ *
+ * The sas_type_t must be SAS_RUNTIME_STRINGTREE.
+ * This function searches the B-Tree for a matching key and if found,
+ * replaces the associated memory address value with \a value, and
+ * returns the previous associated value.
+ *
+ * This nolock form should only be used when the referenced SASStringBTree_t
+ * is known to be locked by the application or contained within a
+ * larger structure with a controlling lock.
+ *
+ * @param btree Handle to the SASStringBTree_t.
+ * @param key Key to use as index for the value.
+ * @param value Memory address to replace in the B-Tree.
+ * @return The address of the previous associated value for the
+ * matching key, or 0 if an error occurs.
+ */
+extern __C__ void *
+SASStringBTreeReplace_nolock (SASStringBTree_t btree, char *key, void *value);
+
+
+/*!
  * \brief Remove the key \a key and its associated value from SAS B-Tree \a btree.
  *
  * The sas_type_t must be SAS_RUNTIME_STRINGTREE. The function holds a write
@@ -416,6 +604,28 @@ SASStringBTreeReplace (SASStringBTree_t btree, char *key, void *value);
  */
 extern __C__ void *
 SASStringBTreeRemove (SASStringBTree_t btree, char *key);
+
+/*!
+ * \brief Remove the key \a key and its associated value from SAS B-Tree \a btree.
+ *
+ * The sas_type_t must be SAS_RUNTIME_STRINGTREE.
+ * This function searches the B-Tree for a matching key and if found,
+ * removes the key and associates value from this B-Tree.
+ *
+ * \note removing the key and associated value from the B-Tree does not
+ * remove or alter the data at that memory address. It only removes the
+ * associated between the and key and the address from this B-Tree.
+ *
+ * This nolock form should only be used when the referenced SASStringBTree_t
+ * is known to be locked by the application or contained within a
+ * larger structure with a controlling lock.
+ *
+ * @param btree Handle to the SASStringBTree_t.
+ * @param key Key value to be removed from this B-Tree.
+ * @return The address of the previous item or 0 if an error occurs.
+ */
+extern __C__ void *
+SASStringBTreeRemove_nolock (SASStringBTree_t btree, char *key);
 
 /*!
  * \brief Internal function to initialize storage as a B-tree.

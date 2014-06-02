@@ -28,7 +28,6 @@
 #include "sasstringbtreepriv.h"
 #include "sasstringbtreenodepriv.h"
 
-
 #ifdef __SASDebugPrint__
 static void
 SASStringBTreeNodePrint (SASStringBTreeNode_t header)
@@ -204,22 +203,23 @@ SASStringBTreeNodeAllocNoLock (SASStringBTreeNode_t heap,
 }
 
 void *
-SASStringBTreeNodeAlloc (SASStringBTreeNode_t heap, block_size_t alloc_size)
+SASStringBTreeNodeAlloc (SASStringBTreeNode_t heap, block_size_t alloc_size,
+			lock_on_t lock_on)
 {
   SASBlockHeader *headerBlock = (SASBlockHeader *) heap;
   void *mem = NULL;
 
   if (SOMSASCheckBlockSigAndType (headerBlock, SAS_RUNTIME_SIMPLEHEAP))
     {
-      SASLock (heap, SasUserLock__WRITE);
+      if (lock_on) SASLock (heap, SasUserLock__WRITE);
       mem = SASStringBTreeNodeAllocNoLock (heap, alloc_size);
-      SASUnlock (heap);
+      if (lock_on) SASUnlock (heap);
 #ifdef __SASDebugPrint__
     }
   else
     {
-      sas_printf ("SASStringBTreeNodeAlloc(%p, %zu) type check failed\n",
-		  heap, alloc_size);
+      sas_printf ("SASStringBTreeNodeAlloc(%p, %zu, %d) type check failed\n",
+		  heap, alloc_size, lock_on);
 #endif
     }
   return mem;
@@ -268,24 +268,25 @@ SASStringBTreeNodeFreeNoLock (SASStringBTreeNode_t heap,
 
 int
 SASStringBTreeNodeFree (SASStringBTreeNode_t heap,
-			void *free_block, block_size_t alloc_size)
+			void *free_block, block_size_t alloc_size,
+			lock_on_t lock_on)
 {
   SASBlockHeader *headerBlock = (SASBlockHeader *) heap;
   int rc;
 
   if (SOMSASCheckBlockSigAndType (headerBlock, SAS_RUNTIME_STRINGBTREENODE))
     {
-      SASLock (heap, SasUserLock__WRITE);
+      if (lock_on) SASLock (heap, SasUserLock__WRITE);
       rc = SASStringBTreeNodeFreeNoLock (heap, free_block, alloc_size);
-      SASUnlock (heap);
+      if (lock_on) SASUnlock (heap);
     }
   else
     {
       rc = -1;
 #ifdef __SASDebugPrint__
       sas_printf
-	("SASStringBTreeNodeFree(%p, ...) does not match type/subtype\n",
-	 heap);
+	("SASStringBTreeNodeFree(%p,%d, ...) does not match type/subtype\n",
+	 heap, lock_on);
 #endif
     }
   return rc;
@@ -320,7 +321,7 @@ SASStringBTreeNodeIsSpill (SASStringBTreeNode_t heap)
  * non-local and we need to lock the spill node before we free the block.  */
 int
 SASStringBTreeNodeNearDealloc (SASStringBTreeNode_t heap, void *free_block,
-			       block_size_t alloc_size)
+			       block_size_t alloc_size, lock_on_t lock_on)
 {
   SASBlockHeader *headerBlock = (SASBlockHeader *) heap;
   SASBlockHeader *nearHeader = SASFindHeader (free_block);
@@ -336,17 +337,17 @@ SASStringBTreeNodeNearDealloc (SASStringBTreeNode_t heap, void *free_block,
       newHeap = SASStringBTreeNodeVerify ((SASStringBTreeNode_t) nearHeader);
       if (newHeap != NULL)
 	{
-	  SASLock (newHeap, SasUserLock__WRITE);
+	  if (lock_on) SASLock (newHeap, SasUserLock__WRITE);
 	  rc = SASStringBTreeNodeFreeNoLock (newHeap, free_block, alloc_size);
-	  SASUnlock (newHeap);
+	  if (lock_on) SASUnlock (newHeap);
 	}
       else
 	{
 	  rc = -1;
 #ifdef __SASDebugPrint__
 	  sas_printf
-	    ("SASStringBTreeNodeNearDealloc(%p, %p, %zu) not local/spill\n",
-	     heap, free_block, alloc_size);
+	    ("SASStringBTreeNodeNearDealloc(%p, %p, %zu, %d) not local/spill\n",
+	     heap, free_block, alloc_size, lock_on);
 #endif
 	}
     }
@@ -354,7 +355,7 @@ SASStringBTreeNodeNearDealloc (SASStringBTreeNode_t heap, void *free_block,
 }
 
 void *
-SASStringBTreeNodeNearAlloc (void *nearObj, long allocSize)
+SASStringBTreeNodeNearAlloc (void *nearObj, long allocSize, lock_on_t lock_on)
 {
   void *result;
   result = SASNearAlloc (nearObj, allocSize);
@@ -366,12 +367,12 @@ SASStringBTreeNodeNearAlloc (void *nearObj, long allocSize)
       SASStringBTreeNode_t newHeap;
 
 #if __SASDebugPrint__ > 1
-      sas_printf ("NearAlloc@%p, size=%d far\n", newHeap, allocSize);
+      sas_printf ("NearAlloc@%p, size=%d far lock_on=%d\n", newHeap, allocSize, lock_on);
 #endif
       newHeap = SASStringBTreeNodeVerify ((SASStringBTreeNode_t) nearHeader);
 #ifdef __SASDebugPrint__
-      sas_printf ("SASStringBTreeNodeNearAlloc(%p, %zu) failed\n",
-		  newHeap, allocSize);
+      sas_printf ("SASStringBTreeNodeNearAlloc(%p, %zu, %d) failed\n",
+		  newHeap, allocSize, lock_on);
       sas_printf (" freespace=%zu,  fragments=%zu,  max_free_block=%zu\n",
 		  SASStringBTreeNodeFreeSpaceNoLock (newHeap),
 		  SASStringBTreeNodeFreeFragmentsNoLock (newHeap),
@@ -388,18 +389,18 @@ SASStringBTreeNodeNearAlloc (void *nearObj, long allocSize)
 		    (SASStringBTreeHeader *) nearHeader->baseBlock;
 		}
 	      spill_lst = SASStringBTreeGetSpill (compoundHeader);
-	      SASLock (spill_lst, SasUserLock__WRITE);
+	      if (lock_on) SASLock (spill_lst, SasUserLock__WRITE);
 	      if (spill_lst->count == 0)
 		{
-		  newHeap = SASStringBTreeSpillAlloc (nearObj);
+		  newHeap = SASStringBTreeSpillAlloc (nearObj, lock_on);
 		  if (newHeap != NULL)
 		    {
 		      result =
 			SASStringBTreeNodeAllocNoLock (newHeap, allocSize);
 #ifdef __SASDebugPrint__
 		      sas_printf
-			("SASStringBTreeNodeNearAlloc(%p, %ld) added spill area@%p\n",
-			 nearObj, allocSize, newHeap);
+			("SASStringBTreeNodeNearAlloc(%p, %ld, %d) added spill area@%p\n",
+			 nearObj, allocSize, lock_on, newHeap);
 #endif
 		    }
 		}
@@ -410,7 +411,7 @@ SASStringBTreeNodeNearAlloc (void *nearObj, long allocSize)
 		    {
 		      newHeap =
 			(SASStringBTreeNode_t) spill_lst->spillHeap[i];
-		      result = SASStringBTreeNodeAlloc (newHeap, allocSize);
+		      result = SASStringBTreeNodeAlloc (newHeap, allocSize, lock_on);
 		      if (result != NULL)
 			break;
 		    }
@@ -418,19 +419,19 @@ SASStringBTreeNodeNearAlloc (void *nearObj, long allocSize)
 
 	      if (result == NULL)
 		{
-		  newHeap = SASStringBTreeSpillAlloc (nearObj);
+		  newHeap = SASStringBTreeSpillAlloc (nearObj, lock_on);
 		  if (newHeap != NULL)
 		    {
 		      result =
 			SASStringBTreeNodeAllocNoLock (newHeap, allocSize);
 #ifdef __SASDebugPrint__
 		      sas_printf
-			("SASStringBTreeNodeNearAlloc(%p, %ld) added spill area@%p\n",
-			 nearObj, allocSize, newHeap);
+			("SASStringBTreeNodeNearAlloc(%p, %ld, %d) added spill area@%p\n",
+			 nearObj, allocSize, lock_on, newHeap);
 #endif
 		    }
 		}
-	      SASUnlock (spill_lst);
+	      if (lock_on) SASUnlock (spill_lst);
 	    }
 	}
     }
@@ -510,23 +511,23 @@ SASStringBTreeNodeFreeSpaceNoLock (SASStringBTreeNode_t heap)
 }
 
 block_size_t
-SASStringBTreeNodeFreeSpace (SASStringBTreeNode_t heap)
+SASStringBTreeNodeFreeSpace (SASStringBTreeNode_t heap, lock_on_t lock_on)
 {
   SASBlockHeader *headerBlock = (SASBlockHeader *) heap;
   block_size_t heapFree = 0;
 
   if (SOMSASCheckBlockSigAndType (headerBlock, SAS_SIMPLEHEAP_TYPE))
     {
-      SASLock (heap, SasUserLock__WRITE);
+      if (lock_on) SASLock (heap, SasUserLock__WRITE);
       heapFree = SASStringBTreeNodeFreeSpaceNoLock (heap);
-      SASUnlock (heap);
+      if (lock_on) SASUnlock (heap);
 #ifdef __SASDebugPrint__
     }
   else
     {
       sas_printf
-	("SASStringBTreeNodeFreeSpace(%p) does not match type/subtype\n",
-	 heap);
+	("SASStringBTreeNodeFreeSpace(%p,%d) does not match type/subtype\n",
+	 heap, lock_on);
 #endif
     }
   return heapFree;
@@ -554,22 +555,22 @@ SASStringBTreeNodeDestroyNoLock (SASStringBTreeNode_t heap)
 }
 
 void
-SASStringBTreeNodeDestroy (SASStringBTreeNode_t heap)
+SASStringBTreeNodeDestroy (SASStringBTreeNode_t heap, lock_on_t lock_on)
 {
   SASBlockHeader *headerBlock = (SASBlockHeader *) heap;
 
   if (SOMSASCheckBlockSigAndTypeAndSubtype (headerBlock,
 					    SAS_RUNTIME_STRINGBTREENODE))
     {
-      SASLock (heap, SasUserLock__WRITE);
+      if (lock_on) SASLock (heap, SasUserLock__WRITE);
       SASStringBTreeNodeDestroyNoLock (heap);
-      SASUnlock (heap);
+      if (lock_on) SASUnlock (heap);
     }
   else
     {
 #ifdef __SASDebugPrint__
       sas_printf
-	("SASStringBTreeNodeDestroy(%p) does not match type/subtype\n", heap);
+	("SASStringBTreeNodeDestroy(%p,%d) does not match type/subtype\n", heap, lock_on);
 #endif
     }
 }
@@ -1215,20 +1216,21 @@ SASStringBTreeNodeSearchLE (SASStringBTreeNode_t header,
 }
 
 static inline void
-SASStringBTreeNodeKeyMove (SASStringBTreeNode_t heap, short pos, char *key)
+SASStringBTreeNodeKeyMove (SASStringBTreeNode_t heap, short pos, char *key,
+				lock_on_t lock_on)
 {
   SASStringBTreeNodeHeader *node = (SASStringBTreeNodeHeader *) heap;
   char *oldkey = node->keys[pos];
   char *tempkey;
   int key_len = strlen (key) + 1;
 
-  tempkey = (char *) SASStringBTreeNodeNearAlloc (heap, key_len);
+  tempkey = (char *) SASStringBTreeNodeNearAlloc (heap, key_len, lock_on);
   node->keys[pos] = strcpy (tempkey, key);
 
   if (oldkey != NULL)
     {
       int keylen = strlen (oldkey) + 1;
-      SASStringBTreeNodeNearDealloc (heap, oldkey, keylen);
+      SASStringBTreeNodeNearDealloc (heap, oldkey, keylen, lock_on);
       node->keys[pos] = NULL;
     }
 
@@ -1237,31 +1239,33 @@ SASStringBTreeNodeKeyMove (SASStringBTreeNode_t heap, short pos, char *key)
       if ((unsigned long) key >= getMemLow ())
 	{
 	  if ((unsigned long) key <= getMemHigh ())
-	    SASStringBTreeNodeNearDealloc (heap, key, key_len);
+	    SASStringBTreeNodeNearDealloc (heap, key, key_len, lock_on);
 	}
     }
 }
 
 static inline void
-SASStringBTreeNodeKeyCopy (SASStringBTreeNode_t heap, short pos, char *key)
+SASStringBTreeNodeKeyCopy (SASStringBTreeNode_t heap, short pos, char *key,
+				lock_on_t lock_on)
 {
   SASStringBTreeNodeHeader *node = (SASStringBTreeNodeHeader *) heap;
   char *oldkey = node->keys[pos];
   char *tempkey;
   int key_len = strlen (key) + 1;
 
-  tempkey = (char *) SASStringBTreeNodeNearAlloc (heap, key_len);
+  tempkey = (char *) SASStringBTreeNodeNearAlloc (heap, key_len, lock_on);
   node->keys[pos] = strcpy (tempkey, key);
 
   if (oldkey != NULL)
     {
       int keylen = strlen (oldkey) + 1;
-      SASStringBTreeNodeNearDealloc (heap, oldkey, keylen);
+      SASStringBTreeNodeNearDealloc (heap, oldkey, keylen, lock_on);
     }
 }
 
 static inline void
-SASStringBTreeNodeKeyDelete (SASStringBTreeNode_t heap, short pos)
+SASStringBTreeNodeKeyDelete (SASStringBTreeNode_t heap, short pos,
+				lock_on_t lock_on)
 {
   SASStringBTreeNodeHeader *node = (SASStringBTreeNodeHeader *) heap;
   char *oldkey = node->keys[pos];
@@ -1269,24 +1273,25 @@ SASStringBTreeNodeKeyDelete (SASStringBTreeNode_t heap, short pos)
   if (oldkey != NULL)
     {
       int keylen = strlen (oldkey) + 1;
-      SASStringBTreeNodeNearDealloc (heap, oldkey, keylen);
+      SASStringBTreeNodeNearDealloc (heap, oldkey, keylen, lock_on);
     }
 }
 
 static inline void
-SASStringBTreeNodeKeyReplace (SASStringBTreeNode_t heap, short pos, char *key)
+SASStringBTreeNodeKeyReplace (SASStringBTreeNode_t heap, short pos, char *key,
+				lock_on_t lock_on)
 {
   SASStringBTreeNodeHeader *node = (SASStringBTreeNodeHeader *) heap;
   char *tempkey;
   int key_len = strlen (key) + 1;
 
-  tempkey = (char *) SASStringBTreeNodeNearAlloc (heap, key_len);
+  tempkey = (char *) SASStringBTreeNodeNearAlloc (heap, key_len, lock_on);
   node->keys[pos] = strcpy (tempkey, key);
 }
 
 static void
 SASStringBTreeNodePushIn (SASStringBTreeNode_t node_t,
-			  __SBTnodeKeyRef * ref, short k)
+			  __SBTnodeKeyRef * ref, short k, lock_on_t lock_on)
 {
   SASStringBTreeNodeHeader *node = (SASStringBTreeNodeHeader *) node_t;
   char *str_ptr;
@@ -1295,7 +1300,7 @@ SASStringBTreeNodePushIn (SASStringBTreeNode_t node_t,
   size_t key_len, max_frag;
   short i;
 #ifdef __SASDebugPrint__
-  sas_printf ("PushIn@%p ref->key=%p k=%hd\n", node, ref->key, k);
+  sas_printf ("PushIn@%p ref->key=%p k=%hd lock_on=%d\n", node, ref->key, k, lock_on);
 #endif
   str_ptr = (char *) node;
   end_ptr = str_ptr + node->blockHeader.blockSize;
@@ -1318,13 +1323,13 @@ SASStringBTreeNodePushIn (SASStringBTreeNode_t node_t,
 			  node_t, (i + 1), temp_key, key_len);
 #endif
 	      SASStringBTreeNodeKeyCopy ((SASStringBTreeNode_t) node,
-					 (i + 1), temp_key);
+					 (i + 1), temp_key, lock_on);
 	      max_frag = SASStringBTreeNodeMaxFragmentNoLock (node_t);
 	    }
 	}
     }
 
-  SASStringBTreeNodeKeyReplace (node, (k + 1), ref->key);
+  SASStringBTreeNodeKeyReplace (node, (k + 1), ref->key, lock_on);
   node->vals[k + 1] = ref->val;
   node->branch[k + 1] = (SASStringBTreeNodeHeader *) ref->node;
   node->count++;
@@ -1333,7 +1338,8 @@ SASStringBTreeNodePushIn (SASStringBTreeNode_t node_t,
 static void
 SASStringBTreeNodeSplit (SASStringBTreeNode_t node_t,
 			 __SBTnodeKeyRef * xref,
-			 short k, __SBTnodeKeyRef * yref)
+			 short k, __SBTnodeKeyRef * yref,
+			lock_on_t lock_on)
 {
   SASStringBTreeNodeHeader *node = (SASStringBTreeNodeHeader *) node_t;
   short i, median;
@@ -1356,17 +1362,21 @@ SASStringBTreeNodeSplit (SASStringBTreeNode_t node_t,
       median = (short) (min + 1);
     }
 #ifdef __SASDebugPrint__
-  sas_printf ("Split@%p x=%s k=%hd median=%hd\n", node, xref->key, k, median);
+  sas_printf ("Split@%p x=%s k=%hd median=%hd lock_on=%d\n", node, xref->key, k, median, lock_on);
 #endif
 
-  yr = (SASStringBTreeNodeHeader *) SASStringBTreeNearAlloc (node_t);
+  if (lock_on == LOCK_ON)
+    yr = (SASStringBTreeNodeHeader *) SASStringBTreeNearAlloc (node_t);
+  else
+    yr = (SASStringBTreeNodeHeader *) SASStringBTreeNearAllocNoLock (node_t);
+
   SASStringBTreeNodeHeader **yrBranch = yr->branch;
   void **yrVals = yr->vals;
 
   for (i = (short) (median + 1); i <= node->max_count; i++)
     {
 
-      SASStringBTreeNodeKeyMove (yr, (i - median), thisKeys[i]);
+      SASStringBTreeNodeKeyMove (yr, (i - median), thisKeys[i], lock_on);
       yrVals[i - median] = thisVals[i];
       yrBranch[i - median] = thisBranch[i];
     }
@@ -1375,11 +1385,11 @@ SASStringBTreeNodeSplit (SASStringBTreeNode_t node_t,
 
   if (k <= min)
     {
-      SASStringBTreeNodePushIn (node_t, xref, k);
+      SASStringBTreeNodePushIn (node_t, xref, k, lock_on);
     }
   else
     {
-      SASStringBTreeNodePushIn (yr, xref, (short) (k - median));
+      SASStringBTreeNodePushIn (yr, xref, (short) (k - median), lock_on);
     }
 
   yrBranch[0] = (SASStringBTreeNodeHeader *) thisBranch[node->count];
@@ -1414,7 +1424,7 @@ SASStringBTreeNodeSplit (SASStringBTreeNode_t node_t,
 			  node_t, (i + 1), temp_key, key_len);
 #endif
 	      SASStringBTreeNodeKeyCopy ((SASStringBTreeNode_t) node,
-					 i, temp_key);
+					 i, temp_key, lock_on);
 	      max_frag = SASStringBTreeNodeMaxFragmentNoLock (node_t);
 	    }
 	}
@@ -1423,7 +1433,8 @@ SASStringBTreeNodeSplit (SASStringBTreeNode_t node_t,
 
 static int
 SASStringBTreeNodePushDown (SASStringBTreeNode_t node_t,
-			    char *newkey, void *newval, __SBTnodeKeyRef * ref)
+			    char *newkey, void *newval, __SBTnodeKeyRef * ref,
+				lock_on_t lock_on)
 {
   SASStringBTreeNodeHeader *node = (SASStringBTreeNodeHeader *) node_t;
   short pos;			// AKA k
@@ -1431,7 +1442,7 @@ SASStringBTreeNodePushDown (SASStringBTreeNode_t node_t,
   int pushup = false;
 
 #ifdef __SASDebugPrint__
-  sas_printf ("PushDown@%p newkey=%s\n", node, newkey);
+  sas_printf ("PushDown@%p newkey=%s lock_on=%d\n", node, newkey, lock_on);
 #endif
   pos = SASStringBTreeNodeSearchNode (node_t, newkey);
   if (pos < 0)
@@ -1461,7 +1472,7 @@ SASStringBTreeNodePushDown (SASStringBTreeNode_t node_t,
   if (node->branch[pos] != NULL)
     {
       pushup = SASStringBTreeNodePushDown (node->branch[pos], newkey,
-					   newval, ref);
+					   newval, ref, lock_on);
     }
   else
     {
@@ -1482,12 +1493,12 @@ SASStringBTreeNodePushDown (SASStringBTreeNode_t node_t,
       if (node->count < node->max_count)
 	{
 	  pushup = false;
-	  SASStringBTreeNodePushIn (node_t, ref, pos);
+	  SASStringBTreeNodePushIn (node_t, ref, pos, lock_on);
 	}
       else
 	{
 	  pushup = true;
-	  SASStringBTreeNodeSplit (node_t, ref, pos, ref);
+	  SASStringBTreeNodeSplit (node_t, ref, pos, ref, lock_on);
 	}
     }
   return pushup;
@@ -1495,15 +1506,17 @@ SASStringBTreeNodePushDown (SASStringBTreeNode_t node_t,
 
 void
 SASStringBTreeNodeInitialize (SASStringBTreeNode_t node_t,
-			      char *newkey, void *newval)
+			      char *newkey, void *newval,
+				lock_on_t lock_on)
 {
   SASStringBTreeNodeHeader *node = (SASStringBTreeNodeHeader *) node_t;
 
 #ifdef __SASDebugPrint__
-  sas_printf ("Initialize@%p newkey=%s, newval=%p\n", node, newkey, newval);
+  sas_printf ("Initialize@%p newkey=%s, newval=%p lock_on=%d\n",
+		node, newkey, newval, lock_on);
 #endif
   node->count = 1;
-  SASStringBTreeNodeKeyCopy (node, 1, newkey);
+  SASStringBTreeNodeKeyCopy (node, 1, newkey, lock_on);
   node->vals[1] = newval;
   node->branch[1] = NULL;
   node->branch[0] = NULL;
@@ -1511,7 +1524,7 @@ SASStringBTreeNodeInitialize (SASStringBTreeNode_t node_t,
 
 SASStringBTreeNode_t
 SASStringBTreeNodeInsert (SASStringBTreeNode_t node_t,
-			  char *newkey, void *newval)
+			  char *newkey, void *newval, lock_on_t lock_on)
 {
   SASStringBTreeNodeHeader *node = (SASStringBTreeNodeHeader *) node_t;
   int pushup;
@@ -1519,16 +1532,19 @@ SASStringBTreeNodeInsert (SASStringBTreeNode_t node_t,
   SASStringBTreeNode_t result = node_t;
 
 #ifdef __SASDebugPrint__
-  sas_printf ("Insert@%p newkey=%s\n", node, newkey);
+  sas_printf ("Insert@%p newkey=%s lock_on=%d\n", node, newkey, lock_on);
 #endif
-  pushup = SASStringBTreeNodePushDown (node_t, newkey, newval, &xref);
+  pushup = SASStringBTreeNodePushDown (node_t, newkey, newval, &xref, lock_on);
   if (pushup)
     {
       SASStringBTreeNodeHeader *new_node;
-      result = SASStringBTreeNearAlloc (node_t);
+      if (lock_on == LOCK_ON)
+        result = SASStringBTreeNearAlloc (node_t);
+      else
+        result = SASStringBTreeNearAllocNoLock (node_t);
       new_node = (SASStringBTreeNodeHeader *) result;
       new_node->count = 1;
-      SASStringBTreeNodeKeyMove (new_node, 1, xref.key);
+      SASStringBTreeNodeKeyMove (new_node, 1, xref.key, lock_on);
       new_node->vals[1] = xref.val;
       new_node->branch[1] = (SASStringBTreeNodeHeader *) xref.node;
       new_node->branch[0] = node;
@@ -1544,7 +1560,8 @@ SASStringBTreeNodeInsert (SASStringBTreeNode_t node_t,
 
 /* removes key[k] & branch[k] from this node */
 void
-SASStringBTreeNodeRemove (SASStringBTreeNode_t node_t, short pos)
+SASStringBTreeNodeRemove (SASStringBTreeNode_t node_t, short pos,
+			lock_on_t lock_on)
 {
   SASStringBTreeNodeHeader *node = (SASStringBTreeNodeHeader *) node_t;
   SASStringBTreeNodeHeader *q;
@@ -1556,10 +1573,10 @@ SASStringBTreeNodeRemove (SASStringBTreeNode_t node_t, short pos)
 
   q = ((SASStringBTreeNodeHeader *) node->branch[pos]);
 #ifdef __SASDebugPrint__
-  sas_printf ("Remove@%p key[%hd]=%s branch=%p\n",
-	      node_t, pos, node->keys[pos], q);
+  sas_printf ("Remove@%p key[%hd]=%s branch=%p lock_on=%d\n",
+	      node_t, pos, node->keys[pos], q, lock_on);
 #endif
-  SASStringBTreeNodeKeyDelete (node_t, pos);
+  SASStringBTreeNodeKeyDelete (node_t, pos, lock_on);
 
   str_ptr = (char *) node;
   end_ptr = str_ptr + node->blockHeader.blockSize;
@@ -1586,7 +1603,7 @@ SASStringBTreeNodeRemove (SASStringBTreeNode_t node_t, short pos)
 			  node_t, (i - 1), temp_key, key_len);
 #endif
 	      SASStringBTreeNodeKeyCopy ((SASStringBTreeNode_t) node,
-					 (i - 1), temp_key);
+					 (i - 1), temp_key, lock_on);
 	      max_frag = SASStringBTreeNodeMaxFragmentNoLock (node_t);
 	    }
 	}
@@ -1614,21 +1631,22 @@ SASStringBTreeNodeRemove (SASStringBTreeNode_t node_t, short pos)
 }
 
 void
-SASStringBTreeNodeCombine (SASStringBTreeNode_t node_t, short pos)
+SASStringBTreeNodeCombine (SASStringBTreeNode_t node_t, short pos,
+				lock_on_t lock_on)
 {
   SASStringBTreeNodeHeader *node = (SASStringBTreeNodeHeader *) node_t;
   SASStringBTreeNodeHeader *q, *r;
   short c;
 
 #ifdef __SASDebugPrint__
-  sas_printf ("Combine@%p pos=%hd\n", node_t, pos);
+  sas_printf ("Combine@%p pos=%hd lock_on=%d\n", node_t, pos, lock_on);
 #endif
 
   q = ((SASStringBTreeNodeHeader *) node->branch[pos]);
   r = ((SASStringBTreeNodeHeader *) node->branch[pos - 1]);
   r->count++;
   //r->keys[r->count] = node->keys[pos];
-  SASStringBTreeNodeKeyMove (r, r->count, node->keys[pos]);
+  SASStringBTreeNodeKeyMove (r, r->count, node->keys[pos], lock_on);
   node->keys[pos] = NULL;	// Move frees the key string in node
   r->vals[r->count] = node->vals[pos];
   r->branch[r->count] = q->branch[0];
@@ -1641,7 +1659,7 @@ SASStringBTreeNodeCombine (SASStringBTreeNode_t node_t, short pos)
     {
       r->count++;
       // r->keys[r->count] = q->keys[c];
-      SASStringBTreeNodeKeyMove (r, r->count, q->keys[c]);
+      SASStringBTreeNodeKeyMove (r, r->count, q->keys[c], lock_on);
       q->keys[c] = NULL;
       r->vals[r->count] = q->vals[c];
       q->vals[c] = NULL;
@@ -1654,13 +1672,14 @@ SASStringBTreeNodeCombine (SASStringBTreeNode_t node_t, short pos)
 // remove pivot, since it hase been combined
   node->branch[pos] = NULL;
   node->vals[pos] = NULL;
-  SASStringBTreeNodeRemove (node_t, pos);
+  SASStringBTreeNodeRemove (node_t, pos, lock_on);
 // dispose of q, since it is empty
   SASStringBTreeNearDealloc (q);
 }
 
 void
-SASStringBTreeNodeMoveLeft (SASStringBTreeNode_t node_t, short pos)
+SASStringBTreeNodeMoveLeft (SASStringBTreeNode_t node_t, short pos,
+				lock_on_t lock_on)
 {
   SASStringBTreeNodeHeader *node = (SASStringBTreeNodeHeader *) node_t;
   SASStringBTreeNodeHeader *l, *r;
@@ -1673,17 +1692,17 @@ SASStringBTreeNodeMoveLeft (SASStringBTreeNode_t node_t, short pos)
   l = ((SASStringBTreeNodeHeader *) node->branch[pos - 1]);
   r = ((SASStringBTreeNodeHeader *) node->branch[pos]);
 #ifdef __SASDebugPrint__
-  sas_printf ("MoveLeft@%p pos=%hd left@%p right@%p\n", node_t, pos, l, r);
+  sas_printf ("MoveLeft@%p pos=%hd left@%p right@%p lock_on=%d\n", node_t, pos, l, r, lock_on);
 #endif
   l->count++;
   // l->keys[l->count] = node->keys[pos];
-  SASStringBTreeNodeKeyMove (l, l->count, node->keys[pos]);
+  SASStringBTreeNodeKeyMove (l, l->count, node->keys[pos], lock_on);
   node->keys[pos] = NULL;
   l->vals[l->count] = node->vals[pos];
   l->branch[l->count] = r->branch[0];
 
   //node->keys[pos] = r->keys[1];
-  SASStringBTreeNodeKeyMove (node, pos, r->keys[1]);
+  SASStringBTreeNodeKeyMove (node, pos, r->keys[1], lock_on);
   node->vals[pos] = r->vals[1];
   r->branch[0] = r->branch[1];
   r->count--;
@@ -1709,7 +1728,7 @@ SASStringBTreeNodeMoveLeft (SASStringBTreeNode_t node_t, short pos)
 			  node_t, (c), temp_key, key_len);
 #endif
 	      SASStringBTreeNodeKeyCopy ((SASStringBTreeNode_t) r,
-					 (c), temp_key);
+					 (c), temp_key, lock_on);
 	      max_frag = SASStringBTreeNodeMaxFragmentNoLock (node_t);
 	    }
 	}
@@ -1725,7 +1744,8 @@ SASStringBTreeNodeMoveLeft (SASStringBTreeNode_t node_t, short pos)
 }
 
 void
-SASStringBTreeNodeMoveRight (SASStringBTreeNode_t node_t, short pos)
+SASStringBTreeNodeMoveRight (SASStringBTreeNode_t node_t, short pos,
+				lock_on_t lock_on)
 {
   SASStringBTreeNodeHeader *node = (SASStringBTreeNodeHeader *) node_t;
   SASStringBTreeNodeHeader *l, *r;
@@ -1738,7 +1758,7 @@ SASStringBTreeNodeMoveRight (SASStringBTreeNode_t node_t, short pos)
   l = ((SASStringBTreeNodeHeader *) node->branch[pos - 1]);
   r = ((SASStringBTreeNodeHeader *) node->branch[pos]);
 #ifdef __SASDebugPrint__
-  sas_printf ("MoveRight@%p pos=%hd left@%p right@%p\n", node_t, pos, l, r);
+  sas_printf ("MoveRight@%p pos=%hd left@%p right@%p lock_on=%d\n", node_t, pos, l, r, lock_on);
 #endif
 
   str_ptr = (char *) node;
@@ -1762,14 +1782,14 @@ SASStringBTreeNodeMoveRight (SASStringBTreeNode_t node_t, short pos)
 			  node_t, (c + 1), temp_key, key_len);
 #endif
 	      SASStringBTreeNodeKeyCopy ((SASStringBTreeNode_t) r,
-					 (c + 1), temp_key);
+					 (c + 1), temp_key, lock_on);
 	      max_frag = SASStringBTreeNodeMaxFragmentNoLock (node_t);
 	    }
 	}
     };
   // r->keys[1] = node->keys[pos];
   r->keys[1] = NULL;
-  SASStringBTreeNodeKeyMove (r, 1, node->keys[pos]);
+  SASStringBTreeNodeKeyMove (r, 1, node->keys[pos], lock_on);
   node->keys[pos] = NULL;
   r->vals[1] = node->vals[pos];
   r->branch[1] = r->branch[0];
@@ -1781,7 +1801,7 @@ SASStringBTreeNodeMoveRight (SASStringBTreeNode_t node_t, short pos)
 #endif
 
   // node->keys[pos] = l->keys[l->count];
-  SASStringBTreeNodeKeyMove (node, pos, l->keys[l->count]);
+  SASStringBTreeNodeKeyMove (node, pos, l->keys[l->count], lock_on);
   node->vals[pos] = l->vals[l->count];
   r->branch[0] = l->branch[l->count];
 
@@ -1798,19 +1818,20 @@ SASStringBTreeNodeMoveRight (SASStringBTreeNode_t node_t, short pos)
 
  // finds a key and inserts it into this.branch[pos] to restore minimums
 void
-SASStringBTreeNodeRestore (SASStringBTreeNode_t header, short pos)
+SASStringBTreeNodeRestore (SASStringBTreeNode_t header, short pos,
+				lock_on_t lock_on)
 {
   SASStringBTreeNodeHeader *node = (SASStringBTreeNodeHeader *) header;
   short min = node->max_count / 2;
 
 #ifdef __SASDebugPrint__
-  sas_printf ("Restore@%p pos=%hd\n", header, pos);
+  sas_printf ("Restore@%p pos=%hd lock_on=%d\n", header, pos, lock_on);
 #endif
   if (pos > 0)
     {
       if (((SASStringBTreeNodeHeader *) node->branch[pos - 1])->count > min)
 	{			// move key to right
-	  SASStringBTreeNodeMoveRight (header, pos);
+	  SASStringBTreeNodeMoveRight (header, pos, lock_on);
 	}
       else
 	{
@@ -1821,7 +1842,7 @@ SASStringBTreeNodeRestore (SASStringBTreeNode_t header, short pos)
 			  ((SASStringBTreeNodeHeader *) node->branch[pos])->
 			  count);
 #endif
-	      SASStringBTreeNodeMoveLeft (header, pos);
+	      SASStringBTreeNodeMoveLeft (header, pos, lock_on);
 	    }
 	  else
 	    {
@@ -1835,16 +1856,16 @@ SASStringBTreeNodeRestore (SASStringBTreeNode_t header, short pos)
 		  if (((SASStringBTreeNodeHeader *) node->branch[pos + 1])->
 		      count > min)
 		    {		// move key to left
-		      SASStringBTreeNodeMoveLeft (header, (short) (pos + 1));
+		      SASStringBTreeNodeMoveLeft (header, (short) (pos + 1), lock_on);
 		    }
 		  else
 		    {
-		      SASStringBTreeNodeCombine (header, pos);
+		      SASStringBTreeNodeCombine (header, pos, lock_on);
 		    }
 		}
 	      else
 		{
-		  SASStringBTreeNodeCombine (header, pos);
+		  SASStringBTreeNodeCombine (header, pos, lock_on);
 		}
 	    }
 	}
@@ -1857,24 +1878,25 @@ SASStringBTreeNodeRestore (SASStringBTreeNode_t header, short pos)
 #endif
       if (((SASStringBTreeNodeHeader *) node->branch[1])->count > min)
 	{
-	  SASStringBTreeNodeMoveLeft (header, (short) 1);
+	  SASStringBTreeNodeMoveLeft (header, (short) 1, lock_on);
 	}
       else
 	{
-	  SASStringBTreeNodeCombine (header, (short) 1);
+	  SASStringBTreeNodeCombine (header, (short) 1, lock_on);
 	}
     }
 }
 
 // replaces this.key[k] by its immediate successor
 void
-SASStringBTreeNodeSuccessor (SASStringBTreeNode_t header, short pos)
+SASStringBTreeNodeSuccessor (SASStringBTreeNode_t header, short pos,
+				lock_on_t lock_on)
 {
   SASStringBTreeNodeHeader *node = (SASStringBTreeNodeHeader *) header;
   SASStringBTreeNodeHeader *q;
 
 #ifdef __SASDebugPrint__
-  sas_printf ("Successor@%p pos=%hd\n", header, pos);
+  sas_printf ("Successor@%p pos=%hd lock_on=%d\n", header, pos, lock_on);
 #endif
   q = ((SASStringBTreeNodeHeader *) node->branch[pos]);
   while (q->branch[0] != NULL)
@@ -1889,7 +1911,7 @@ SASStringBTreeNodeSuccessor (SASStringBTreeNode_t header, short pos)
 	      header, node->keys[pos], q->keys[1]);
 #endif
   // node->keys[k] = q->keys[1];
-  SASStringBTreeNodeKeyCopy (node, pos, q->keys[1]);
+  SASStringBTreeNodeKeyCopy (node, pos, q->keys[1], lock_on);
 //      q->keys[1] = NULL;
   node->vals[pos] = q->vals[1];
 //      q->vals[1] = NULL;
@@ -1904,7 +1926,8 @@ SASStringBTreeNodeSuccessor (SASStringBTreeNode_t header, short pos)
 
 // recursive delete
 int
-SASStringBTreeNodeRecDelete (SASStringBTreeNode_t header, char *target)
+SASStringBTreeNodeRecDelete (SASStringBTreeNode_t header, char *target,
+				lock_on_t lock_on)
 {
   SASStringBTreeNodeHeader *node = (SASStringBTreeNodeHeader *) header;
   SASStringBTreeNodeHeader *q;
@@ -1913,7 +1936,7 @@ SASStringBTreeNodeRecDelete (SASStringBTreeNode_t header, char *target)
   short k, pos;
 
 #ifdef __SASDebugPrint__
-  sas_printf ("RecDelete@%p target=%s\n", header, target);
+  sas_printf ("RecDelete@%p target=%s lock_on=%d\n", header, target, lock_on);
 #endif
   pos = SASStringBTreeNodeSearchNode (header, target);
   if (pos < 0)
@@ -1933,15 +1956,15 @@ SASStringBTreeNodeRecDelete (SASStringBTreeNode_t header, char *target)
     {
       if (node->branch[k - 1] == NULL)	// case: this is a leaf
 	{			// removes key from position k of this
-	  SASStringBTreeNodeRemove (header, k);
+	  SASStringBTreeNodeRemove (header, k, lock_on);
 	}
       else
 	{			// replaces key[k] by its successor
-	  SASStringBTreeNodeSuccessor (header, k);
+	  SASStringBTreeNodeSuccessor (header, k, lock_on);
 	  q = ((SASStringBTreeNodeHeader *) node->branch[k]);
 	  if (q != NULL)
 	    {
-	      found = SASStringBTreeNodeRecDelete (q, node->keys[k]);
+	      found = SASStringBTreeNodeRecDelete (q, node->keys[k], lock_on);
 #if __SASDebugPrint__ > 1
 	      sas_printf ("RecDelete after Sucessor found=%d\n", found);
 	      sas_printf ("RecDelete: subtree=");
@@ -1965,7 +1988,7 @@ SASStringBTreeNodeRecDelete (SASStringBTreeNode_t header, char *target)
       q = ((SASStringBTreeNodeHeader *) node->branch[k]);
       if (q != NULL)
 	{
-	  found = SASStringBTreeNodeRecDelete (q, target);
+	  found = SASStringBTreeNodeRecDelete (q, target, lock_on);
 	}
       else
 	{
@@ -1977,7 +2000,7 @@ SASStringBTreeNodeRecDelete (SASStringBTreeNode_t header, char *target)
     {
       if (((SASStringBTreeNodeHeader *) node->branch[k])->count < min)
 	{
-	  SASStringBTreeNodeRestore (header, k);
+	  SASStringBTreeNodeRestore (header, k, lock_on);
 	}
     }
 #ifdef __SASDebugPrint__
@@ -1992,16 +2015,17 @@ SASStringBTreeNodeRecDelete (SASStringBTreeNode_t header, char *target)
 }
 
 SASStringBTreeNode_t
-SASStringBTreeNodeDelete (SASStringBTreeNode_t header, char *target)
+SASStringBTreeNodeDelete (SASStringBTreeNode_t header, char *target,
+				lock_on_t lock_on)
 {
   SASStringBTreeNodeHeader *node = (SASStringBTreeNodeHeader *) header;
   SASStringBTreeNodeHeader *result = node;
   int found = false;
 
 #ifdef __SASDebugPrint__
-  sas_printf ("Delete target=%s\n", target);
+  sas_printf ("Delete target=%s lock_on=%d\n", target, lock_on);
 #endif
-  found = SASStringBTreeNodeRecDelete (header, target);
+  found = SASStringBTreeNodeRecDelete (header, target, lock_on);
   if (found)
     {
       if (node->count == 0)

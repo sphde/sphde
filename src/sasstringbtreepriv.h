@@ -105,6 +105,6 @@ extern void
 SASStringBTreePrintStatsPriv (SASStringBTreeHeader *heap);
 
 extern SASStringBTreeNode_t 
-SASStringBTreeSpillAlloc(void *nearObj);
+SASStringBTreeSpillAlloc(void *nearObj, lock_on_t lock_on);
 
 #endif /* __SAS_STRINGBTREE_PRIVH */

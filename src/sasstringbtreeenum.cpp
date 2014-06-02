@@ -269,3 +269,130 @@ SASStringBTreeEnumNext (SASStringBTreeEnum_t sbtenum)
 
   return result;
 }
+
+void *
+SASStringBTreeEnumNext_nolock (SASStringBTreeEnum_t sbtenum)
+{
+  __SBEnumeration *stringenum = (__SBEnumeration *) sbtenum;
+  void *result = NULL;
+  bool found = false;
+  char *maxkey;
+
+
+  maxkey = SASStringBTreeGetMaxKey_nolock (stringenum->tree);
+#if __SASDebugPrint__ > 1
+  sas_printf ("SASStringBTreeEnumNext_nolock; enum->tree=%p maxkey=%s\n",
+                  stringenum->tree, maxkey);
+#endif
+  if (maxkey != NULL)
+    {
+      stringenum->hasmore = (strcmp (stringenum->curkey, maxkey) < 0);
+      if (stringenum->hasmore)
+	{
+	  SASStringBTreeNode_t curnode = stringenum->ref.node;
+	  long treemod = SASStringBTreeGetModCount_nolock (stringenum->tree);
+
+	  if ((curnode != NULL) && (treemod == stringenum->curmod))
+	    {
+	      short curpos = stringenum->ref.pos;
+	      SASStringBTreeNodeHeader *curSBnode =
+		(SASStringBTreeNodeHeader *) curnode;
+	      if (curpos < curSBnode->count)
+		{
+		  if (curSBnode->branch[curpos] == NULL)
+		    {
+		      curpos++;
+		      stringenum->ref.pos = curpos;
+		      result = curSBnode->vals[curpos];
+		      stringenum->curkey = curSBnode->keys[curpos];
+		      stringenum->hasmore =
+			(strcmp (stringenum->curkey, maxkey) < 0);
+		      found = true;
+		    }
+		  else
+		    {
+		      found =
+			SASStringBTreeNodeSearchGT (curnode,
+						    stringenum->curkey,
+						    &stringenum->ref);
+		      if (found)
+			{
+			  curnode = stringenum->ref.node;
+			  curSBnode = (SASStringBTreeNodeHeader *) curnode;
+			  curpos = stringenum->ref.pos;
+			  result = curSBnode->vals[curpos];
+			  stringenum->curkey = curSBnode->keys[curpos];
+			  stringenum->curcount -= 1;
+			  stringenum->hasmore =
+			    (strcmp (stringenum->curkey, maxkey) < 0);
+			}
+		    }
+		  if (stringenum->hasmore)
+		    stringenum->curcount -= 1;
+		  else if (found)
+		    stringenum->curcount = 1;
+		  else
+		    stringenum->curcount = 0;
+		}
+	    }
+	  if (!found)
+	    {
+#if __SASDebugPrint__ > 1
+    sas_printf ("SASStringBTreeEnumNext_nolock; !found enum->tree=%s\n",
+            stringenum->tree, stringenum->curkey);
+#endif
+	      SASStringBTreeNode_t curnode =
+		SASStringBTreeGetRootNodeNoLock (stringenum->tree);
+              if (stringenum->ref.node == NULL)
+              {
+	          found =
+		  SASStringBTreeNodeSearchGE (curnode, stringenum->curkey,
+					    &stringenum->ref);
+#if __SASDebugPrint__ > 1
+    sas_printf ("SASStringBTreeEnumNext_nolock; !found curnode=%p SearchGE=%d\n",
+                                  curnode, found);
+#endif
+              } else {
+	          found =
+		  SASStringBTreeNodeSearchGT (curnode, stringenum->curkey,
+					    &stringenum->ref);
+#if __SASDebugPrint__ > 1
+    sas_printf ("SASStringBTreeEnumNext_nolock; !found curnode=%p SearchGT=%d\n",
+                                  curnode, found);
+#endif
+              }
+	      if (found)
+		{
+		  short curpos = stringenum->ref.pos;
+		  SASStringBTreeNodeHeader *curSBnode =
+		    (SASStringBTreeNodeHeader *) stringenum->ref.node;
+		  result = curSBnode->vals[curpos];
+		  stringenum->curkey = curSBnode->keys[curpos];
+		  stringenum->curmod = treemod;
+		  stringenum->curcount =
+		    SASStringBTreeGetCurCount (stringenum->tree);
+		  stringenum->hasmore =
+		    (strcmp (stringenum->curkey, maxkey) < 0);
+#if __SASDebugPrint__ > 1
+     sas_printf ("SASStringBTreeEnumNext_nolock; curpos=%hd node=%p result=%p\n",
+                                  curpos, curSBnode, result);
+#endif
+		}
+	      else
+		{
+		  stringenum->hasmore = false;
+		}
+	    }
+	}
+#ifdef __SASDebugPrint__
+    }
+  else
+    {
+      sas_printf ("SASStringBTreeEnumNext_nolock; enum->tree=%p invalid\n",
+		  stringenum->tree);
+#endif
+    }
+//      sas_printf("{%s,%s,%d}",stringenum->curkey, maxkey, stringenum->hasmore);
+
+  return result;
+}

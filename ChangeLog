@@ -1,5 +1,105 @@
 2014-06-02 Rajalakshmi Srinivasaraghavan <raji@linux.vnet.ibm.com>
 
+	* src/sasindexnode.h: Define LOCK_ON and LOCK_OFF.
+	* src/sasstringbtree.cpp: Include stddef.h.
+	(SASStringBTreePercentFree): Replace divide by power of 2 with
+	__builtin_ctzl and shift right.
+	(SASStringBTreePercentUsed): Likewise.
+	(SASStringBTreeSpillAllocExtended): Add lock_on_t parm.
+	Conditionally call SASLock/SASUnlock.
+	(SASStringBTreeSpillAlloc): Add lock_on_t parm.
+	Conditionally call SASLock/SASUnlock.
+	(SASStringBTreeGetModCount_nolock):  New function.
+	(SASStringBTreeGetMaxKey_nolock): Like wise.
+	(SASStringBTreeGetMinKey_nolock): Like wise.
+	(SASStringBTreeContainsKey_nolock): Like wise.
+	(SASStringBTreeGet_nolock): Like wise.
+	(SASStringBTreeIsEmpty_nolock): Like wise.
+	(SASStringBTreePut_nolock): Like wise.
+	(SASStringBTreeReplace_nolock): Like wise.
+	(SASStringBTreeRemove_nolock): Like wise.
+	(SASStringBTreePut): Update calls to SASStringBTreeNodeInsert()
+	and SASStringBTreeNodeInitialize().
+	(SASStringBTreeRemove):  Update call to SASStringBTreeNodeDelete().
+	* src/sasstringbtree.h: Add comment.
+	(SASStringBTreeGetModCount_nolock):  Declare with comment.
+	(SASStringBTreeGetMaxKey_nolock): Declare with comment.
+	(SASStringBTreeGetMinKey_nolock): Declare with comment.
+	(SASStringBTreeContainsKey_nolock): Declare with comment.
+	(SASStringBTreeGet_nolock): Declare with comment.
+	(SASStringBTreeIsEmpty_nolock): Declare with comment.
+	(SASStringBTreePut_nolock): Declare with comment.
+	(SASStringBTreeReplace_nolock): Declare with comment.
+	(SASStringBTreeRemove_nolock): Declare with comment.
+	* src/sasstringbtreeenum.cpp (SASStringBTreeEnumNext_nolock): 
+	New function.
+	* src/sasstringbtreeenum.h (SASStringBTreeEnumNext_nolock):
+	Declare with comment.
+	* src/sasstringbtreenode.cpp(SASStringBTreeNodeAlloc): Add lock_on_t
+	parm.Conditionally call SASLock/SASUnlock.
+	(SASStringBTreeNodeFree): Add lock_on_t parm.  Conditionally call
+	SASLock/SASUnlock.
+	(SASStringBTreeNodeNearDealloc): Add lock_on_t parm.  Conditionally
+	call SASLock/SASUnlock.
+	(SASStringBTreeNodeNearAlloc): Add lock_on_t parm.  Conditionally
+	call SASLock/SASUnlock.
+	(SASStringBTreeNodeFreeSpace): Add lock_on_t parm.  Conditionally call
+	SASLock/SASUnlock.
+	(SASStringBTreeNodeDestroy): Add lock_on_t parm.
+	Conditionally call SASLock/SASUnlock.
+	(SASStringBTreeNodeKeyMove): Add lock_on_t parm. Pass lock_on parm to
+	SASStringBTreeNodeNearAlloc() and SASStringBTreeNodeNearDealloc().
+	(SASStringBTreeNodeKeyCopy): Add lock_on_t parm. Pass lock_on parm to
+	SASStringBTreeNodeNearAlloc() and SASStringBTreeNodeNearDealloc().
+	(SASStringBTreeNodeKeyDelete): Add lock_on_t parm. Pass lock_on to
+	SASStringBTreeNodeNearDealloc().
+	(SASStringBTreeNodeKeyReplace): Add lock_on_t parm. Pass lock_on to
+	SASStringBTreeNodeNearAlloc().
+	(SASStringBTreeNodePushIn): Add lock_on_t parm. Pass lock_on to
+	SASStringBTreeNodeKeyCopy() and SASStringBTreeNodeKeyReplace().
+	(SASStringBTreeNodeSplit): Add lock_on_t parm. Pass lock_on to
+	SASStringBTreeNodeKeyMove(), SASStringBTreeNodePushIn() and
+	SASStringBTreeNodeKeyCopy().
+	(SASStringBTreeNodePushDown): Add lock_on_t parm.  Pass lock_on to
+	SASStringBTreeNodePushDown(), SASStringBTreeNodePushIn(), and
+	SASStringBTreeNodeSplit().
+	(SASStringBTreeNodeInitialize): Add lock_on_t parm.  Pass lock_on to
+	SASStringBTreeNodeKeyCopy().
+	(SASStringBTreeNodeInsert): Add lock_on_t parm.  Pass lock_on to
+	SASStringBTreeNodePushDown() and SASStringBTreeNodeKeyMove().
+	(SASStringBTreeNodeRemove): Add lock_on_t parm.  
+	Pass lock_on to SASStringBTreeNodeKeyDelete() SASStringBTreeNodeKeyCopy().
+	(SASStringBTreeNodeCombine): Add lock_on_t parm.  Pass lock_on to
+	SASStringBTreeNodeKeyMove(), SASStringBTreeNodeKeyMove(), and
+	SASStringBTreeNodeRemove().
+	(SASStringBTreeNodeMoveLeft): Add lock_on_t parm.  Pass lock_on to
+	SASStringBTreeNodeKeyCopy() and SASStringBTreeNodeKeyMove().
+	(SASStringBTreeNodeMoveRight): Add lock_on_t parm.  Pass lock_on to
+	SASStringBTreeNodeKeyCopy() and SASStringBTreeNodeKeyMove().
+	(SASStringBTreeNodeRestore): Add lock_on_t parm. Pass lock_on to
+	SASStringBTreeNodeMoveRight(), SASStringBTreeNodeMoveLeft(),
+	and SASStringBTreeNodeCombine().
+	(SASStringBTreeNodeSuccessor): Add lock_on_t parm.  Pass lock_on to
+	SASStringBTreeNodeKeyCopy().
+	(SASStringBTreeNodeRecDelete): Add lock_on_t parm.  Pass lock_on to
+	SASStringBTreeNodeRemove(), SASStringBTreeNodeSuccessor(),
+	SASStringBTreeNodeRecDelete(), and SASStringBTreeNodeRestore().
+	(SASStringBTreeNodeDelete): Add lock_on_t parm.  Pass lock_on to
+	SASStringBTreeNodeRecDelete().
+	* src/sasstringbtreenode.h: Declare lock_on_t.
+	Define LOCK_ON and LOCK_OFF.
+	(SASStringBTreeNodeDestroy, SASStringBTreeNodeFreeSpace,
+	SASStringBTreeNodeAlloc, SASStringBTreeNodeFree,
+	SASStringBTreeNodeNearAlloc, SASStringBTreeNodeInitialize,
+	SASStringBTreeNodeInsert, SASStringBTreeNodeDelete): Add lock_on_t
+	parm.
+	* src/sasstringbtreenodepriv.h (SASStringBTreeNodeNearDealloc): 
+	Add lock_on_t parm.
+	* src/sasstringbtreepriv.h (SASStringBTreeSpillAlloc):
+	Add lock_on_t parm.
+
+2014-06-02 Rajalakshmi Srinivasaraghavan <raji@linux.vnet.ibm.com>
+
 	* src/sasindex.cpp (SASIndexSpillAlloc): Add lock_on_t parm.
 	Conditionally call SASLock/SASUnlock.
 	(SASIndexSpillAllocExtended): Add lock_on_t parm.

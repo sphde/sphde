@@ -203,4 +203,19 @@ extern __C__ char *SASStringBTreeEnumCurrent (SASStringBTreeEnum_t sbtenum);
 */
 extern __C__ void *SASStringBTreeEnumNext (SASStringBTreeEnum_t sbtenum);
 
+/** \brief Move the enumeration to the next String BTree key entry and
+*   return the associated address value.
+*
+*   The corresponding C string key value can be obtained via
+*   SASStringBTreeEnumCurrent()
+*
+* This nolock form should only be used when the referenced SASStringBTreeEnum_t
+* is known to be locked by the application or contained within a
+* larger structure with a controlling lock.
+*
+*	@param sbtenum String BTree enumeration.
+*	@return the address value associated for the next String BTree enumeration.
+*/
+extern __C__ void *SASStringBTreeEnumNext_nolock (SASStringBTreeEnum_t sbtenum);
+
 #endif /* __SAS_STRINGBTREEENUM_H */
