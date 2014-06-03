@@ -1,9 +1,5 @@
-
-#ifndef _SASLOCKLIST_H
-#define _SASLOCKLIST_H
-
 /*
- * Copyright (c) 1995, 2011 IBM Corporation.
+ * Copyright (c) 1995-2014 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,6 +8,9 @@
  * Contributors:
  *     IBM Corporation, M.P. Johnson - initial API and implementation
  */
+
+#ifndef _SASLOCKLIST_H
+#define _SASLOCKLIST_H
 
 // Class Specification *************************************************
 //

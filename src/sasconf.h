@@ -1,10 +1,5 @@
-#ifndef __SASCONF__H
-#define __SASCONF__H
-
-#include <sys/param.h>
-
 /*
- * Copyright (c) 2003, 2011 IBM Corporation.
+ * Copyright (c) 2003-2014 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,6 +8,11 @@
  * Contributors:
  *     IBM Corporation, Steven Munroe - initial API and implementation
  */
+
+#ifndef __SASCONF__H
+#define __SASCONF__H
+
+#include <sys/param.h>
 
 #define __BIGREGION__ 1
 

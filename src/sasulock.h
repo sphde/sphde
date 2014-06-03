@@ -1,8 +1,5 @@
-#ifndef _SASUSERLOCK_H
-#define _SASUSERLOCK_H
-
 /*
- * Copyright (c) 1995, 2011 IBM Corporation.
+ * Copyright (c) 1995-2014 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,6 +9,8 @@
  *     IBM Corporation, M. P. Johnson - initial API and implementation
  */
 
+#ifndef _SASUSERLOCK_H
+#define _SASUSERLOCK_H
 
 #include <stdlib.h>	// size_t
 #include <unistd.h>	// pid_t

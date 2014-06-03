@@ -1,8 +1,5 @@
-#ifndef __SJM_sasstdio_H
-#define __SJM_sasstdio_H
-
 /*
- * Copyright (c) 2009, 2011 IBM Corporation.
+ * Copyright (c) 2009-2014 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,7 +9,9 @@
  *     IBM Corporation, Steven Munroe - initial API and implementation
  */
 
-// stdio for SAS linkage structure initialization
+#ifndef __SJM_sasstdio_H
+#define __SJM_sasstdio_H
+
 /* This header contains the linkage structures the bind the sas IO functions
 	back into the main programs standard IO library. The Main program must use
 	the SAS_IO_INIT macro to allocate the structure and initial pointers to
