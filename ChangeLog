@@ -1,3 +1,12 @@
+2014-06-10 Rajalakshmi Srinivasaraghavan <raji@linux.vnet.ibm.com>
+
+	configure.ac: propagate LDFLAGS properly.
+	configure: Regenerate.
+	examples/Makefile.in: Likewise.
+	src/Makefile.in: Likewise.
+	aclocal.m4: Likewise.
+	Makefile.in: Likewise.
+
 2014-06-02 Rajalakshmi Srinivasaraghavan <raji@linux.vnet.ibm.com>
 
 	* src/sasindexnode.h: Define LOCK_ON and LOCK_OFF.

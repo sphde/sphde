@@ -33,7 +33,7 @@ fi
 
 # This directive is to avoid buggy libtool that don't add the -Wl,--no-as-needed
 # directive in the correct position of LDFLAGS
-LDFLAGS="-Wl,--no-as-needed -lrt"
+LDFLAGS="$LDFLAGS -Wl,--no-as-needed -lrt"
 
 # Check for programs.
 AC_PROG_CC
