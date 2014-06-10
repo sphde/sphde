@@ -43,8 +43,9 @@ TESTS = sphgtod_t$(EXEEXT) sasatom_t$(EXEEXT) bitvec_t$(EXEEXT) \
 	sphlflogger_tt$(EXEEXT) sphlflogger_ttt$(EXEEXT) \
 	sphlogportal_t$(EXEEXT) sphlogportal_tt$(EXEEXT) \
 	sphcontext_t$(EXEEXT) sasindex_t$(EXEEXT) sasindex_tt$(EXEEXT) \
-	sasstringbtree_t$(EXEEXT) sphsinglepcqueue_t$(EXEEXT) \
-	sphsinglepcqueue_tt$(EXEEXT) sphsinglepcqueue_ttt$(EXEEXT)
+	sasstringbtree_t$(EXEEXT) sasstringbtree_tt$(EXEEXT) \
+	sphsinglepcqueue_t$(EXEEXT) sphsinglepcqueue_tt$(EXEEXT) \
+	sphsinglepcqueue_ttt$(EXEEXT)
 noinst_PROGRAMS = $(am__EXEEXT_1)
 subdir = src
 DIST_COMMON = $(libsphdeinclude_HEADERS) $(libsphgtodinclude_HEADERS) \
@@ -118,8 +119,9 @@ am__EXEEXT_1 = sphgtod_t$(EXEEXT) sasatom_t$(EXEEXT) bitvec_t$(EXEEXT) \
 	sphlflogger_tt$(EXEEXT) sphlflogger_ttt$(EXEEXT) \
 	sphlogportal_t$(EXEEXT) sphlogportal_tt$(EXEEXT) \
 	sphcontext_t$(EXEEXT) sasindex_t$(EXEEXT) sasindex_tt$(EXEEXT) \
-	sasstringbtree_t$(EXEEXT) sphsinglepcqueue_t$(EXEEXT) \
-	sphsinglepcqueue_tt$(EXEEXT) sphsinglepcqueue_ttt$(EXEEXT)
+	sasstringbtree_t$(EXEEXT) sasstringbtree_tt$(EXEEXT) \
+	sphsinglepcqueue_t$(EXEEXT) sphsinglepcqueue_tt$(EXEEXT) \
+	sphsinglepcqueue_ttt$(EXEEXT)
 PROGRAMS = $(bin_PROGRAMS) $(noinst_PROGRAMS)
 am_bitvec_t_OBJECTS = bitvec_t.$(OBJEXT)
 bitvec_t_OBJECTS = $(am_bitvec_t_OBJECTS)
@@ -139,6 +141,9 @@ sassim_t_DEPENDENCIES = libsphde.la
 am_sasstringbtree_t_OBJECTS = sasstringbtree_t.$(OBJEXT)
 sasstringbtree_t_OBJECTS = $(am_sasstringbtree_t_OBJECTS)
 sasstringbtree_t_DEPENDENCIES = libsphde.la
+am_sasstringbtree_tt_OBJECTS = sasstringbtree_tt.$(OBJEXT)
+sasstringbtree_tt_OBJECTS = $(am_sasstringbtree_tt_OBJECTS)
+sasstringbtree_tt_DEPENDENCIES = libsphde.la
 am_sasutil_OBJECTS = sasutil.$(OBJEXT)
 sasutil_OBJECTS = $(am_sasutil_OBJECTS)
 sasutil_DEPENDENCIES = libsphde.la
@@ -210,23 +215,25 @@ CXXLINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 SOURCES = $(libsphde_la_SOURCES) $(libsphgtod_la_SOURCES) \
 	$(bitvec_t_SOURCES) $(sasatom_t_SOURCES) $(sasindex_t_SOURCES) \
 	$(sasindex_tt_SOURCES) $(sassim_t_SOURCES) \
-	$(sasstringbtree_t_SOURCES) $(sasutil_SOURCES) \
-	$(sphcontext_t_SOURCES) $(sphgtod_t_SOURCES) \
-	$(sphlflogger_t_SOURCES) $(sphlflogger_tt_SOURCES) \
-	$(sphlflogger_ttt_SOURCES) $(sphlockfreeheap_t_SOURCES) \
-	$(sphlogportal_t_SOURCES) $(sphlogportal_tt_SOURCES) \
-	$(sphsinglepcqueue_t_SOURCES) $(sphsinglepcqueue_tt_SOURCES) \
-	$(sphsinglepcqueue_ttt_SOURCES) $(sphthread_t_SOURCES)
+	$(sasstringbtree_t_SOURCES) $(sasstringbtree_tt_SOURCES) \
+	$(sasutil_SOURCES) $(sphcontext_t_SOURCES) \
+	$(sphgtod_t_SOURCES) $(sphlflogger_t_SOURCES) \
+	$(sphlflogger_tt_SOURCES) $(sphlflogger_ttt_SOURCES) \
+	$(sphlockfreeheap_t_SOURCES) $(sphlogportal_t_SOURCES) \
+	$(sphlogportal_tt_SOURCES) $(sphsinglepcqueue_t_SOURCES) \
+	$(sphsinglepcqueue_tt_SOURCES) $(sphsinglepcqueue_ttt_SOURCES) \
+	$(sphthread_t_SOURCES)
 DIST_SOURCES = $(libsphde_la_SOURCES) $(libsphgtod_la_SOURCES) \
 	$(bitvec_t_SOURCES) $(sasatom_t_SOURCES) $(sasindex_t_SOURCES) \
 	$(sasindex_tt_SOURCES) $(sassim_t_SOURCES) \
-	$(sasstringbtree_t_SOURCES) $(sasutil_SOURCES) \
-	$(sphcontext_t_SOURCES) $(sphgtod_t_SOURCES) \
-	$(sphlflogger_t_SOURCES) $(sphlflogger_tt_SOURCES) \
-	$(sphlflogger_ttt_SOURCES) $(sphlockfreeheap_t_SOURCES) \
-	$(sphlogportal_t_SOURCES) $(sphlogportal_tt_SOURCES) \
-	$(sphsinglepcqueue_t_SOURCES) $(sphsinglepcqueue_tt_SOURCES) \
-	$(sphsinglepcqueue_ttt_SOURCES) $(sphthread_t_SOURCES)
+	$(sasstringbtree_t_SOURCES) $(sasstringbtree_tt_SOURCES) \
+	$(sasutil_SOURCES) $(sphcontext_t_SOURCES) \
+	$(sphgtod_t_SOURCES) $(sphlflogger_t_SOURCES) \
+	$(sphlflogger_tt_SOURCES) $(sphlflogger_ttt_SOURCES) \
+	$(sphlockfreeheap_t_SOURCES) $(sphlogportal_t_SOURCES) \
+	$(sphlogportal_tt_SOURCES) $(sphsinglepcqueue_t_SOURCES) \
+	$(sphsinglepcqueue_tt_SOURCES) $(sphsinglepcqueue_ttt_SOURCES) \
+	$(sphthread_t_SOURCES)
 HEADERS = $(libsphdeinclude_HEADERS) $(libsphgtodinclude_HEADERS)
 ETAGS = etags
 CTAGS = ctags
@@ -516,6 +523,8 @@ sasindex_tt_SOURCES = tests/sasindex_tt.c
 sasindex_tt_LDADD = libsphde.la
 sasstringbtree_t_SOURCES = tests/sasstringbtree_t.c
 sasstringbtree_t_LDADD = libsphde.la
+sasstringbtree_tt_SOURCES = tests/sasstringbtree_tt.c
+sasstringbtree_tt_LDADD = libsphde.la
 sphsinglepcqueue_t_SOURCES = tests/sphsinglepcqueue_t.c
 sphsinglepcqueue_t_LDADD = libsphde.la
 sphsinglepcqueue_tt_SOURCES = tests/sphsinglepcqueue_tt.c
@@ -661,6 +670,9 @@ sassim_t$(EXEEXT): $(sassim_t_OBJECTS) $(sassim_t_DEPENDENCIES)
 sasstringbtree_t$(EXEEXT): $(sasstringbtree_t_OBJECTS) $(sasstringbtree_t_DEPENDENCIES) 
 	@rm -f sasstringbtree_t$(EXEEXT)
 	$(LINK) $(sasstringbtree_t_OBJECTS) $(sasstringbtree_t_LDADD) $(LIBS)
+sasstringbtree_tt$(EXEEXT): $(sasstringbtree_tt_OBJECTS) $(sasstringbtree_tt_DEPENDENCIES) 
+	@rm -f sasstringbtree_tt$(EXEEXT)
+	$(LINK) $(sasstringbtree_tt_OBJECTS) $(sasstringbtree_tt_LDADD) $(LIBS)
 sasutil$(EXEEXT): $(sasutil_OBJECTS) $(sasutil_DEPENDENCIES) 
 	@rm -f sasutil$(EXEEXT)
 	$(LINK) $(sasutil_OBJECTS) $(sasutil_LDADD) $(LIBS)
@@ -743,6 +755,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sasindex_tt.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sassim_t.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sasstringbtree_t.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sasstringbtree_tt.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sasutil.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sphcontext_t.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sphgtod_t.Po@am__quote@
@@ -923,6 +936,20 @@ sasstringbtree_t.obj: tests/sasstringbtree_t.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='tests/sasstringbtree_t.c' object='sasstringbtree_t.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o sasstringbtree_t.obj `if test -f 'tests/sasstringbtree_t.c'; then $(CYGPATH_W) 'tests/sasstringbtree_t.c'; else $(CYGPATH_W) '$(srcdir)/tests/sasstringbtree_t.c'; fi`
+
+sasstringbtree_tt.o: tests/sasstringbtree_tt.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT sasstringbtree_tt.o -MD -MP -MF $(DEPDIR)/sasstringbtree_tt.Tpo -c -o sasstringbtree_tt.o `test -f 'tests/sasstringbtree_tt.c' || echo '$(srcdir)/'`tests/sasstringbtree_tt.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/sasstringbtree_tt.Tpo $(DEPDIR)/sasstringbtree_tt.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='tests/sasstringbtree_tt.c' object='sasstringbtree_tt.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o sasstringbtree_tt.o `test -f 'tests/sasstringbtree_tt.c' || echo '$(srcdir)/'`tests/sasstringbtree_tt.c
+
+sasstringbtree_tt.obj: tests/sasstringbtree_tt.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT sasstringbtree_tt.obj -MD -MP -MF $(DEPDIR)/sasstringbtree_tt.Tpo -c -o sasstringbtree_tt.obj `if test -f 'tests/sasstringbtree_tt.c'; then $(CYGPATH_W) 'tests/sasstringbtree_tt.c'; else $(CYGPATH_W) '$(srcdir)/tests/sasstringbtree_tt.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/sasstringbtree_tt.Tpo $(DEPDIR)/sasstringbtree_tt.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='tests/sasstringbtree_tt.c' object='sasstringbtree_tt.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o sasstringbtree_tt.obj `if test -f 'tests/sasstringbtree_tt.c'; then $(CYGPATH_W) 'tests/sasstringbtree_tt.c'; else $(CYGPATH_W) '$(srcdir)/tests/sasstringbtree_tt.c'; fi`
 
 sphcontext_t.o: tests/sphcontext_t.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT sphcontext_t.o -MD -MP -MF $(DEPDIR)/sphcontext_t.Tpo -c -o sphcontext_t.o `test -f 'tests/sphcontext_t.c' || echo '$(srcdir)/'`tests/sphcontext_t.c

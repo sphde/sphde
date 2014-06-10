@@ -193,6 +193,10 @@ TESTS                += sasstringbtree_t
 sasstringbtree_t_SOURCES = tests/sasstringbtree_t.c
 sasstringbtree_t_LDADD   = libsphde.la
 
+TESTS                += sasstringbtree_tt
+sasstringbtree_tt_SOURCES = tests/sasstringbtree_tt.c
+sasstringbtree_tt_LDADD   = libsphde.la
+
 TESTS                 += sphsinglepcqueue_t
 sphsinglepcqueue_t_SOURCES = tests/sphsinglepcqueue_t.c
 sphsinglepcqueue_t_LDADD   = libsphde.la

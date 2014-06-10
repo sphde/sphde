@@ -1,3 +1,8 @@
+2014-06-06  Steven Munroe  <sjmunroe@us.ibm.com>
+
+	* ./src/Makefile.am: Add sasstringbtree_tt to TESTS.	
+	* ./src/tests/sasstringbtree_tt.c: New file.
+
 2014-06-10 Rajalakshmi Srinivasaraghavan <raji@linux.vnet.ibm.com>
 
 	configure.ac: propagate LDFLAGS properly.
