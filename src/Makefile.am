@@ -32,6 +32,7 @@ libsphdeinclude_HEADERS = \
 	saslock.h \
 	sasmsync.h \
 	sasindex.h \
+	sasindexnode.h \
 	sasindexkey.h \
 	freenode.h \
 	sasconf.h \

@@ -10,7 +10,7 @@
  */
 
 #include <stdlib.h>
-#include "sasalloc.h"
+#include "sasallocpriv.h"
 #include "freenode.h"
 #ifdef __SAS__
 #include "sasstuff.h"
@@ -38,7 +38,7 @@ void setSASAnchor (void *val)
     mainAnchor->myFinder = (Finder*)val;
 #else
 #ifdef __SASSIM__
-    SASBlockHeader	*anchorBlock = (SASBlockHeader*)getMemLow();
+    SASBlockHeader	*anchorBlock = (SASBlockHeader*)getfastMemLow();
     SASAnchor_t	*anchor = (SASAnchor_t*)anchorBlock->special;
     anchor->finder = val;
 #else
@@ -58,7 +58,7 @@ void *getSASAnchor(void)
     return ( (void*)(mainAnchor->myFinder) );
 #else
 #ifdef __SASSIM__
-    SASBlockHeader	*anchorBlock = (SASBlockHeader*)getMemLow();
+    SASBlockHeader	*anchorBlock = (SASBlockHeader*)getfastMemLow();
     SASAnchor_t		*anchor = (SASAnchor_t*)anchorBlock->special;
     return (anchor->finder);
 #else
@@ -78,7 +78,7 @@ void setSASFinder (void *val)
     mainAnchor->myFinder = (Finder*)val;
 #else
 #ifdef __SASSIM__
-    SASBlockHeader	*anchorBlock = (SASBlockHeader*)getMemLow();
+    SASBlockHeader	*anchorBlock = (SASBlockHeader*)getfastMemLow();
     SASAnchor_t		*anchor = (SASAnchor_t*)anchorBlock->special;
     anchor->finder = val;
 #else
@@ -120,7 +120,7 @@ void *getSASFinder()
     return ( (void*)(mainAnchor->myFinder) );
 #else
 #ifdef __SASSIM__
-    SASBlockHeader	*anchorBlock = (SASBlockHeader*)getMemLow();
+    SASBlockHeader	*anchorBlock = (SASBlockHeader*)getfastMemLow();
     SASAnchor_t		*anchor = (SASAnchor_t*)anchorBlock->special;
     return (anchor->finder);
 #else
@@ -456,7 +456,7 @@ SASBlockHeader *SASFindHeader (void *nearObj)
     {
 #else
 #ifdef __SASSIM__
-    if ( ((temp >= getMemLow()) && (temp < getMemHigh())) || 
+    if ( ((temp >= getfastMemLow()) && (temp < getfastMemHigh())) || 
          ((temp >= __SAS_TEMP_ADDRESS) && (temp < (__SAS_TEMP_FREE)))) {
 #endif
 #endif
@@ -548,7 +548,7 @@ SASBlockHeader *SASFindHeader (void *nearObj)
 	}
 #ifdef __SASDebugPrint__
 	    sas_printf("SASFindHeader low=%lx, high=%lx, tmp_low=%lx, tmp_hign=%lx\n",
-			getMemLow(), getMemHigh(),
+			getfastMemLow(), getfastMemHigh(),
 			__SAS_TEMP_ADDRESS, __SAS_TEMP_FREE);
 #endif
 #ifdef __SAS__

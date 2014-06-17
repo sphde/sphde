@@ -13,7 +13,7 @@
 #define sas_printf printf
 #include <stdlib.h>
 #include <stdio.h>
-#include "sasalloc.h"
+#include "sasallocpriv.h"
 #include "freenode.h"
 #ifdef __SASDebugPrint__
 #include "sasio.h"
@@ -1224,9 +1224,9 @@ SASIndexNodeKeyMove (SASIndexNode_t heap, short pos,
 
   if (key != NULL)
     {
-      if ((unsigned long) key >= getMemLow ())
+      if ((unsigned long) key >= getfastMemLow ())
 	{
-	  if ((unsigned long) key <= getMemHigh ())
+	  if ((unsigned long) key <= getfastMemHigh ())
 	    SASIndexNodeNearDealloc (heap, key, key_len, lock_on);
 	}
     }
@@ -1332,8 +1332,8 @@ SASIndexNodeSplit (SASIndexNode_t node_t,
 		   lock_on_t lock_on)
 {
   SASIndexNodeHeader *node = (SASIndexNodeHeader *) node_t;
-  short i, median;
-  short min = node->max_count / 2;
+  long i, median;
+  long min = node->max_count / 2;
   SASIndexKey_t **thisKeys = node->keys;
   SASIndexNodeHeader **thisBranch = node->branch;
   void **thisVals = node->vals;
@@ -1363,7 +1363,7 @@ SASIndexNodeSplit (SASIndexNode_t node_t,
   SASIndexNodeHeader **yrBranch = yr->branch;
   void **yrVals = yr->vals;
 
-  for (i = (short) (median + 1); i <= node->max_count; i++)
+  for (i = (median + 1); i <= node->max_count; i++)
     {
 #if __SASDebugPrint__ > 1
 	  sas_printf ("Split@%p copy pos=%hd key%lx to=%hd\n",

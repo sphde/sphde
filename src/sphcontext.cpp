@@ -12,7 +12,7 @@
 #define sas_printf printf
 #include <stdio.h>
 #include <stdlib.h>
-#include "sasalloc.h"
+#include "sasallocpriv.h"
 #include "freenode.h"
 #ifdef __SASDebugPrint__
 #include "sasio.h"
@@ -710,7 +710,7 @@ SPHSetupProjectContext(char *project_name)
 {
 	SPHContext_t result = NULL;
 	SPHContext_t rootcntx;
-	void *rootlock	= (void*)getMemLow();
+	void *rootlock	= (void*)getfastMemLow();
 	int	rc;
 
     /* Can't use SASSeize here as this could cause deadlock when we try
@@ -757,7 +757,7 @@ SPHSetupAltProjectContext(char *project_name)
 {
 	SPHContext_t result = NULL;
 	SPHContext_t rootcntx;
-	void *rootlock	= (void*)getMemLow();
+	void *rootlock	= (void*)getfastMemLow();
 	int	rc;
 
     /* Can't use SASSeize here as this could cause deadlock when we try
@@ -798,7 +798,7 @@ SPHRemoveProjectContext(char *project_name)
 {
 	SPHContext_t result = NULL;
 	SPHContext_t rootcntx;
-	void *rootlock	= (void*)getMemLow();
+	void *rootlock	= (void*)getfastMemLow();
 	int	rc;
 
     /* Can't use SASSeize here as this could cause deadlock when we try
@@ -832,7 +832,7 @@ SPHDestroyProjectContext(char *project_name)
 {
 	SPHContext_t projcntx;
 	SPHContext_t rootcntx;
-	void *rootlock	= (void*)getMemLow();
+	void *rootlock	= (void*)getfastMemLow();
 	int	rc, result;
 
     /* Can't use SASSeize here as this could cause deadlock when we try

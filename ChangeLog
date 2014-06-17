@@ -1,5 +1,28 @@
 2014-06-12  Steven Munroe  <sjmunroe@us.ibm.com>
 
+	* ./src/sasallocpriv.h: New file.
+	* ./src/sasalloc.cpp: Include sasallocpriv.h.
+	(setSASFinder): Use getfastMemLow().
+	(getSASFinder): Use getfastMemLow().
+	(SASFindHeader): Use getfastMemLow() and getfastMemHigh().
+	* ./src/sasindexnode.cpp: Include sasallocpriv.h.
+	(SASIndexNodeKeyMove): Use getfastMemLow() and getfastMemHigh().
+	* ./src/sasstringbtreenode.cpp: Include sasallocpriv.h.
+	(SASStringBTreeNodeKeyMove): Use getfastMemLow() and
+	getfastMemHigh().
+	* ./src/sphcontext.cpp: Include sasallocpriv.h.
+	(SPHSetupProjectContext): Use getfastMemLow().
+	(SPHSetupAltProjectContext): Use getfastMemLow().
+	(SPHRemoveProjectContext): Use getfastMemLow().
+	(SPHDestroyProjectContext): Use getfastMemLow().
+	* ./src/sasindexnode.cpp (SASIndexNodeSplit): Change short int
+	to long int for performance.
+	* ./src/Makefile.am (libsphdeinclude_HEADERS): Export
+	sasindexnode.h for make install.
+	* ./src/Makefile.in: Regenerate.
+
+2014-06-12  Steven Munroe  <sjmunroe@us.ibm.com>
+
 	* ./src/sassim.cpp (memLow, memHigh): Visability hidden.
 	(setSASmemrange): New function. 
 	* ./src/sassim.h (setSASmemrange): Extern.

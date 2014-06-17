@@ -14,7 +14,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include "sasalloc.h"
+#include "sasallocpriv.h"
 #include "freenode.h"
 #ifdef __SASDebugPrint__
 #include "sasio.h"
@@ -1236,9 +1236,9 @@ SASStringBTreeNodeKeyMove (SASStringBTreeNode_t heap, short pos, char *key,
 
   if (key != NULL)
     {
-      if ((unsigned long) key >= getMemLow ())
+      if ((unsigned long) key >= getfastMemLow ())
 	{
-	  if ((unsigned long) key <= getMemHigh ())
+	  if ((unsigned long) key <= getfastMemHigh ())
 	    SASStringBTreeNodeNearDealloc (heap, key, key_len, lock_on);
 	}
     }
