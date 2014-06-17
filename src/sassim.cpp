@@ -58,7 +58,9 @@ typedef struct
   uLongTreeNode *root;
 } roottype;
 
-unsigned long memLow, memHigh;
+unsigned long memLow __attribute__ ((visibility ("hidden")));
+unsigned long memHigh __attribute__ ((visibility ("hidden")));
+
 key_t sas_key;
 int *mem_IDs;
 int sasClearOnDealloc = 0;
@@ -406,6 +408,12 @@ getMemHigh ()
   return memHigh;
 }
 
+void
+setSASmemrange (unsigned long low, unsigned long high)
+{
+    memLow = low;
+    memHigh = high;
+}
 
 static int
 initSASSem (SASAnchor_t * anchor)

@@ -1184,15 +1184,13 @@ logportal_basic_test (char *x4k, char *y4k, char *z4k, char *w4k)
 
 /* Fake out the SAS region range checking for these tests.
 */
-extern unsigned long memLow, memHigh;
 
 void
 setmemrange (unsigned long low, unsigned long high)
 {
     unsigned long	ak, bk;
 
-    memLow = low;
-    memHigh = high;
+    setSASmemrange (low, high);
 
     ak = getMemLow();
     bk = getMemHigh();

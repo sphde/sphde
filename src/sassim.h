@@ -117,6 +117,14 @@ extern __C__ unsigned long getMemLow();
 */
 extern __C__ unsigned long getMemHigh();
 
+/** \brief Set the Region's low/high memory address for testing
+*
+*   @param low defines the regions starting address.
+*   @param high defines the regions ending address.
+*/
+extern __C__ void
+setSASmemrange (unsigned long low, unsigned long high);
+
 /** \brief Join this process to a SAS Region.
 *
 *   Join this process to the SAS Region based on the anchor segment

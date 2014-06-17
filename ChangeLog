@@ -1,3 +1,14 @@
+2014-06-12  Steven Munroe  <sjmunroe@us.ibm.com>
+
+	* ./src/sassim.cpp (memLow, memHigh): Visability hidden.
+	(setSASmemrange): New function. 
+	* ./src/sassim.h (setSASmemrange): Extern.
+	* src/tests/sphlflogger_t.c (setmemrange): Replace direct
+	access to memLow/memHigh with setSASmemrange() call.
+	* src/tests/sphlockfreeheap_t.c (setmemrange): Likewise.
+	* src/tests/sphlogportal_t.c (setmemrange): Likewise.
+	* src/tests/sphsinglepcqueue_t.c  (setmemrange): Likewise.
+
 2014-06-06  Steven Munroe  <sjmunroe@us.ibm.com>
 
 	* ./src/Makefile.am: Add sasstringbtree_tt to TESTS.	
