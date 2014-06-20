@@ -1,3 +1,8 @@
+2014-06-19 Rajalakshmi Srinivasaraghavan <raji@linux.vnet.ibm.com>
+
+	* src/tests/sphsinglepcqueue_t.c (lfpcqueue_basic_test): Remove
+	SPHSinglePCQueueEmpty() calls.
+
 2014-06-12  Steven Munroe  <sjmunroe@us.ibm.com>
 
 	* ./src/sasallocpriv.h: New file.

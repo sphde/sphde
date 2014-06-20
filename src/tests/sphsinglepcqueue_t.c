@@ -45,16 +45,6 @@ lfpcqueue_basic_test (char *x4k)
 	("lfpcqueue_basic_test(%p)  SPHSinglePCQueueFreeSpace(%p) = %zu\n",
 	 x4k, pcqueue, lf0space);
 
-      if (SPHSinglePCQueueEmpty (pcqueue))
-	{
-	}
-      else
-	{
-	  printf ("lfpcqueue_basic_test SPHSinglePCQueueEmpty(%p) failed\n",
-		  pcqueue);
-	  rc++;
-	}
-
       if (SPHSinglePCQueueFull (pcqueue))
 	{
 	  printf ("lfpcqueue_basic_test SPHSinglePCQueueFull(%p) failed\n",
@@ -87,19 +77,6 @@ lfpcqueue_basic_test (char *x4k)
 	    ("error lfpcqueue_basic_test  SPHSinglePCQueueAllocRaw(%p,%zu) failed\n",
 	     pcqueue, aSize);
 	  return 10;
-	}
-
-      if (SPHSinglePCQueueEmpty (pcqueue))
-	{
-	  printf ("lfpcqueue_basic_test SPHSinglePCQueueEmpty(%p) failed\n",
-		  pcqueue);
-	  rc++;
-	}
-      else
-	{
-	  printf
-	    ("lfpcqueue_basic_test SPHSinglePCQueueEmpty(%p) false, succeeds\n",
-	     pcqueue);
 	}
 
       temp1 = (char *) SPHSinglePCQueueAllocRaw (pcqueue);
@@ -204,16 +181,6 @@ lfpcqueue_basic_test (char *x4k)
 
       printf ("lfpcqueue_basic_test data\n");
       /* in its current state the queue is neither empty or full */
-      if (SPHSinglePCQueueEmpty (pcqueue))
-	{
-	  printf ("lfpcqueue_basic_test SPHSinglePCQueueEmpty(%p) failed\n",
-		  pcqueue);
-	  rc++;
-	}
-      else
-	{
-	}
-
       if (SPHSinglePCQueueFull (pcqueue))
 	{
 	  printf ("lfpcqueue_basic_test SPHSinglePCQueueFull(%p) failed\n",
@@ -252,16 +219,6 @@ lfpcqueue_basic_test (char *x4k)
 	}
 
       /* in its current state the queue is not empty and is full */
-      if (SPHSinglePCQueueEmpty (pcqueue))
-	{
-	  printf ("lfpcqueue_basic_test SPHSinglePCQueueEmpty(%p) failed\n",
-		  pcqueue);
-	  rc++;
-	}
-      else
-	{
-	}
-
       if (SPHSinglePCQueueFull (pcqueue))
 	{
 	}
