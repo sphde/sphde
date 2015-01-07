@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011 IBM Corporation.
+ * Copyright (c) 2011-2014 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,6 +13,7 @@
 #include <stdio.h>
 #include <errno.h>
 #include <unistd.h>
+#include <stdint.h>
 #include <string.h>
 
 #include "sphtimer.h"
@@ -21,6 +22,1699 @@
 #include "sassim.h"
 #include "sphlfentry.h"
 #include "sphsinglepcqueue.h"
+#include "sphdirectpcqueue.h"
+
+int
+lfpcqueue_stride_direct_test (char *x4k)
+{
+  int rc = 0;
+  SPHSinglePCQueue_t pcqueue;
+  block_size_t lfspace, lf0space, lfTemp;
+  block_size_t aSize;;
+  SPHLFEntryDirect_t handle;
+  SPHLFEntryDirect_t handlex;
+  char *temp0, *temp1, *temp2, *temp3, *tempx;
+  uintptr_t tptr;
+  int cat, sub;
+  sphLFEntryID_t entry_tmp;
+
+  aSize = 128;
+
+  memset (x4k, 0, 4096);
+
+  pcqueue = SPHSinglePCQueueInitWithStride (x4k, 1024, aSize, 0);
+  if (pcqueue)
+    {
+      lf0space = SPHSinglePCQueueFreeSpace (pcqueue);
+      lfspace = lf0space;
+      entry_tmp = SPHSinglePCQueueGetEntryTemplate(pcqueue);
+
+      printf
+        ("lfpcqueue_stride_direct_test(%p)  SPHSinglePCQueueFreeSpace(%p) = %zu\n",
+         x4k, pcqueue, lf0space);
+
+      printf
+        ("lfpcqueue_stride_direct_test(%p)  SPHSinglePCQueueGetEntryTemplate(%p) = %zu\n",
+         x4k, pcqueue, (size_t)entry_tmp);
+
+      if (SPHSinglePCQueueEmpty (pcqueue))
+        {
+          handlex = SPHSinglePCQueueGetNextCompleteDirect (pcqueue);
+          if (handlex)
+            {
+              printf
+                ("lfpcqueue_stride_direct_test SPHSinglePCQueueGetNextComplete(%p,%p) failed for empty queue \n",
+                 pcqueue, handlex);
+              rc++;
+            }
+          else
+            {
+
+            }
+        }
+      else
+        {
+          printf ("lfpcqueue_stride_direct_test SPHSinglePCQueueEmpty(%p) failed\n",
+                  pcqueue);
+          rc++;
+        }
+
+      if (SPHSinglePCQueueFull (pcqueue))
+        {
+          printf ("lfpcqueue_stride_direct_test SPHSinglePCQueueFull(%p) failed\n",
+                  pcqueue);
+          rc++;
+        }
+      else
+        {
+        }
+
+      handle = SPHSinglePCQueueAllocStrideDirect (pcqueue);
+      if (handle)
+        {
+          printf
+            ("lfpcqueue_stride_direct_test SPHSinglePCQueueAllocStrideEntry(%p) = %p\n",
+             pcqueue, handle);
+
+          temp0 = (char *) SPHLFEntryDirectGetFreePtr (handle);
+          strcpy (temp0, "temp0");
+
+          if (SPHSinglePCQueueGetNextCompleteDirect (handle))
+            {
+              printf
+                ("error lfpcqueue_stride_direct_test SPHSinglePCQueueGetNextCompleteDirect(%p) failed)\n",
+                 handle);
+              rc++;
+            }
+
+          if (SPHLFEntryDirectComplete (handle, entry_tmp, 1, 2))
+            {
+              printf
+                ("lfpcqueue_stride_direct_test SPHLFEntryDirectComplete(%p)\n",
+                 handle);
+              if (!SPHLFEntryDirectIsComplete (handle))
+                {
+                  printf
+                    ("error lfpcqueue_stride_direct_test SPHLFEntryDirectIsComplete(%p) failed)\n",
+                     handle);
+                  rc++;
+                }
+              handlex = SPHSinglePCQueueGetNextCompleteDirect (pcqueue);
+              if (handlex)
+                {
+                  printf
+                    ("lfpcqueue_stride_direct_test SPHSinglePCQueueGetNextCompleteDirect(%p) = %p succeed \n",
+                     pcqueue, handlex);
+                  tempx = (char *) SPHLFEntryDirectGetFreePtr (handlex);
+                  if (temp0 == tempx)
+                    {
+                    }
+                  else
+                    {
+                      printf
+                        ("error lfpcqueue_stride_direct_test SPHLFEntryDirectGetFreePtr(%p) = %p != %p \n",
+                         handlex, tempx, temp0);
+                      rc++;
+                    }
+                }
+              else
+                {
+                  printf
+                    ("error lfpcqueue_stride_direct_test SPHSinglePCQueueGetNextCompleteDirect(%p) failed none empty queue \n",
+                     pcqueue);
+                  rc++;
+                }
+            }
+          else
+            {
+              printf
+                ("error lfpcqueue_stride_direct_test SPHLFEntryDirectComplete(%p) failed)\n",
+                 handle);
+              rc++;
+            }
+
+          lfTemp = SPHSinglePCQueueFreeSpace (pcqueue);
+          if (lfspace != (lfTemp + aSize))
+            {
+              printf
+                ("error lfpcqueue_stride_direct_test(%p)  lfspace (%zu != (%zu+%zu))\n",
+                 pcqueue, lfspace, lfTemp, (aSize));
+              rc++;
+            }
+        }
+      else
+        {
+          printf
+            ("lfpcqueue_stride_direct_test SPHSinglePCQueueAllocStrideDirect(%p) failed\n",
+             pcqueue);
+          return 10;
+        }
+
+      if (SPHSinglePCQueueEmpty (pcqueue))
+        {
+          printf ("lfpcqueue_stride_direct_test SPHSinglePCQueueEmpty(%p) failed\n",
+                  pcqueue);
+          rc++;
+        }
+      else
+        {
+          printf
+            ("lfpcqueue_stride_direct_test SPHSinglePCQueueEmpty(%p) false, succeeds\n",
+             pcqueue);
+        }
+
+      handle = SPHSinglePCQueueAllocStrideDirect (pcqueue);
+      if (handle)
+        {
+          printf
+            ("lfpcqueue_stride_direct_test SPHSinglePCQueueAllocStrideEntry(%p) = %p\n",
+             pcqueue, handle);
+
+          temp1 = (char *) SPHLFEntryDirectGetFreePtr (handle);
+          strcpy (temp1, "temp1");
+
+          tptr = (uintptr_t)SPHLFEntryDirectGetPtrAligned (handle,
+        		  	  	  	  (sizeof(double)));
+          if(tptr & (sizeof(double) -1))
+          {
+              printf
+                ("error lfpcqueue_stride_direct_test SPHLFEntryDirectGetPtrAligned(%p, %ld) failed)\n",
+                		handle, (sizeof(double)));
+              rc++;
+          } else {
+              printf
+                ("lfpcqueue_stride_direct_test SPHLFEntryDirectGetPtrAligned(%p, %ld)) = %p\n",
+                		handle, (sizeof(double)), (void*)tptr);
+          }
+
+          if (SPHLFEntryDirectIsComplete (handle))
+            {
+              printf
+                ("error lfpcqueue_stride_direct_test SPHLFEntryDirectIsComplete(%p) failed)\n",
+                 handle);
+              rc++;
+            }
+
+          if (SPHLFEntryDirectComplete (handle, entry_tmp, 1, 2))
+            {
+              printf
+                ("lfpcqueue_stride_direct_test SPHLFEntryDirectComplete(%p)\n",
+                 handle);
+              if (!SPHLFEntryDirectIsComplete (handle))
+                {
+                  printf
+                    ("error lfpcqueue_stride_direct_test SPHLFEntryDirectIsComplete(%p) failed)\n",
+                     handle);
+                  rc++;
+                }
+            }
+          else
+            {
+              printf
+                ("error lfpcqueue_stride_direct_test SPHLFEntryDirectComplete(%p) failed)\n",
+                 handle);
+              rc++;
+            }
+
+          lfTemp = SPHSinglePCQueueFreeSpace (pcqueue);
+          if (lfspace != (lfTemp + aSize + aSize))
+            {
+              printf
+                ("error lfpcqueue_stride_direct_test(%p)  lfspace (%zu != (%zu+%zu))\n",
+                 pcqueue, lfspace, lfTemp, (aSize + aSize));
+              rc++;
+            }
+        }
+      else
+        {
+          printf
+            ("lfpcqueue_stride_direct_test SPHSinglePCQueueAllocStrideDirect(%p) failed\n",
+             pcqueue);
+          return 10;
+        }
+
+      handle = SPHSinglePCQueueAllocStrideDirect (pcqueue);
+      if (handle)
+        {
+          printf
+            ("lfpcqueue_stride_direct_test SPHSinglePCQueueAllocStrideEntry(%p) = %p\n",
+             pcqueue, handle);
+
+          temp2 = (char *) SPHLFEntryDirectGetFreePtr (handle);
+          strcpy (temp2, "temp2");
+
+          tptr = (uintptr_t)SPHLFEntryDirectIncAndAlign (temp2,
+        		  	  	  	  (strlen(temp2)+1), (sizeof(double)));
+          if(tptr & (sizeof(double) -1))
+          {
+              printf
+                ("error lfpcqueue_stride_direct_test SPHLFEntryDirectIncAndAlign(%p, %ld, %ld) failed)\n",
+                		temp2, (strlen(temp2)+1), (sizeof(double)));
+              rc++;
+          } else {
+              printf
+                ("lfpcqueue_stride_direct_test SPHLFEntryDirectIncAndAlign(%p, %ld, %ld)) = %p\n",
+                		temp2, (strlen(temp2)+1), (sizeof(double)), (void*)tptr);
+          }
+
+          if (SPHSinglePCQueueEntryIsCompleteDirect (handle))
+            {
+              printf
+                ("error lfpcqueue_stride_direct_test SPHSinglePCQueueEntryIsComplete(%p) failed)\n",
+                 handle);
+              rc++;
+            }
+
+          if (SPHLFEntryDirectComplete (handle, entry_tmp, 1, 2))
+            {
+              printf
+                ("lfpcqueue_stride_direct_test SPHLFEntryDirectComplete(%p)\n",
+                 handle);
+              if (!SPHSinglePCQueueEntryIsCompleteDirect (handle))
+                {
+                  printf
+                    ("error lfpcqueue_stride_direct_test SPHSinglePCQueueEntryIsComplete(%p) failed)\n",
+                     handle);
+                  rc++;
+                }
+            }
+          else
+            {
+              printf
+                ("error lfpcqueue_stride_direct_test SPHLFEntryDirectComplete(%p) failed)\n",
+                 handle);
+              rc++;
+            }
+
+          lfTemp = SPHSinglePCQueueFreeSpace (pcqueue);
+          if (lfspace != (lfTemp + aSize + aSize + aSize))
+            {
+              printf
+                ("error lfpcqueue_stride_direct_test(%p)  lfspace (%zu != (%zu+%zu))\n",
+                 pcqueue, lfspace, lfTemp, (aSize + aSize + aSize));
+              rc++;
+            }
+        }
+      else
+        {
+          printf
+            ("lfpcqueue_stride_direct_test SPHSinglePCQueueAllocStrideDirect(%p) failed\n",
+             pcqueue);
+          return 10;
+        }
+
+      handle = SPHSinglePCQueueAllocStrideDirect (pcqueue);
+      if (handle)
+        {
+          printf
+            ("lfpcqueue_stride_direct_test SPHSinglePCQueueAllocStrideDirect(%p) = %p\n",
+             pcqueue, handle);
+
+          temp3 = (char *) SPHLFEntryDirectGetFreePtr (handle);
+          strcpy (temp3, "temp3");
+
+          if (SPHLFEntryDirectIsComplete (handle))
+            {
+              printf
+                ("error lfpcqueue_stride_direct_test SPHLFEntryDirectIsComplete(%p) failed)\n",
+                 handle);
+              rc++;
+            }
+
+          if (SPHLFEntryDirectComplete (handle, entry_tmp, 1, 2))
+            {
+              printf
+                ("lfpcqueue_stride_direct_test SPHLFEntryDirectComplete(%p)\n",
+                 handle);
+              if (!SPHLFEntryDirectIsComplete (handle))
+                {
+                  printf
+                    ("error lfpcqueue_stride_direct_test SPHLFEntryDirectIsComplete(%p) failed)\n",
+                     handle);
+                  rc++;
+                }
+            }
+          else
+            {
+              printf
+                ("error lfpcqueue_stride_direct_test SPHLFEntryDirectComplete(%p) failed)\n",
+                 handle);
+              rc++;
+            }
+
+          lfTemp = SPHSinglePCQueueFreeSpace (pcqueue);
+          if (lfspace != (lfTemp + aSize + aSize + aSize + aSize))
+            {
+              printf
+                ("error lfpcqueue_stride_direct_test(%p)  lfspace (%zu != (%zu+%zu))\n",
+                 pcqueue, lfspace, lfTemp, (aSize + aSize + aSize + aSize));
+              rc++;
+            }
+        }
+      else
+        {
+          printf
+            ("lfpcqueue_stride_direct_test SPHSinglePCQueueAllocStrideDirect(%p) failed\n",
+             pcqueue);
+          return 10;
+        }
+
+      if (0 != strcmp (temp0, "temp0"))
+        {
+          printf ("lfpcqueue_stride_direct_test data verify temp0=%s failed\n",
+                  temp0);
+          return 10;
+        }
+
+      if (0 != strcmp (temp1, "temp1"))
+        {
+          printf ("lfpcqueue_stride_direct_test data verify temp1=%s failed\n",
+                  temp1);
+          return 10;
+        }
+
+      if (0 != strcmp (temp2, "temp2"))
+        {
+          printf ("lfpcqueue_stride_direct_test data verify temp2=%s failed\n",
+                  temp2);
+          return 10;
+        }
+
+      if (0 != strcmp (temp3, "temp3"))
+        {
+          printf ("lfpcqueue_stride_direct_test data verify temp3=%s failed\n",
+                  temp3);
+          return 10;
+        }
+
+      printf ("lfpcqueue_stride_direct_test queue full tests\n");
+      /* in its current state the queue is neither empty or full */
+      if (SPHSinglePCQueueEmpty (pcqueue))
+        {
+          printf ("lfpcqueue_stride_direct_test SPHSinglePCQueueEmpty(%p) failed\n",
+                  pcqueue);
+          rc++;
+        }
+      else
+        {
+        }
+
+      if (SPHSinglePCQueueFull (pcqueue))
+        {
+          printf ("lfpcqueue_stride_direct_test SPHSinglePCQueueFull(%p) failed\n",
+                  pcqueue);
+          rc++;
+        }
+      else
+        {
+        }
+
+      lfspace = SPHSinglePCQueueFreeSpace (pcqueue);
+      printf
+        ("lfpcqueue_stride_direct_test(%p)  SPHSinglePCQueueFreeSpace(%p) = %zu\n",
+         x4k, pcqueue, lfspace);
+
+      while (lfspace > 0)
+        {
+          handle = SPHSinglePCQueueAllocStrideDirect (pcqueue);
+          if (handle)
+            {
+              printf
+                ("lfpcqueue_stride_direct_test SPHSinglePCQueueAllocStrideDirect(%p) = %p\n",
+                 pcqueue, handle);
+              lfspace = SPHSinglePCQueueFreeSpace (pcqueue);
+              printf
+                ("lfpcqueue_stride_direct_test(%p)  SPHSinglePCQueueFreeSpace(%p) = %zu\n",
+                 x4k, pcqueue, lfspace);
+
+              if (SPHLFEntryDirectComplete (handle, entry_tmp, 2, 1))
+                {
+
+                }
+              else
+                {
+                  printf
+                    ("error lfpcqueue_stride_direct_test SPHLFEntryDirectComplete(%p) failed)\n",
+                     handle);
+                  rc++;
+                }
+            }
+          else
+            {
+              printf
+                ("error lfpcqueue_stride_direct_test  SPHSinglePCQueueAllocStrideDirect(%p) failed\n",
+                 pcqueue);
+              return 10;
+            }
+        }
+
+      /* in its current state the queue is not empty and is full */
+      if (SPHSinglePCQueueEmpty (pcqueue))
+        {
+          printf ("lfpcqueue_stride_direct_test SPHSinglePCQueueEmpty(%p) failed\n",
+                  pcqueue);
+          rc++;
+        }
+      else
+        {
+        }
+
+      if (SPHSinglePCQueueFull (pcqueue))
+        {
+        }
+      else
+        {
+          printf ("lfpcqueue_stride_direct_test SPHSinglePCQueueFull(%p) failed\n",
+                  pcqueue);
+          rc++;
+        }
+
+      lfspace = SPHSinglePCQueueFreeSpace (pcqueue);
+      if (lfspace)
+        {
+          printf
+            ("error lfpcqueue_stride_direct_test(%p)  SPHSinglePCQueueFreeSpace(%p) = %zu\n",
+             x4k, pcqueue, lfspace);
+          rc++;
+        }
+
+      printf ("lfpcqueue_stride_direct_test dequeue tests\n");
+      handlex = SPHSinglePCQueueGetNextCompleteDirect (pcqueue);
+      if (handlex)
+        {
+          printf
+            ("lfpcqueue_stride_direct_test SPHSinglePCQueueGetNextCompleteDirect(%p) = %p succeed \n",
+             pcqueue, handle);
+          tempx = SPHLFEntryDirectGetFreePtr (handlex);
+          cat = SPHLFEntryDirectCategory (handlex);
+          sub = SPHLFEntryDirectSubcat (handlex);
+          printf
+            ("lfpcqueue_stride_direct_test data verify; entry cat=%d,sub=%d,string data=%s\n",
+             cat, sub, tempx);
+
+          if (SPHLFEntryDirectIsTimestamped (handlex))
+            {
+              printf
+                ("error lfpcqueue_stride_direct_test data verify; entry is timestamped\n");
+              rc++;
+            }
+          else
+            {
+              printf
+                ("lfpcqueue_stride_direct_test data verify; entry is not timestamped\n");
+            }
+
+          if (cat != 1)
+            {
+              printf
+                ("error lfpcqueue_stride_direct_test data verify; cat should be 1\n");
+              rc++;
+            }
+          if (sub != 2)
+            {
+              printf
+                ("error lfpcqueue_stride_direct_test data verify; subcat should be 2\n");
+              rc++;
+            }
+          if (tempx)
+            {
+              if (0 != strcmp (tempx, "temp0"))
+                {
+                  printf
+                    ("lfpcqueue_stride_direct_test data verify temp0=%s failed\n",
+                     tempx);
+                  rc++;
+                }
+            }
+          if (SPHSinglePCQueueFull (pcqueue))
+            {
+            }
+          else
+            {
+              printf
+                ("lfpcqueue_stride_direct_test SPHSinglePCQueueFull(%p) failed\n",
+                 pcqueue);
+              rc++;
+            }
+
+          if (SPHSinglePCQueueFreeNextEntryDirect (pcqueue, handlex))
+            {
+              printf
+                ("lfpcqueue_stride_direct_test SPHSinglePCQueueFreeNextEntryDirect(%p) succeed \n",
+                 pcqueue);
+              lfspace = SPHSinglePCQueueFreeSpace (pcqueue);
+              if (lfspace != 128L)
+                {
+                  printf
+                    ("error lfpcqueue_stride_direct_test(%p)  SPHSinglePCQueueFreeSpace(%p) = %zu\n",
+                     x4k, pcqueue, lfspace);
+                  rc++;
+                }
+
+              if (SPHSinglePCQueueFull (pcqueue))
+                {
+                  printf
+                    ("lfpcqueue_stride_direct_test SPHSinglePCQueueFull(%p) failed\n",
+                     pcqueue);
+                  rc++;
+                }
+              handle = SPHSinglePCQueueAllocStrideDirect (pcqueue);
+              if (handle)
+                {
+                  printf
+                    ("lfpcqueue_stride_direct_test SPHSinglePCQueueAllocStrideDirect(%p) = %p\n",
+                     pcqueue, handle);
+                  lfspace = SPHSinglePCQueueFreeSpace (pcqueue);
+                  if (lfspace)
+                    {
+                      printf
+                        ("error lfpcqueue_stride_direct_test(%p)  SPHSinglePCQueueFreeSpace(%p) = %zu\n",
+                         x4k, pcqueue, lfspace);
+                      rc++;
+                    }
+
+                  if (SPHLFEntryDirectComplete (handle, entry_tmp, 2, 2))
+                    {
+
+                    }
+                  else
+                    {
+                      printf
+                        ("error lfpcqueue_stride_direct_test SPHSinglePCQueueEntryComplete(%p) failed)\n",
+                         handle);
+                      rc++;
+                    }
+
+                  if (SPHSinglePCQueueFull (pcqueue))
+                    {
+                    }
+                  else
+                    {
+                      printf
+                        ("lfpcqueue_stride_direct_test SPHSinglePCQueueFull(%p) failed\n",
+                         pcqueue);
+                      rc++;
+                    }
+                }
+              else
+                {
+                  printf
+                    ("error lfpcqueue_stride_direct_test  SPHSinglePCQueueAllocStrideDirect(%p) failed\n",
+                     pcqueue);
+                  return 10;
+                }
+            }
+          else
+            {
+              printf
+                ("lfpcqueue_stride_direct_test SPHSinglePCQueueFreeNextEntryDirect(%p,%p) failed\n",
+                 pcqueue, handlex);
+              rc++;
+            }
+        }
+      else
+        {
+          printf
+            ("lfpcqueue_stride_direct_test SPHSinglePCQueueGetNextCompleteDirect(%p) failed for empty queue \n",
+             pcqueue);
+          rc++;
+        }
+
+      handlex = SPHSinglePCQueueGetNextCompleteDirect (pcqueue);
+      if (handlex)
+        {
+          printf
+            ("lfpcqueue_stride_direct_test SPHSinglePCQueueGetNextComplete(%p) = %p succeed \n",
+             pcqueue, handlex);
+          tempx = SPHLFEntryDirectGetFreePtr (handlex);
+          if (tempx)
+            {
+              if (0 != strcmp (tempx, "temp1"))
+                {
+                  printf
+                    ("lfpcqueue_stride_direct_test data verify temp1=%s failed\n",
+                     tempx);
+                  rc++;
+                }
+            }
+          if (SPHSinglePCQueueFull (pcqueue))
+            {
+            }
+          else
+            {
+              printf
+                ("lfpcqueue_stride_direct_test SPHSinglePCQueueFull(%p) failed\n",
+                 pcqueue);
+              rc++;
+            }
+
+          if (SPHSinglePCQueueFreeNextEntryDirect (pcqueue, handlex))
+            {
+              printf
+                ("lfpcqueue_stride_direct_test SPHSinglePCQueueFreeNextEntryDirect(%p) succeed \n",
+                 pcqueue);
+              lfspace = SPHSinglePCQueueFreeSpace (pcqueue);
+              if (lfspace != 128L)
+                {
+                  printf
+                    ("error lfpcqueue_stride_direct_test(%p)  SPHSinglePCQueueFreeSpace(%p) = %zu\n",
+                     x4k, pcqueue, lfspace);
+                  rc++;
+                }
+
+              if (SPHSinglePCQueueFull (pcqueue))
+                {
+                  printf
+                    ("lfpcqueue_stride_direct_test SPHSinglePCQueueFull(%p) failed\n",
+                     pcqueue);
+                  rc++;
+                }
+              handle = SPHSinglePCQueueAllocStrideDirect (pcqueue);
+              if (handle)
+                {
+                  printf
+                    ("lfpcqueue_stride_direct_test SPHSinglePCQueueAllocStrideDirect(%p) = %p\n",
+                     pcqueue, handle);
+                  lfspace = SPHSinglePCQueueFreeSpace (pcqueue);
+                  if (lfspace)
+                    {
+                      printf
+                        ("error lfpcqueue_stride_direct_test(%p)  SPHSinglePCQueueFreeSpace(%p) = %zu\n",
+                         x4k, pcqueue, lfspace);
+                      rc++;
+                    }
+
+                  if (SPHLFEntryDirectComplete (handle, entry_tmp, 2, 2))
+                    {
+
+                    }
+                  else
+                    {
+                      printf
+                        ("error lfpcqueue_stride_direct_test SPHLFEntryDirectComplete(%p) failed)\n",
+                         handle);
+                      rc++;
+                    }
+
+                  if (SPHSinglePCQueueFull (pcqueue))
+                    {
+                    }
+                  else
+                    {
+                      printf
+                        ("lfpcqueue_stride_direct_test SPHSinglePCQueueFull(%p) failed\n",
+                         pcqueue);
+                      rc++;
+                    }
+                }
+              else
+                {
+                  printf
+                    ("error lfpcqueue_stride_direct_test  SPHSinglePCQueueAllocStrideDirect(%p) failed\n",
+                     pcqueue);
+                  return 10;
+                }
+            }
+          else
+            {
+              printf
+                ("lfpcqueue_stride_direct_test SPHSinglePCQueueFreeNextEntryDirect(%p,%p) failed\n",
+                 pcqueue, handlex);
+              rc++;
+            }
+        }
+      else
+        {
+          printf
+            ("lfpcqueue_stride_direct_test SPHSinglePCQueueGetNextCompleteDirect(%p) failed for empty queue \n",
+             pcqueue);
+          rc++;
+        }
+
+      handlex = SPHSinglePCQueueGetNextCompleteDirect (pcqueue);
+      if (handlex)
+        {
+          printf
+            ("lfpcqueue_stride_direct_test SPHSinglePCQueueGetNextCompleteDirect(%p) = %p succeed \n",
+             pcqueue, handlex);
+          tempx = SPHLFEntryDirectGetFreePtr (handlex);
+          if (tempx)
+            {
+              if (0 != strcmp (tempx, "temp2"))
+                {
+                  printf
+                    ("lfpcqueue_stride_direct_test data verify temp2=%s failed\n",
+                     tempx);
+                  rc++;
+                }
+            }
+          if (SPHSinglePCQueueFull (pcqueue))
+            {
+            }
+          else
+            {
+              printf
+                ("lfpcqueue_stride_direct_test SPHSinglePCQueueFull(%p) failed\n",
+                 pcqueue);
+              rc++;
+            }
+
+          if (SPHSinglePCQueueFreeNextEntryDirect (pcqueue, handlex))
+            {
+              printf
+                ("lfpcqueue_stride_direct_test SPHSinglePCQueueFreeNextEntry(%p,%p) succeed \n",
+                 pcqueue, handlex);
+              lfspace = SPHSinglePCQueueFreeSpace (pcqueue);
+              if (lfspace != 128L)
+                {
+                  printf
+                    ("error lfpcqueue_stride_direct_test(%p)  SPHSinglePCQueueFreeSpace(%p) = %zu\n",
+                     x4k, pcqueue, lfspace);
+                  rc++;
+                }
+
+              if (SPHSinglePCQueueFull (pcqueue))
+                {
+                  printf
+                    ("lfpcqueue_stride_direct_test SPHSinglePCQueueFull(%p) failed\n",
+                     pcqueue);
+                  rc++;
+                }
+              handle =
+                  SPHSinglePCQueueAllocStrideDirect (pcqueue);
+              if (handle)
+                {
+                  printf
+                    ("lfpcqueue_stride_direct_test SPHSinglePCQueueAllocStrideDirect(%p) = %p\n",
+                     pcqueue, handle);
+                  lfspace = SPHSinglePCQueueFreeSpace (pcqueue);
+                  if (lfspace)
+                    {
+                      printf
+                        ("error lfpcqueue_stride_direct_test(%p)  SPHSinglePCQueueFreeSpace(%p) = %zu\n",
+                         x4k, pcqueue, lfspace);
+                      rc++;
+                    }
+
+                  if (SPHLFEntryDirectComplete (handle, entry_tmp, 2, 2))
+                    {
+
+                    }
+                  else
+                    {
+                      printf
+                        ("error lfpcqueue_stride_direct_test SPHSinglePCQueueEntryComplete(%p) failed)\n",
+                         handle);
+                      rc++;
+                    }
+
+                  if (SPHSinglePCQueueFull (pcqueue))
+                    {
+                    }
+                  else
+                    {
+                      printf
+                        ("lfpcqueue_stride_direct_test SPHSinglePCQueueFull(%p) failed\n",
+                         pcqueue);
+                      rc++;
+                    }
+                }
+              else
+                {
+                  printf
+                    ("error lfpcqueue_stride_direct_test  SPHSinglePCQueueAllocStrideDirect(%p) failed\n",
+                     pcqueue);
+                  return 10;
+                }
+            }
+          else
+            {
+              printf
+                ("lfpcqueue_stride_direct_test SPHSinglePCQueueFreeNextEntry(%p,%p) failed\n",
+                 pcqueue, handlex);
+              rc++;
+            }
+        }
+      else
+        {
+          printf
+            ("lfpcqueue_stride_direct_test SPHSinglePCQueueGetNextCompleteDirect(%p) failed for empty queue \n",
+             pcqueue);
+          rc++;
+        }
+
+      handlex = SPHSinglePCQueueGetNextCompleteDirect (pcqueue);
+      if (handlex)
+        {
+          printf
+            ("lfpcqueue_stride_direct_test SPHSinglePCQueueGetNextCompleteDirect(%p) = %p succeed \n",
+             pcqueue, handlex);
+          tempx = SPHLFEntryDirectGetFreePtr (handlex);
+          cat = SPHLFEntryDirectCategory (handlex);
+          sub = SPHLFEntryDirectSubcat (handlex);
+          printf
+            ("lfpcqueue_stride_direct_test data verify; entry cat=%d,sub=%d,string data=%s\n",
+             cat, sub, tempx);
+#if 1
+          if (SPHLFEntryDirectIsTimestamped (handlex))
+            {
+              printf
+                ("error lfpcqueue_stride_direct_test data verify; entry is timestamped\n");
+              rc++;
+            }
+          else
+            {
+              printf
+                ("lfpcqueue_stride_direct_test data verify; entry is not timestamped\n");
+            }
+#endif
+          if (cat != 1)
+            {
+              printf
+                ("error lfpcqueue_stride_direct_test data verify; cat should be 1\n");
+              rc++;
+            }
+          if (sub != 2)
+            {
+              printf
+                ("error lfpcqueue_stride_direct_test data verify; subcat should be 2\n");
+              rc++;
+            }
+          if (tempx)
+            {
+              if (0 != strcmp (tempx, "temp3"))
+                {
+                  printf
+                    ("lfpcqueue_stride_direct_test data verify temp3=%s failed\n",
+                     tempx);
+                  rc++;
+                }
+            }
+          if (SPHSinglePCQueueFull (pcqueue))
+            {
+            }
+          else
+            {
+              printf
+                ("lfpcqueue_stride_direct_test SPHSinglePCQueueFull(%p) failed\n",
+                 pcqueue);
+              rc++;
+            }
+
+          if (SPHSinglePCQueueFreeNextEntryDirect (pcqueue, handlex))
+            {
+              printf
+                ("lfpcqueue_stride_direct_test SPHSinglePCQueueFreeNextEntryDirect(%p,%p) succeed \n",
+                 pcqueue, handlex);
+              lfspace = SPHSinglePCQueueFreeSpace (pcqueue);
+              if (lfspace != 128L)
+                {
+                  printf
+                    ("error lfpcqueue_stride_direct_test(%p)  SPHSinglePCQueueFreeSpace(%p) = %zu\n",
+                     x4k, pcqueue, lfspace);
+                  rc++;
+                }
+
+              if (SPHSinglePCQueueFull (pcqueue))
+                {
+                  printf
+                    ("lfpcqueue_stride_direct_test SPHSinglePCQueueFull(%p) failed\n",
+                     pcqueue);
+                  rc++;
+                }
+              handle =
+                  SPHSinglePCQueueAllocStrideDirect (pcqueue);
+              if (handle)
+                {
+                  printf
+                    ("lfpcqueue_stride_direct_test SPHSinglePCQueueAllocStrideDirect(%p) = %p\n",
+                     pcqueue, handle);
+                  lfspace = SPHSinglePCQueueFreeSpace (pcqueue);
+                  if (lfspace)
+                    {
+                      printf
+                        ("error lfpcqueue_stride_direct_test(%p)  SPHSinglePCQueueFreeSpace(%p) = %zu\n",
+                         x4k, pcqueue, lfspace);
+                      rc++;
+                    }
+
+                  if (SPHLFEntryDirectComplete (handle, entry_tmp, 2, 2))
+                    {
+
+                    }
+                  else
+                    {
+                      printf
+                        ("error lfpcqueue_stride_direct_test SPHLFEntryDirectComplete(%p) failed)\n",
+                         handle);
+                      rc++;
+                    }
+
+                  if (SPHSinglePCQueueFull (pcqueue))
+                    {
+                    }
+                  else
+                    {
+                      printf
+                        ("lfpcqueue_stride_direct_test SPHSinglePCQueueFull(%p) failed\n",
+                         pcqueue);
+                      rc++;
+                    }
+                }
+              else
+                {
+                  printf
+                    ("error lfpcqueue_stride_direct_test  SPHSinglePCQueueAllocStrideDirect(%p) failed\n",
+                     pcqueue);
+                  return 10;
+                }
+            }
+          else
+            {
+              printf
+                ("lfpcqueue_stride_direct_test SPHSinglePCQueueFreeNextEntryDirect(%p,%p) failed\n",
+                 pcqueue, handlex);
+              rc++;
+            }
+        }
+      else
+        {
+          printf
+            ("lfpcqueue_stride_direct_test SPHSinglePCQueueGetNextCompleteDirect(%p) failed for empty queue \n",
+             pcqueue);
+          rc++;
+        }
+
+      handlex = SPHSinglePCQueueGetNextCompleteDirect (pcqueue);
+      if (handlex)
+        {
+          printf
+            ("lfpcqueue_stride_direct_test SPHSinglePCQueueGetNextCompleteDirect(%p) %p succeed \n",
+             pcqueue, handlex);
+
+          cat = SPHLFEntryDirectCategory (handlex);
+          sub = SPHLFEntryDirectSubcat (handlex);
+          printf ("lfpcqueue_stride_direct_test data verify; entry cat=%d,sub=%d\n",
+                  cat, sub);
+
+          if (SPHLFEntryDirectIsTimestamped (handlex))
+            {
+              printf
+                ("error lfpcqueue_stride_direct_test data verify; entry is timestamped\n");
+              rc++;
+            }
+          else
+            {
+              printf
+                ("lfpcqueue_stride_direct_test data verify; entry is not timestamped\n");
+            }
+
+          if (cat != 2)
+            {
+              printf
+                ("error lfpcqueue_stride_direct_test data verify; cat should be 2\n");
+              rc++;
+            }
+          if (sub != 1)
+            {
+              printf
+                ("error lfpcqueue_stride_direct_test data verify; subcat should be 1\n");
+              rc++;
+            }
+
+          if (SPHSinglePCQueueFull (pcqueue))
+            {
+            }
+          else
+            {
+              printf
+                ("lfpcqueue_stride_direct_test SPHSinglePCQueueFull(%p) failed\n",
+                 pcqueue);
+              rc++;
+            }
+
+          if (SPHSinglePCQueueFreeNextEntryDirect (pcqueue, handlex))
+            {
+              printf
+                ("lfpcqueue_stride_direct_test SPHSinglePCQueueFreeNextEntry(%p,%p) succeed \n",
+                 pcqueue, handlex);
+              lfspace = SPHSinglePCQueueFreeSpace (pcqueue);
+              if (lfspace != 128L)
+                {
+                  printf
+                    ("error lfpcqueue_stride_direct_test(%p)  SPHSinglePCQueueFreeSpace(%p) = %zu\n",
+                     x4k, pcqueue, lfspace);
+                  rc++;
+                }
+
+              if (SPHSinglePCQueueFull (pcqueue))
+                {
+                  printf
+                    ("lfpcqueue_stride_direct_test SPHSinglePCQueueFull(%p) failed\n",
+                     pcqueue);
+                  rc++;
+                }
+              handle =
+                  SPHSinglePCQueueAllocStrideDirect (pcqueue);
+              if (handle)
+                {
+                  printf
+                    ("lfpcqueue_stride_direct_test SPHSinglePCQueueAllocStrideDirect(%p) = %p\n",
+                     pcqueue, handle);
+                  lfspace = SPHSinglePCQueueFreeSpace (pcqueue);
+                  if (lfspace)
+                    {
+                      printf
+                        ("error lfpcqueue_stride_direct_test(%p)  SPHSinglePCQueueFreeSpace(%p) = %zu\n",
+                         x4k, pcqueue, lfspace);
+                      rc++;
+                    }
+
+                  if (SPHLFEntryDirectComplete (handle, entry_tmp, 2, 2))
+                    {
+
+                    }
+                  else
+                    {
+                      printf
+                        ("error lfpcqueue_stride_direct_test SPHLFEntryDirectComplete(%p) failed)\n",
+                         handle);
+                      rc++;
+                    }
+
+                  if (SPHSinglePCQueueFull (pcqueue))
+                    {
+                    }
+                  else
+                    {
+                      printf
+                        ("lfpcqueue_stride_direct_test SPHSinglePCQueueFull(%p) failed\n",
+                         pcqueue);
+                      rc++;
+                    }
+                }
+              else
+                {
+                  printf
+                    ("error lfpcqueue_stride_direct_test  SPHSinglePCQueueAllocStrideDirect(%p) failed\n",
+                     pcqueue);
+                  return 10;
+                }
+            }
+          else
+            {
+              printf
+                ("lfpcqueue_stride_direct_test SPHSinglePCQueueFreeNextEntryDirect(%p,%p) failed\n",
+                 pcqueue, handlex);
+              rc++;
+            }
+        }
+      else
+        {
+          printf
+            ("lfpcqueue_stride_direct_test SPHSinglePCQueueGetNextCompleteDirect(%p) failed for empty queue \n",
+             pcqueue);
+          rc++;
+        }
+
+      handlex = SPHSinglePCQueueGetNextCompleteDirect (pcqueue);
+      if (handlex)
+        {
+          printf
+            ("lfpcqueue_stride_direct_test SPHSinglePCQueueGetNextCompleteDirect(%p) =%p succeed \n",
+             pcqueue, handlex);
+
+          cat = SPHLFEntryDirectCategory (handlex);
+          sub = SPHLFEntryDirectSubcat (handlex);
+          printf ("lfpcqueue_stride_direct_test data verify; entry cat=%d,sub=%d\n",
+                  cat, sub);
+
+          if (SPHLFEntryDirectIsTimestamped (handlex))
+            {
+              printf
+                ("error lfpcqueue_stride_direct_test data verify; entry is timestamped\n");
+              rc++;
+            }
+          else
+            {
+              printf
+                ("lfpcqueue_stride_direct_test data verify; entry is not timestamped\n");
+            }
+
+          if (cat != 2)
+            {
+              printf
+                ("error lfpcqueue_stride_direct_test data verify; cat should be 2\n");
+              rc++;
+            }
+          if (sub != 2)
+            {
+              printf
+                ("error lfpcqueue_stride_direct_test data verify; subcat should be 2\n");
+              rc++;
+            }
+
+          if (SPHSinglePCQueueFull (pcqueue))
+            {
+            }
+          else
+            {
+              printf
+                ("lfpcqueue_stride_direct_test SPHSinglePCQueueFull(%p) failed\n",
+                 pcqueue);
+              rc++;
+            }
+
+          if (SPHSinglePCQueueFreeNextEntryDirect (pcqueue, handlex))
+            {
+              printf
+                ("lfpcqueue_stride_direct_test SPHSinglePCQueueFreeNextEntry(%p,%p) succeed \n",
+                 pcqueue, handlex);
+              lfspace = SPHSinglePCQueueFreeSpace (pcqueue);
+              if (lfspace != 128L)
+                {
+                  printf
+                    ("error lfpcqueue_stride_direct_test(%p)  SPHSinglePCQueueFreeSpace(%p) = %zu\n",
+                     x4k, pcqueue, lfspace);
+                  rc++;
+                }
+
+              if (SPHSinglePCQueueFull (pcqueue))
+                {
+                  printf
+                    ("lfpcqueue_stride_direct_test SPHSinglePCQueueFull(%p) failed\n",
+                     pcqueue);
+                  rc++;
+                }
+              handle =
+                  SPHSinglePCQueueAllocStrideDirect (pcqueue);
+              if (handle)
+                {
+                  printf
+                    ("lfpcqueue_stride_direct_test SPHSinglePCQueueAllocStrideDirect(%p) = %p\n",
+                     pcqueue, handle);
+                  lfspace = SPHSinglePCQueueFreeSpace (pcqueue);
+                  if (lfspace)
+                    {
+                      printf
+                        ("error lfpcqueue_stride_direct_test(%p)  SPHSinglePCQueueFreeSpace(%p) = %zu\n",
+                         x4k, pcqueue, lfspace);
+                      rc++;
+                    }
+
+                  if (SPHLFEntryDirectComplete (handle, entry_tmp, 2, 2))
+                    {
+
+                    }
+                  else
+                    {
+                      printf
+                        ("error lfpcqueue_stride_direct_test SPHLFEntryDirectComplete(%p) failed)\n",
+                         handle);
+                      rc++;
+                    }
+
+                  if (SPHSinglePCQueueFull (pcqueue))
+                    {
+                    }
+                  else
+                    {
+                      printf
+                        ("lfpcqueue_stride_direct_test SPHSinglePCQueueFull(%p) failed\n",
+                         pcqueue);
+                      rc++;
+                    }
+                }
+              else
+                {
+                  printf
+                    ("error lfpcqueue_stride_direct_test  SPHSinglePCQueueGetNextCompleteDirect(%p) failed\n",
+                     pcqueue);
+                  return 10;
+                }
+            }
+          else
+            {
+              printf
+                ("lfpcqueue_stride_direct_test SPHSinglePCQueueFreeNextEntryDirect(%p,%p) failed\n",
+                 pcqueue, handlex);
+              rc++;
+            }
+        }
+      else
+        {
+          printf
+            ("lfpcqueue_stride_direct_test SPHSinglePCQueueGetNextCompleteDirect(%p) failed for empty queue \n",
+             pcqueue);
+          rc++;
+        }
+
+      handlex = SPHSinglePCQueueGetNextCompleteDirect (pcqueue);
+      if (handlex)
+        {
+          printf
+            ("lfpcqueue_stride_direct_test SPHSinglePCQueueGetNextCompleteDirect(%p) =%p succeed \n",
+             pcqueue, handlex);
+
+          cat = SPHLFEntryDirectCategory (handlex);
+          sub = SPHLFEntryDirectSubcat (handlex);
+          printf ("lfpcqueue_stride_direct_test data verify; entry cat=%d,sub=%d\n",
+                  cat, sub);
+
+          if (SPHLFEntryDirectIsTimestamped (handlex))
+            {
+              printf
+                ("error lfpcqueue_stride_direct_test data verify; entry is timestamped\n");
+              rc++;
+            }
+          else
+            {
+              printf
+                ("lfpcqueue_stride_direct_test data verify; entry is not timestamped\n");
+            }
+
+          if (cat != 2)
+            {
+              printf
+                ("error lfpcqueue_stride_direct_test data verify; cat should be 2\n");
+              rc++;
+            }
+          if (sub != 2)
+            {
+              printf
+                ("error lfpcqueue_stride_direct_test data verify; subcat should be 2\n");
+              rc++;
+            }
+
+          if (SPHSinglePCQueueFreeNextEntryDirect (pcqueue, handlex))
+            {
+              printf
+                ("lfpcqueue_stride_direct_test SPHSinglePCQueueFreeNextEntryDirect(%p,%p) succeed \n",
+                 pcqueue, handlex);
+              lfspace = SPHSinglePCQueueFreeSpace (pcqueue);
+              if (lfspace != 128L)
+                {
+                  printf
+                    ("error lfpcqueue_stride_direct_test(%p)  SPHSinglePCQueueFreeSpace(%p) = %zu\n",
+                     x4k, pcqueue, lfspace);
+                  rc++;
+                }
+
+              if (SPHSinglePCQueueFull (pcqueue))
+                {
+                  printf
+                    ("lfpcqueue_stride_direct_test SPHSinglePCQueueFull(%p) failed\n",
+                     pcqueue);
+                  rc++;
+                }
+
+              if (SPHSinglePCQueueEmpty (pcqueue))
+                {
+                  printf
+                    ("lfpcqueue_stride_direct_test SPHSinglePCQueueEmpty(%p) failed\n",
+                     pcqueue);
+                  rc++;
+                }
+            }
+          else
+            {
+              printf
+                ("lfpcqueue_stride_direct_test SPHSinglePCQueueFreeNextEntryDirect(%p,%p) failed\n",
+                 pcqueue, handlex);
+              rc++;
+            }
+
+        }
+      else
+        {
+          printf
+            ("lfpcqueue_stride_direct_test SPHSinglePCQueueGetNextCompleteDirect(%p) failed for empty queue \n",
+             pcqueue);
+          rc++;
+        }
+
+      handlex = SPHSinglePCQueueGetNextCompleteDirect (pcqueue);
+      if (handlex)
+        {
+          printf
+            ("lfpcqueue_stride_direct_test SPHSinglePCQueueGetNextCompleteDirect(%p) =%p succeed \n",
+             pcqueue, handlex);
+
+          cat = SPHLFEntryDirectCategory (handlex);
+          sub = SPHLFEntryDirectSubcat (handlex);
+          printf ("lfpcqueue_stride_direct_test data verify; entry cat=%d,sub=%d\n",
+                  cat, sub);
+
+          if (SPHLFEntryDirectIsTimestamped (handlex))
+            {
+              printf
+                ("error lfpcqueue_stride_direct_test data verify; entry is timestamped\n");
+              rc++;
+            }
+          else
+            {
+              printf
+                ("lfpcqueue_stride_direct_test data verify; entry is not timestamped\n");
+            }
+
+          if (cat != 2)
+            {
+              printf
+                ("error lfpcqueue_stride_direct_test data verify; cat should be 2\n");
+              rc++;
+            }
+          if (sub != 2)
+            {
+              printf
+                ("error lfpcqueue_stride_direct_test data verify; subcat should be 2\n");
+              rc++;
+            }
+
+          if (SPHSinglePCQueueFreeNextEntryDirect (pcqueue, handlex))
+            {
+              printf
+                ("lfpcqueue_stride_direct_test SPHSinglePCQueueFreeNextEntryDirect(%p,%p) succeed \n",
+                 pcqueue, handlex);
+              lfspace = SPHSinglePCQueueFreeSpace (pcqueue);
+              if (lfspace != 256L)
+                {
+                  printf
+                    ("error lfpcqueue_stride_direct_test(%p)  SPHSinglePCQueueFreeSpace(%p) = %zu\n",
+                     x4k, pcqueue, lfspace);
+                  rc++;
+                }
+
+              if (SPHSinglePCQueueFull (pcqueue))
+                {
+                  printf
+                    ("lfpcqueue_stride_direct_test SPHSinglePCQueueFull(%p) failed\n",
+                     pcqueue);
+                  rc++;
+                }
+
+              if (SPHSinglePCQueueEmpty (pcqueue))
+                {
+                  printf
+                    ("lfpcqueue_stride_direct_test SPHSinglePCQueueEmpty(%p) failed\n",
+                     pcqueue);
+                  rc++;
+                }
+            }
+          else
+            {
+              printf
+                ("lfpcqueue_stride_direct_test SPHSinglePCQueueFreeNextEntryDirect(%p,%p) failed\n",
+                 pcqueue, handlex);
+              rc++;
+            }
+
+        }
+      else
+        {
+          printf
+            ("lfpcqueue_stride_direct_test SPHSinglePCQueueGetNextCompleteDirect(%p) failed for empty queue \n",
+             pcqueue);
+          rc++;
+        }
+
+      handlex = SPHSinglePCQueueGetNextCompleteDirect (pcqueue);
+      if (handlex)
+        {
+          printf
+            ("lfpcqueue_stride_direct_test SPHSinglePCQueueGetNextComplete(%p) =%p succeed \n",
+             pcqueue, handlex);
+
+          cat = SPHLFEntryDirectCategory (handlex);
+          sub = SPHLFEntryDirectSubcat (handlex);
+          printf ("lfpcqueue_stride_direct_test data verify; entry cat=%d,sub=%d\n",
+                  cat, sub);
+
+          if (SPHLFEntryDirectIsTimestamped (handlex))
+            {
+              printf
+                ("error lfpcqueue_stride_direct_test data verify; entry is timestamped\n");
+              rc++;
+            }
+          else
+            {
+              printf
+                ("lfpcqueue_stride_direct_test data verify; entry is not timestamped\n");
+            }
+
+          if (cat != 2)
+            {
+              printf
+                ("error lfpcqueue_stride_direct_test data verify; cat should be 2\n");
+              rc++;
+            }
+          if (sub != 2)
+            {
+              printf
+                ("error lfpcqueue_stride_direct_test data verify; subcat should be 2\n");
+              rc++;
+            }
+
+          if (SPHSinglePCQueueFreeNextEntryDirect (pcqueue, handlex))
+            {
+              printf
+                ("lfpcqueue_stride_direct_test SPHSinglePCQueueFreeNextEntry(%p,%p) succeed \n",
+                 pcqueue, handlex);
+              lfspace = SPHSinglePCQueueFreeSpace (pcqueue);
+              if (lfspace != 384L)
+                {
+                  printf
+                    ("error lfpcqueue_stride_direct_test(%p)  SPHSinglePCQueueFreeSpace(%p) = %zu\n",
+                     x4k, pcqueue, lfspace);
+                  rc++;
+                }
+
+              if (SPHSinglePCQueueFull (pcqueue))
+                {
+                  printf
+                    ("lfpcqueue_stride_direct_test SPHSinglePCQueueFull(%p) failed\n",
+                     pcqueue);
+                  rc++;
+                }
+
+              if (SPHSinglePCQueueEmpty (pcqueue))
+                {
+                  printf
+                    ("lfpcqueue_stride_direct_test SPHSinglePCQueueEmpty(%p) failed\n",
+                     pcqueue);
+                  rc++;
+                }
+            }
+          else
+            {
+              printf
+                ("lfpcqueue_stride_direct_test SPHSinglePCQueueFreeNextEntryDirect(%p,%p) failed\n",
+                 pcqueue, handlex);
+              rc++;
+            }
+
+        }
+      else
+        {
+          printf
+            ("lfpcqueue_stride_direct_test SPHSinglePCQueueGetNextCompleteDirect(%p) failed for empty queue \n",
+             pcqueue);
+          rc++;
+        }
+
+      handlex = SPHSinglePCQueueGetNextCompleteDirect (pcqueue);
+      if (handlex)
+        {
+          printf
+            ("lfpcqueue_stride_direct_test SPHSinglePCQueueGetNextComplete(%p) =%p succeed \n",
+             pcqueue, handlex);
+
+          cat = SPHLFEntryDirectCategory (handlex);
+          sub = SPHLFEntryDirectSubcat (handlex);
+          printf ("lfpcqueue_stride_direct_test data verify; entry cat=%d,sub=%d\n",
+                  cat, sub);
+
+          if (SPHLFEntryDirectIsTimestamped (handlex))
+            {
+              printf
+                ("error lfpcqueue_stride_direct_test data verify; entry is timestamped\n");
+              rc++;
+            }
+          else
+            {
+              printf
+                ("lfpcqueue_stride_direct_test data verify; entry is not timestamped\n");
+            }
+
+          if (cat != 2)
+            {
+              printf
+                ("error lfpcqueue_stride_direct_test data verify; cat should be 2\n");
+              rc++;
+            }
+          if (sub != 2)
+            {
+              printf
+                ("error lfpcqueue_stride_direct_test data verify; subcat should be 2\n");
+              rc++;
+            }
+
+          if (SPHSinglePCQueueFreeNextEntryDirect (pcqueue, handlex))
+            {
+              printf
+                ("lfpcqueue_stride_direct_test SPHSinglePCQueueFreeNextEntryDirect(%p,%p) succeed \n",
+                 pcqueue, handlex);
+              lfspace = SPHSinglePCQueueFreeSpace (pcqueue);
+              if (lfspace != 512L)
+                {
+                  printf
+                    ("error lfpcqueue_stride_direct_test(%p)  SPHSinglePCQueueFreeSpace(%p) = %zu\n",
+                     x4k, pcqueue, lfspace);
+                  rc++;
+                }
+
+              if (SPHSinglePCQueueFull (pcqueue))
+                {
+                  printf
+                    ("lfpcqueue_stride_direct_test SPHSinglePCQueueFull(%p) failed\n",
+                     pcqueue);
+                  rc++;
+                }
+
+              if (SPHSinglePCQueueEmpty (pcqueue))
+                {
+                  printf
+                    ("lfpcqueue_stride_direct_test SPHSinglePCQueueEmpty(%p) failed\n",
+                     pcqueue);
+                  rc++;
+                }
+            }
+          else
+            {
+              printf
+                ("lfpcqueue_stride_direct_test SPHSinglePCQueueFreeNextEntryDirect(%p,%p) failed\n",
+                 pcqueue, handlex);
+              rc++;
+            }
+
+        }
+      else
+        {
+          printf
+            ("lfpcqueue_stride_direct_test SPHSinglePCQueueGetNextCompleteDirect(%p) failed for empty queue \n",
+             pcqueue);
+          rc++;
+        }
+
+      handlex = SPHSinglePCQueueGetNextCompleteDirect (pcqueue);
+      if (handlex)
+        {
+          printf
+            ("lfpcqueue_stride_direct_test SPHSinglePCQueueGetNextComplete(%p) =%p succeed \n",
+             pcqueue, handlex);
+
+          cat = SPHLFEntryDirectCategory (handlex);
+          sub = SPHLFEntryDirectSubcat (handlex);
+          printf ("lfpcqueue_stride_direct_test data verify; entry cat=%d,sub=%d\n",
+                  cat, sub);
+
+          if (SPHLFEntryDirectIsTimestamped (handlex))
+            {
+              printf
+                ("error lfpcqueue_stride_direct_test data verify; entry is timestamped\n");
+              rc++;
+            }
+          else
+            {
+              printf
+                ("lfpcqueue_stride_direct_test data verify; entry is not timestamped\n");
+            }
+
+          if (cat != 2)
+            {
+              printf
+                ("error lfpcqueue_stride_direct_test data verify; cat should be 2\n");
+              rc++;
+            }
+          if (sub != 2)
+            {
+              printf
+                ("error lfpcqueue_stride_direct_test data verify; subcat should be 2\n");
+              rc++;
+            }
+
+          if (SPHSinglePCQueueFreeNextEntryDirect (pcqueue, handlex))
+            {
+              printf
+                ("lfpcqueue_stride_direct_test SPHSinglePCQueueFreeNextEntryDirect(%p,%p) succeed \n",
+                 pcqueue, handlex);
+              lfspace = SPHSinglePCQueueFreeSpace (pcqueue);
+              if (lfspace != 640L)
+                {
+                  printf
+                    ("error lfpcqueue_stride_direct_test(%p)  SPHSinglePCQueueFreeSpace(%p) = %zu\n",
+                     x4k, pcqueue, lfspace);
+                  rc++;
+                }
+
+              if (SPHSinglePCQueueFull (pcqueue))
+                {
+                  printf
+                    ("lfpcqueue_stride_direct_test SPHSinglePCQueueFull(%p) failed\n",
+                     pcqueue);
+                  rc++;
+                }
+
+              if (!SPHSinglePCQueueEmpty (pcqueue))
+                {
+                  printf
+                    ("lfpcqueue_stride_direct_test SPHSinglePCQueueEmpty(%p) failed\n",
+                     pcqueue);
+                  rc++;
+                }
+            }
+          else
+            {
+              printf
+                ("lfpcqueue_stride_direct_test SPHSinglePCQueueFreeNextEntryDirect(%p,%p) failed\n",
+                 pcqueue, handlex);
+              rc++;
+            }
+
+        }
+      else
+        {
+          printf
+            ("lfpcqueue_stride_direct_test SPHSinglePCQueueGetNextCompleteDirect(%p) failed for empty queue \n",
+             pcqueue);
+          rc++;
+        }
+
+      handlex = SPHSinglePCQueueGetNextCompleteDirect (pcqueue);
+      if (handlex)
+        {
+          printf
+            ("error lfpcqueue_stride_direct_test SPHSinglePCQueueGetNextCompleteDirect(%p) =%p failed for empty queue \n",
+             pcqueue, handlex);
+          rc++;
+        }
+      else
+        {
+          printf
+            ("lfpcqueue_stride_direct_test SPHSinglePCQueueGetNextCompleteDirect(%p) detected empty queue \n",
+             pcqueue);
+
+        }
+    }
+  else
+    {
+      printf
+        ("error lfpcqueue_stride_direct_test(%p)  SPHSinglePCQueueInitWithStride(%p) failed\n",
+         x4k, x4k);
+      return 10;
+    }
+
+  return (rc);
+}
 
 int
 lfpcqueue_basic_test (char *x4k)
@@ -763,7 +2457,7 @@ lfpcqueue_stride_test (char *x4k)
 	  if (SPHSinglePCQueueFreeNextEntry (pcqueue))
 	    {
 	      printf
-		("lfpcqueue_stride_test SPHSinglePCQueueFreeNextEntry(%p) succeed \n",
+		("lfpcqueue_stride_test SPHSinglePCQueueFreeNextEntryDirect(%p) succeed \n",
 		 pcqueue);
 	      lfspace = SPHSinglePCQueueFreeSpace (pcqueue);
 	      if (lfspace != 128L)
@@ -831,8 +2525,8 @@ lfpcqueue_stride_test (char *x4k)
 	  else
 	    {
 	      printf
-		("lfpcqueue_stride_test SPHSinglePCQueueFreeNextEntry(%p) failed\n",
-		 pcqueue);
+		("lfpcqueue_stride_test SPHSinglePCQueueFreeNextEntryDirect(%p,%p) failed\n",
+		 pcqueue, handlex);
 	      rc++;
 	    }
 	}
@@ -872,11 +2566,11 @@ lfpcqueue_stride_test (char *x4k)
 	      rc++;
 	    }
 
-	  if (SPHSinglePCQueueFreeNextEntry (pcqueue))
+	  if (SPHSinglePCQueueFreeNextEntryDirect (pcqueue, handlex))
 	    {
 	      printf
-		("lfpcqueue_stride_test SPHSinglePCQueueFreeNextEntry(%p) succeed \n",
-		 pcqueue);
+		("lfpcqueue_stride_test SPHSinglePCQueueFreeNextEntryDirect(%p,%p) succeed \n",
+		 pcqueue, handlex);
 	      lfspace = SPHSinglePCQueueFreeSpace (pcqueue);
 	      if (lfspace != 128L)
 		{
@@ -943,8 +2637,8 @@ lfpcqueue_stride_test (char *x4k)
 	  else
 	    {
 	      printf
-		("lfpcqueue_stride_test SPHSinglePCQueueFreeNextEntry(%p) failed\n",
-		 pcqueue);
+		("lfpcqueue_stride_test SPHSinglePCQueueFreeNextEntryDirect(%p,%p) failed\n",
+		 pcqueue, handlex);
 	      rc++;
 	    }
 	}
@@ -5413,6 +7107,9 @@ main (int argc, char *argv[])
   rc =+ lfpcqueue_stride_test (source_address);
 #endif
 #if 1
+  rc =+ lfpcqueue_stride_direct_test (source_address);
+#endif
+#if 1
   rc =+ lfpcqueue_stride_timestamp_test (source_address);
 #endif
 #if 1
@@ -5427,5 +7124,5 @@ main (int argc, char *argv[])
 #if 1
   rc =+ lfpcqueue_large_stride_test (source_address, 16 * 1024, 2048);
 #endif
-  return rc;
+  return (rc);
 }

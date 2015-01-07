@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2014 IBM Corporation.
+ * Copyright (c) 2012-2015 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -269,6 +269,16 @@ extern __C__ SPHSinglePCQueue_t
 SPHSinglePCQueueCreateWithStride (block_size_t buf_size,
                            unsigned short stride);
 
+/** \brief Return the entry stride for an existing Lock Free
+*       Single Producer Single Consumer Queue.
+*
+*       @param queue Handle of a producer consumer queue.
+*       @return the entry stride of strided queues, 0 if not strided,
+*       or -1 is not a valid SPHSinglePCQueue_t.
+*/
+extern __C__ int
+SPHSinglePCQueueGetStride (SPHSinglePCQueue_t queue);
+
 /** \brief Allows the Producer thread to return the address of a
 *   (raw) queue entry allocated from the specified
 *   Single Producer Single Consumer Queue.
@@ -280,13 +290,13 @@ SPHSinglePCQueueCreateWithStride (block_size_t buf_size,
 *	\warning This function is primarily for internal testing and should
 *	not be used by applications.
 *
-*	@param log Handle to a Logger.
-*	@return the address of the raw queue Entry is returned if successful,
-*	or NULL if unsuccessful.
-*	For example the Allocate may fail if the queue is full.
+*       @param queue Handle of a producer consumer queue.
+*       @return address of the raw entry,
+*       or 0 (NULL) if the allocation failed.
+*       For example the Allocate may fail if the queue is full.
 */
 extern __C__ void *
-SPHSinglePCQueueAllocRaw (SPHSinglePCQueue_t log);
+SPHSinglePCQueueAllocRaw (SPHSinglePCQueue_t queue);
 
 /** \brief Allows the producer thread to allocate and initialize the
 *   header of a queue entry for access.	The allocation is from the

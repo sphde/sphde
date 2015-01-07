@@ -1,3 +1,65 @@
+2015-01-02  Steven Munroe  <sjmunroe@us.ibm.com>
+
+	* configure.ac (SPHDE_SO_VERSION): Change SO version to 1.0.0.
+	SPHSinglePCQueue_t requires an incompatible data change.
+	* configure: Regenerate.
+	* ./doc/libsphde-doxygen-sph.doxy (INPUT): Add
+	./src/sphdirectpcqueue.h
+	* ./doc/sphmaindox.h: Add common for sphdirectpcqueue.h. Correct
+	spelling.
+	* ./src/Makefile.am (libsphdeinclude_HEADERS): Add
+	sphdirectpcqueue.h.
+	Add sphdirectpcqueue_ttt_tt to TESTS.
+	* ./src/Makefile.in: Regenerate.
+	* ./src/sasatom.h (sas_code_barrier): Define.
+	* ./src/sasatom_i386.h (__arch_pause): Define.
+	* ./src/sasatom_x86_64.h (__arch_pause): Define.
+	* ./src/sasatom_powerpc.h [_ARCH_PWR4]: Define
+	__arch_sas_read_barrier as lwsync.  Otherwisw sync.
+	* ./src/sasatom_powerpc.h [_ARCH_PWR7]: Define __arch_sas_PPR_low,
+	__arch_sas_PPR_medium_low, and __arch_sas_PPR_medium.
+	* ./src/sphdirectpcqueue.h: New file.
+	* ./src/sphlfentry.h: Correct comment.
+	* ./src/sphsinglepcqueue.cpp [__SPHSPCQUEUE_V1]: Defines the data
+	struct change (V0 to V1) for for SPHPCQueueHeader. The V1 header
+	moves the qhead/qtail pointers to the next cache-line. This reduces
+	false sharing between qhead/qtail and the rest of the
+	SPHPCQueueHeader.
+	(SPHSinglePCQueueInitInternal) [__SASDebugPrint__]: Added debug.
+	(SPHSinglePCQueueGetStride): New function.
+	(SPHSinglePCQueueAllocStrideDirect): New function.
+	(SPHSinglePCQueueAllocStrideDirectSpin): New function.
+	(SPHSinglePCQueueAllocStrideDirectSpinPause): New function.
+	(SPHSinglePCQueueEntryIsCompleteDirect): New function.
+	(SPHSinglePCQueueGetNextCompleteDirectSpin): New function.
+	(SPHSinglePCQueueGetNextCompleteDirectSpinPause): New function.
+	(SPHSinglePCQueueGetNextCompleteDirect): New function.
+	(SPHSinglePCQueueGetNextEntryDirect): New function.
+	(SPHSinglePCQueueFreeNextEntryDirect): New function.
+	(SPHSinglePCQueueGetEntryTemplate): New function.
+	(SPHSinglePCQueueAllocStrideEntry)  [__SASDebugPrint__]:
+	Corrections.
+	(SPHSinglePCQueueFreeNextEntr): Correct placement of
+	sas_write_barrier().
+	* ./src/sphsinglepcqueue.h (SPHSinglePCQueueGetStride):
+	Declare extern.
+	(SPHSinglePCQueueAllocRaw): Correct doxy comments.
+	* ./src/tests/sphdirectpcqueue_ttt.c: New file.
+	* ./src/tests/sphsinglepcqueue_t.c: Include stdint.h and
+	sphdirectpcqueue.h
+	(lfpcqueue_stride_direct_test): New function.
+	(lfpcqueue_basic_test): Update to include tests of DirectPCQueue
+	functions.
+	(main): Add call to lfpcqueue_stride_direct_test();
+	* ./src/tests/sphsinglepcqueue_ttt.c (sassim_print_error):
+	New function.
+	(sassim_print_msg): New function.
+	(sassim_dump_block): New function.
+	(lfPCQentry_fastverify): Improve spin loop.  Add recovery for data
+	miscompare.
+	(test_thread_Producer_fastfill): Add debug print.
+	(main): Set p10 to incease interations by 10X.
+
 2014-06-19 Rajalakshmi Srinivasaraghavan <raji@linux.vnet.ibm.com>
 
 	* src/tests/sphsinglepcqueue_t.c (lfpcqueue_basic_test): Remove

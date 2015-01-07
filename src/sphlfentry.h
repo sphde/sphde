@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014 IBM Corporation.
+ * Copyright (c) 2011-2015 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -171,8 +171,6 @@ SPHLFEntryWeakComplete (SPHLFEntryHandle_t *handlespace)
 /** \brief Marks the entry specified by the entry handle as complete.
 *	Also executes write memory barries required by the platform to ensure
 *	that all previous stores by this thread to this entry are complete.
-*	On out-of-order machines this barrier does not guarantee that all
-*	previous stores by this thread are visible to other threads.
 *
 *   @param handlespace Entry Handle for an allocated entry.
 *	@return a 0 value indicates success.
@@ -336,7 +334,7 @@ SPHLFEntrySubcat (SPHLFEntryHandle_t *handlespace)
     return result;
 }
 
-/** \brief Return the address first free byte for the entry specified by
+/** \brief Return the first free byte address for the entry specified by
 *   the entry handle.
 *
 *   \warning This function should be used carefully. It is not safe to use

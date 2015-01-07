@@ -13,7 +13,7 @@ AM_INIT_AUTOMAKE([1.10 no-define foreign])
 
 # Update this value for every release: (A:B:C will map to foo.so.(A-C).C.B)
 # http://www.gnu.org/software/libtool/manual/html_node/Updating-version-info.html
-SPHDE_SO_VERSION=0:1:0
+SPHDE_SO_VERSION=1:0:0
 AC_SUBST(SPHDE_SO_VERSION)
 
 # Debug option

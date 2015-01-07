@@ -16,6 +16,17 @@
 #define __arch_sas_read_barrier()  __sync_synchronize()
 #define __arch_sas_write_barrier() __sync_synchronize()
 
+static inline void
+__arch_pause (void)
+{
+  __asm__ (
+    "  pause;"
+   :
+   :
+   : "memory"
+  );
+}
+
 static inline void *
 __arch_fetch_and_add_ptr (void **pointer, long int delta)
 {

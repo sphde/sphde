@@ -5,7 +5,7 @@
  *      Author: sjmunroe
  */
 /*
- * Copyright (c) 2012 IBM Corporation.
+ * Copyright (c) 2012, 2014, 2015 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -84,6 +84,67 @@ typedef void *(*test_ptr_t) (void *);
 typedef int (*test_fill_ptr_t) (SPHSinglePCQueue_t, SPHSinglePCQueue_t, int, long);
 static test_fill_ptr_t test_funclist[MAX_THREADS];
 
+#define STRINGIZE(x)  STRINGIZE2(x)
+#define STRINGIZE2(x)  #x
+#define LINE_STRING  STRINGIZE(__LINE__)
+
+static const char sassim_prog_name[] = "sphsinglepcqueue_ttt";
+
+static inline void
+sassim_print_error (const char *test, int line, const char *fmt, ...)
+{
+  va_list args;
+  fprintf (stderr, "%s:%s:%i error: ", sassim_prog_name, test, line);
+  va_start (args, fmt);
+  vfprintf (stderr, fmt, args);
+  fprintf (stderr, "\n");
+  va_end (args);
+}
+
+#define SASSIM_PRINT_ERR(fmt, ...) sassim_print_error(__FUNCTION__, __LINE__, fmt, ##__VA_ARGS__)
+
+static inline void
+sassim_print_msg (const char *func, int line, const char *fmt, ...)
+{
+  va_list args;
+  printf ("%s:%s:%i ", sassim_prog_name, func, line);
+  va_start (args, fmt);
+  vprintf (fmt, args);
+  printf ("\n");
+  va_end (args);
+}
+
+#define SASSIM_PRINT_MSG(fmt, ...) sassim_print_msg(__FUNCTION__, __LINE__, fmt, ##__VA_ARGS__)
+#if 0
+static void
+sassim_dump_block (const char *func, int line, void *blockAddr,
+                   unsigned long len)
+{
+  unsigned int *dumpAddr = (unsigned int *) blockAddr;
+  unsigned char *charAddr = (unsigned char *) blockAddr;
+  void *tempAddr;
+  unsigned char chars[20];
+  unsigned char temp;
+  unsigned int i, j;
+  chars[16] = 0;
+  for (i = 0; i < len; i = i + 16)
+    {
+      tempAddr = dumpAddr;
+      for (j = 0; j < 16; j++)
+        {
+          temp = *charAddr++;
+          if ((temp < 32) || (temp > 126))
+            temp = '.';
+          chars[j] = temp;
+        };
+      sassim_print_msg (func, line, "%p  %08x %08x %08x %08x <%s>",
+                        tempAddr, *dumpAddr, *(dumpAddr + 1),
+                        *(dumpAddr + 2), *(dumpAddr + 3), chars);
+      dumpAddr += 4;
+    }
+}
+#define SASSIM_DUMP_BLOCK(fmt, ...) sassim_dump_block(__FUNCTION__, __LINE__, fmt, ##__VA_ARGS__)
+#endif
 static void
 sem_data_init (sphPCQAlignedSem_t *wait, unsigned int spinlimit, unsigned int threshld)
 {
@@ -498,7 +559,9 @@ lfPCQentry_fasttest (SPHSinglePCQueue_t pqueue, SPHSinglePCQueue_t cqueue, int v
     {
       while (SPHSinglePCQueueFull (pqueue))
 	{
+#if 1
 	  sched_yield ();
+#endif
 	}
       handle = SPHSinglePCQueueAllocStrideEntry (pqueue, 1, 2, &handle0);
     }
@@ -520,7 +583,7 @@ lfPCQentry_fasttest (SPHSinglePCQueue_t pqueue, SPHSinglePCQueue_t cqueue, int v
 
 int
 lfPCQentry_fastverify (SPHSinglePCQueue_t pqueue, SPHSinglePCQueue_t cqueue, int val1, int val2,
-		       int val3)
+                       int val3)
 {
   int rc1, rc2, rc3, rc4;
   SPHLFEntryHandle_t *handle, handle0;
@@ -529,11 +592,18 @@ lfPCQentry_fastverify (SPHSinglePCQueue_t pqueue, SPHSinglePCQueue_t cqueue, int
   handle = SPHSinglePCQueueGetNextComplete (cqueue, &handle0);
   if (!handle)
     {
+#if 1
       while (SPHSinglePCQueueEmpty (pcqueue))
-	{
-	  sched_yield ();
-	}
+        {
+          sched_yield ();
+        }
       handle = SPHSinglePCQueueGetNextComplete (cqueue, &handle0);
+#else
+      while (&handle0 != SPHSinglePCQueueGetNextComplete (cqueue, &handle0))
+        {
+        }
+      handle = &handle0;
+#endif
     }
   if (handle)
     {
@@ -543,22 +613,22 @@ lfPCQentry_fastverify (SPHSinglePCQueue_t pqueue, SPHSinglePCQueue_t cqueue, int
       rc3 = (array[2] != val3);
 
       if (rc1 | rc2 | rc3)
-	{
-	  printf
-	    ("lfPCQentry_fastverify:: SPHLFEntryGetNextInt() = %d,%d,%d should be %d,%d,%d\n",
-	     array[0], array[1], array[2] ,val1, val2, val3);
-	}
+        {
+          printf
+            ("lfPCQentry_fastverify:: SPHLFEntryGetFreePtr() = %d,%d,%d should be %d,%d,%d\n",
+             array[0], array[1], array[2] ,val1, val2, val3);
+        }
 
       if (SPHSinglePCQueueFreeNextEntry (cqueue))
-	{
-	  rc4 = 0;
-	}
+        {
+          rc4 = 0;
+        }
       else
-	{
-	  printf
-	    ("lfPCQentry_fastverify:: SPHSinglePCQueueFreeNextEntry() = failed\n");
-	  rc4 = 1;
-	}
+        {
+          printf
+            ("lfPCQentry_fastverify:: SPHSinglePCQueueFreeNextEntry() = failed\n");
+          rc4 = 1;
+        }
     }
   else
     {
@@ -999,16 +1069,17 @@ test_thread_consumer_waittransfercopy (SPHSinglePCQueue_t pqueue, SPHSinglePCQue
   return rtn;
 }
 //#undef DEBUG_PRINT
+
 int
 test_thread_Producer_fastfill (SPHSinglePCQueue_t pqueue, SPHSinglePCQueue_t cqueue,
-			       int thread_ID, long iterations)
+                               int thread_ID, long iterations)
 {
   int rc, rtn = 0;
   long i;
 #ifdef DEBUG_PRINT
   char number[128];
-  sprintf (number, "test_thread_Producer_fill(%p, %d, %ld)\n", pcqueue,
-	   thread_ID, iterations);
+  sprintf (number, "test_thread_Producer_fastfill(%p, %d, %ld)\n", pcqueue,
+           thread_ID, iterations);
   puts (number);
 #endif
 
@@ -1016,16 +1087,16 @@ test_thread_Producer_fastfill (SPHSinglePCQueue_t pqueue, SPHSinglePCQueue_t cqu
     {
       rc = lfPCQentry_fasttest (pqueue, cqueue, i, 0x01234567, 0xdeadbeef);
       if (!rc)
-	{
-	}
+        {
+        }
       else
-	{
-	  printf
-	    ("test_thread_Producer_fill SPHSinglePCQueueAllocStrideEntry (%p) failed\n",
-	     pcqueue);
-	  rtn++;
-	  break;
-	}
+        {
+          printf
+            ("test_thread_Producer_fill SPHSinglePCQueueAllocStrideEntry (%p) failed\n",
+             pcqueue);
+          rtn++;
+          break;
+        }
     }
 
   return rtn;
@@ -1271,7 +1342,7 @@ main ()
     {
       printf ("SASJoinRegion Error# %d\n", rc);
 
-      return 1;
+      return (1);
 	}
       else
 	{
@@ -1286,7 +1357,8 @@ main ()
       test_funclist[1] = test_thread_consumer_verify;
       if (rc == 0)
 	{
-	  p10 = units * 1000000;
+#if 1
+	  p10 = units * 10000000;
 	  printf ("start 1 test_thread_Producer | consumer (%p,%zu)\n",
 		  pcqueue, units);
 
@@ -1309,6 +1381,8 @@ main ()
 	     p10, nano, rate);
 	  printf ("end 1   test_thread_Producer | consumer (%p,%zu) = %d\n",
 		  pcqueue, units, rc);
+
+#endif
 #if 1
 	  rc3 = test_pcq_reset ();
 	  if (rc3 == 0)
@@ -1317,7 +1391,7 @@ main ()
 	      consumer_pcq_list[1] = pcqueue;
 	      test_funclist[0] = test_thread_Producer_fastfill;
 	      test_funclist[1] = test_thread_consumer_fastverify;
-	      p10 = units * 1000000;
+	      p10 = units * 10000000;
 
 	      printf ("start 2 test_thread_Producer | consumer fast (%p,%zu)\n",
 		      pcqueue, units);
@@ -1346,7 +1420,8 @@ main ()
 	}
       else
 	    rc += rc3;
-
+#endif
+#if 1
 	  rc3 = test_pcq_reset ();
 	  if (rc3 == 0)
 	{
@@ -1453,6 +1528,7 @@ main ()
   else
 	    rc += rc3;
 #endif
+#if 1
       num_threads = 3;
 	  rc3 = test_pcq_reset ();
 	  if (rc3 == 0)
@@ -1913,11 +1989,12 @@ main ()
 	    }
 	  else
 	    rc += rc3;
+#endif
 	}
     }
   fflush(stdout);
   //SASCleanUp();
   printf ("SAS removed\n");
   SASRemove ();
-  return rc;
+  return (rc);
 };

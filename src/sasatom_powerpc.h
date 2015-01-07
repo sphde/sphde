@@ -20,8 +20,20 @@
 #elif defined(__powerpc__)
 /* PPC32 might be older ISA-1.0 machine */
 #define __arch_sas_write_barrier() __asm ("isync"  ::: "memory")
+#if defined(_ARCH_PWR4)
+/* For ISA 2.0 or later we can use light weight sync.  */
+#define __arch_sas_read_barrier()  __asm ("lwsync" ::: "memory")
+#else
 #define __arch_sas_read_barrier()  __asm ("sync"   ::: "memory")
+#endif
 #define __arch_sas_full_barrier()  __asm ("sync"   ::: "memory")
+#endif
+
+#if defined(_ARCH_PWR7)
+/* For ISA 2.6 or later we can change the thread priority.  */
+#define __arch_sas_PPR_low()  __asm ("or 1,1,1;" ::: "memory")
+#define __arch_sas_PPR_medium_low()  __asm ("or 6,6,6;" ::: "memory")
+#define __arch_sas_PPR_medium()  __asm ("or 2,2,2;" ::: "memory")
 #endif
 
 #if defined(__64BIT__) || defined(__powerpc64__) || defined(__ppc64__)

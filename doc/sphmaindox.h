@@ -279,10 +279,11 @@ int main ()
 *  - sphlflogger.h Lock Free Logger
 *  - sphlogportal.h Lock Free Portal/Multiplexer for Loggers
 *  - sphlflogentry.h Logger Entry access API
+*  - sphdirectpcqueue.h Lock Free Direct Single Producer / Single Consumer Queue
 *  - sphsinglepcqueue.h Lock Free Single Producer / Single Consumer Queue
 *  - sphlfentry.h SPH Entry access API
 *
-*  \subsection SPH MultiCore Utilitary functions
+*  \subsection SPH MultiCore Utility functions
 *  - sphtimer.h APIs to access the high resolution timer and timer frequency
 *  - sphthread.h APIs to identify processes and threads
 **/

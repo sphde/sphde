@@ -25,16 +25,22 @@
 #include "sasatom.h"
 #include "sassim.h"
 #include "saslock.h"
-#include "sphsinglepcqueue.h"
+#include "sphdirectpcqueue.h"
 #include "sphthread.h"
 
+#define __SPHSPCQUEUE_V1 1
 //#undef __SASDebugPrint__
 
 typedef struct SPHPCQueueHeader
 {
   SASBlockHeader blockHeader;
+#if __SPHSPCQUEUE_V1
+  longPtr_t old_qhead;
+  longPtr_t Old_qtail;
+#else
   longPtr_t qhead;
   longPtr_t qtail;
+#endif
   longPtr_t startq;
   longPtr_t endq;
   longPtr_t align_mask;
@@ -48,12 +54,22 @@ typedef struct SPHPCQueueHeader
   unsigned short default_entry_stride;
   unsigned short dummy5;
 #endif
+#if __SPHSPCQUEUE_V1
+  void *dummy6;
+  longPtr_t qhead;
+//  void * dummy7[15];
+  longPtr_t qtail;
+#endif
   freeNode *headerFreeSpace;
 } SPHPCQueueHeader;
 
 #ifdef __LP64__
 #define HEAP_OFFSET 128
+#if 1
 #define DEFAULT_PAGE 256
+#else
+#define DEFAULT_PAGE 384
+#endif
 #else
 #define HEAP_OFFSET 64
 #define DEFAULT_PAGE 256
@@ -103,6 +119,12 @@ SPHSinglePCQueueInitInternal (void *buf_seg, sas_type_t sasType,
 #ifdef __SASDebugPrint__
   sas_printf ("SPHSinglePCQueueInitInternal() qStart=%p, qEnd=%p\n",
 	      qStart, qEnd);
+  sas_printf ("SPHSinglePCQueueInitInternal() offsetof(startq)=%lx, offsetof(endq)=%lx\n",
+      __builtin_offsetof(struct SPHPCQueueHeader, startq),
+      __builtin_offsetof(struct SPHPCQueueHeader, endq));
+  sas_printf ("SPHSinglePCQueueInitInternal() offsetof(qhead)=%lx, offsetof(qtail)=%lx\n",
+      __builtin_offsetof(struct SPHPCQueueHeader, qhead),
+      __builtin_offsetof(struct SPHPCQueueHeader, qtail));
 #endif
   heapBlock->qhead = (longPtr_t) qStart;
   heapBlock->qtail = (longPtr_t) qStart;
@@ -175,6 +197,28 @@ SPHSinglePCQueueCreateWithStride (block_size_t buf_size,
     }
   else
     return NULL;
+}
+
+int
+SPHSinglePCQueueGetStride (SPHSinglePCQueue_t queue)
+{
+  SPHPCQueueHeader *headerBlock = (SPHPCQueueHeader *) queue;
+  int rc = 0;
+
+  if (SOMSASCheckBlockSigAndType ((SASBlockHeader *) headerBlock,
+                                  SAS_RUNTIME_PCQUEUE))
+    {
+        rc = headerBlock->default_entry_stride;
+    }
+  else
+    {
+        rc = -1;
+#ifdef __SASDebugPrint__
+        sas_printf ("SPHSinglePCQueueGetStride(%p) type check failed\n", queue);
+#endif
+     }
+
+  return (rc);
 }
 
 int
@@ -373,6 +417,483 @@ SPHSinglePCQueueAllocRaw (SPHSinglePCQueue_t queue)
   return (void *) queue_entry;
 }
 
+SPHLFEntryDirect_t
+SPHSinglePCQueueAllocStrideDirect (SPHSinglePCQueue_t queue)
+{
+  SPHPCQueueHeader *headerBlock = (SPHPCQueueHeader *) queue;
+  longPtr_t alloc_round = 0;
+  longPtr_t head;
+  longPtr_t queue_entry = 0;
+
+  if (SOMSASCheckBlockSigAndType ((SASBlockHeader *) headerBlock,
+                                  SAS_RUNTIME_PCQUEUE))
+    {                           /* for Strided alloc increment is pre rounded */
+      SPHLFEntryHeader_t *entryPtr;
+      sphLFEntry_t entrytemp;
+
+      queue_entry = headerBlock->qhead;
+      entryPtr = (SPHLFEntryHeader_t *) queue_entry;
+
+      head = queue_entry + headerBlock->default_entry_stride;
+      alloc_round = headerBlock->default_entry_stride;
+      if (head >= headerBlock->endq)
+        head = headerBlock->startq;
+
+      if ((head != headerBlock->qtail)
+          && !entryPtr->entryID.detail.valid
+          && !entryPtr->entryID.detail.allocated)
+        {
+          /* Not full so safe to allocate */
+          entrytemp.detail.valid = 0;
+          entrytemp.detail.timestamped = 0;
+          entrytemp.detail.allocated = 1;
+          entrytemp.detail.__reserved = 0;
+          entrytemp.detail.category = 0;
+          entrytemp.detail.subcat = 0;
+          entrytemp.detail.len = (alloc_round / DEFAULT_ALLOC_UNIT);
+          entryPtr->entryID.idUnit = entrytemp.idUnit;
+          /* allocate the entry */
+          headerBlock->qhead = head;
+        }
+      else
+        {
+          queue_entry = 0;
+#ifdef __SASDebugPrint__
+          sas_printf
+            ("SPHSinglePCQueueAllocStrideDirect(%p, %ld) alloc failed opt=%x\n",
+             queue, alloc_round, headerBlock->options);
+#endif
+        }
+#ifdef __SASDebugPrint__
+    }
+  else
+    {
+      sas_printf
+        ("SPHSinglePCQueueAllocStrideDirect(%p, %ld) type check failed\n",
+         queue, alloc_round);
+#endif
+    }
+  return ((SPHLFEntryDirect_t)queue_entry);
+}
+
+SPHLFEntryDirect_t
+SPHSinglePCQueueAllocStrideDirectSpin (SPHSinglePCQueue_t queue)
+{
+  volatile SPHPCQueueHeader *headerBlock = (SPHPCQueueHeader *) queue;
+  longPtr_t alloc_round = 0;
+  longPtr_t head;
+  longPtr_t queue_entry = 0;
+
+  if (SOMSASCheckBlockSigAndType ((SASBlockHeader *) headerBlock,
+                                  SAS_RUNTIME_PCQUEUE))
+    {                           /* for Strided alloc increment is pre rounded */
+      SPHLFEntryHeader_t *entryPtr;
+      sphLFEntry_t entrytemp;
+
+      queue_entry = headerBlock->qhead;
+
+      alloc_round = headerBlock->default_entry_stride;
+      head = queue_entry + alloc_round;
+      if (head >= headerBlock->endq)
+        head = headerBlock->startq;
+
+      entryPtr = (SPHLFEntryHeader_t *) queue_entry;
+      entrytemp.detail.valid = 0;
+      entrytemp.detail.timestamped = 0;
+      entrytemp.detail.allocated = 1;
+      entrytemp.detail.__reserved = 0;
+      entrytemp.detail.category = 0;
+      entrytemp.detail.subcat = 0;
+      entrytemp.detail.len = (alloc_round / DEFAULT_ALLOC_UNIT);
+
+      if ((head != headerBlock->qtail)
+          && !entryPtr->entryID.detail.valid
+          && !entryPtr->entryID.detail.allocated)
+        {
+        }
+      else
+        {
+        /* only the producer changes qhead so only have to spin on
+         * qtail changing.  */
+          while (head == headerBlock->qtail)
+            {
+              sas_code_barrier ();
+            }
+
+          while (entryPtr->entryID.detail.valid
+              || entryPtr->entryID.detail.allocated)
+            {
+              sas_code_barrier ();
+            }
+        }
+      /* Not full so safe to allocate */
+      entryPtr->entryID.idUnit = entrytemp.idUnit;
+      /* allocate the entry */
+      headerBlock->qhead = head;
+#ifdef __SASDebugPrint__
+    }
+  else
+    {
+      sas_printf
+        ("SPHSinglePCQueueAllocStrideDirect(%p, %ld) type check failed\n",
+         queue, alloc_round);
+#endif
+    }
+  return ((SPHLFEntryDirect_t)queue_entry);
+}
+
+SPHLFEntryDirect_t
+SPHSinglePCQueueAllocStrideDirectSpinPause (SPHSinglePCQueue_t queue)
+{
+  volatile SPHPCQueueHeader *headerBlock = (SPHPCQueueHeader *) queue;
+  longPtr_t alloc_round = 0;
+  longPtr_t head;
+  longPtr_t queue_entry = 0;
+
+  if (SOMSASCheckBlockSigAndType ((SASBlockHeader *) headerBlock,
+                                  SAS_RUNTIME_PCQUEUE))
+    {                           /* for Strided alloc increment is pre rounded */
+      SPHLFEntryHeader_t *entryPtr;
+      sphLFEntry_t entrytemp;
+
+      queue_entry = headerBlock->qhead;
+
+      alloc_round = headerBlock->default_entry_stride;
+      head = queue_entry + alloc_round;
+      if (head >= headerBlock->endq)
+        head = headerBlock->startq;
+
+      entryPtr = (SPHLFEntryHeader_t *) queue_entry;
+      entrytemp.detail.valid = 0;
+      entrytemp.detail.timestamped = 0;
+      entrytemp.detail.allocated = 1;
+      entrytemp.detail.__reserved = 0;
+      entrytemp.detail.category = 0;
+      entrytemp.detail.subcat = 0;
+      entrytemp.detail.len = (alloc_round / DEFAULT_ALLOC_UNIT);
+
+      if ((head != headerBlock->qtail)
+          && !entryPtr->entryID.detail.valid
+          && !entryPtr->entryID.detail.allocated)
+        {
+        }
+      else
+        {
+#if defined(_ARCH_PWR7)
+          __arch_sas_PPR_low();
+#endif
+        /* only the producer changes qhead so only have to spin on
+         * qtail changing.  */
+          while (head == headerBlock->qtail)
+            {
+#if __powerpc__
+              sas_code_barrier ();
+#else
+              __arch_pause();
+#endif
+            }
+
+          while (entryPtr->entryID.detail.valid
+              || entryPtr->entryID.detail.allocated)
+            {
+#if __powerpc__
+              sas_code_barrier ();
+#else
+              __arch_pause();
+#endif
+            }
+#if defined(_ARCH_PWR7)
+          __arch_sas_PPR_medium();
+#endif
+        }
+      /* Not full so safe to allocate */
+      entryPtr->entryID.idUnit = entrytemp.idUnit;
+      /* allocate the entry */
+      headerBlock->qhead = head;
+#ifdef __SASDebugPrint__
+    }
+  else
+    {
+      sas_printf
+        ("SPHSinglePCQueueAllocStrideDirect(%p, %ld) type check failed\n",
+         queue, alloc_round);
+#endif
+    }
+  return ((SPHLFEntryDirect_t)queue_entry);
+}
+
+int
+SPHSinglePCQueueEntryIsCompleteDirect (SPHLFEntryDirect_t directHandle)
+{
+  SPHLFEntryHeader_t *entryPtr = (SPHLFEntryHeader_t*)directHandle;
+
+  return (entryPtr->entryID.detail.valid == 1);
+}
+
+SPHLFEntryDirect_t
+SPHSinglePCQueueGetNextCompleteDirectSpin (SPHSinglePCQueue_t queue)
+{
+  volatile SPHPCQueueHeader *headerBlock = (SPHPCQueueHeader *) queue;
+  longPtr_t queue_entry = 0;
+
+  if (SOMSASCheckBlockSigAndType ((SASBlockHeader *) headerBlock,
+                                  SAS_RUNTIME_PCQUEUE))
+    {                           /* for Strided alloc increment is pre rounded */
+      volatile SPHLFEntryHeader_t *entryPtr;
+      sphLFEntry_t entrytemp;
+
+      queue_entry = headerBlock->qtail;
+      entryPtr = (SPHLFEntryHeader_t *) queue_entry;
+      entrytemp.idUnit = entryPtr->entryID.idUnit;
+
+      if (headerBlock->qhead != queue_entry
+          && entrytemp.detail.valid && entrytemp.detail.allocated)
+        {
+          sas_read_barrier ();
+        }
+      else
+        {
+    	  while (headerBlock->qhead == queue_entry)
+    	    {
+              sas_code_barrier ();
+    	    }
+
+          entrytemp.idUnit = entryPtr->entryID.idUnit;
+    	  while (!entrytemp.detail.valid || !entrytemp.detail.allocated)
+  	    {
+              sas_code_barrier ();
+              entrytemp.idUnit = entryPtr->entryID.idUnit;
+             }
+           sas_read_barrier ();
+        }
+#ifdef __SASDebugPrint__
+    }
+  else
+    {
+      sas_printf
+        ("SPHSinglePCQueueGetNextCompleteDirect(%p, %ld) type check failed\n",
+         queue, alloc_round);
+#endif
+    }
+  return ((SPHLFEntryDirect_t)queue_entry);
+}
+
+SPHLFEntryDirect_t
+SPHSinglePCQueueGetNextCompleteDirectSpinPause (SPHSinglePCQueue_t queue)
+{
+  volatile SPHPCQueueHeader *headerBlock = (SPHPCQueueHeader *) queue;
+  longPtr_t queue_entry = 0;
+
+  if (SOMSASCheckBlockSigAndType ((SASBlockHeader *) headerBlock,
+                                  SAS_RUNTIME_PCQUEUE))
+    {                           /* for Strided alloc increment is pre rounded */
+      volatile SPHLFEntryHeader_t *entryPtr;
+      sphLFEntry_t entrytemp;
+
+      queue_entry = headerBlock->qtail;
+      entryPtr = (SPHLFEntryHeader_t *) queue_entry;
+      entrytemp.idUnit = entryPtr->entryID.idUnit;
+
+      if (headerBlock->qhead != queue_entry
+          && entrytemp.detail.valid && entrytemp.detail.allocated)
+        {
+          sas_read_barrier ();
+        }
+      else
+        {
+#if defined(_ARCH_PWR7)
+          __arch_sas_PPR_low();
+#endif
+          while (headerBlock->qhead == queue_entry)
+            {
+#if __powerpc__
+              sas_code_barrier ();
+#else
+              __arch_pause();
+#endif
+            }
+
+          entrytemp.idUnit = entryPtr->entryID.idUnit;
+          while (!entrytemp.detail.valid || !entrytemp.detail.allocated)
+                {
+#if __powerpc__
+              sas_code_barrier ();
+#else
+              __arch_pause();
+#endif
+              entrytemp.idUnit = entryPtr->entryID.idUnit;
+                }
+#if defined(_ARCH_PWR7)
+          __arch_sas_PPR_medium();
+#endif
+           sas_read_barrier ();
+        }
+#ifdef __SASDebugPrint__
+    }
+  else
+    {
+      sas_printf
+        ("SPHSinglePCQueueGetNextCompleteDirect(%p, %ld) type check failed\n",
+         queue, alloc_round);
+#endif
+    }
+  return ((SPHLFEntryDirect_t)queue_entry);
+}
+
+SPHLFEntryDirect_t
+SPHSinglePCQueueGetNextCompleteDirect (SPHSinglePCQueue_t queue)
+{
+  SPHPCQueueHeader *headerBlock = (SPHPCQueueHeader *) queue;
+  longPtr_t queue_entry = 0;
+
+  if (SOMSASCheckBlockSigAndType ((SASBlockHeader *) headerBlock,
+                                  SAS_RUNTIME_PCQUEUE))
+    {                           /* for Strided alloc increment is pre rounded */
+      SPHLFEntryHeader_t *entryPtr;
+      sphLFEntry_t entrytemp;
+
+      queue_entry = headerBlock->qtail;
+      entryPtr = (SPHLFEntryHeader_t *) queue_entry;
+      entrytemp.idUnit = entryPtr->entryID.idUnit;
+
+      if (headerBlock->qhead != queue_entry
+          && entrytemp.detail.valid && entrytemp.detail.allocated)
+        {
+          sas_read_barrier ();
+        }
+      else
+        {
+          queue_entry = 0;
+        }
+#ifdef __SASDebugPrint__
+    }
+  else
+    {
+      sas_printf
+        ("SPHSinglePCQueueGetNextCompleteDirect(%p, %ld) type check failed\n",
+         queue, alloc_round);
+#endif
+    }
+  return ((SPHLFEntryDirect_t)queue_entry);
+}
+
+SPHLFEntryDirect_t
+SPHSinglePCQueueGetNextEntryDirect (SPHSinglePCQueue_t queue)
+{
+  SPHPCQueueHeader *headerBlock = (SPHPCQueueHeader *) queue;
+  longPtr_t queue_entry = 0;
+
+  if (SOMSASCheckBlockSigAndType ((SASBlockHeader *) headerBlock,
+                                  SAS_RUNTIME_PCQUEUE))
+    {                           /* for Strided alloc increment is pre rounded */
+      SPHLFEntryHeader_t *entryPtr;
+      sphLFEntry_t entrytemp;
+
+//      sas_read_barrier ();
+      queue_entry = headerBlock->qtail;
+      entryPtr = (SPHLFEntryHeader_t *) queue_entry;
+      entrytemp.idUnit = entryPtr->entryID.idUnit;
+
+      if (headerBlock->qhead != queue_entry
+          && entrytemp.detail.allocated)
+        {
+          sas_read_barrier ();
+        }
+      else
+        {
+          queue_entry = 0;
+        }
+#ifdef __SASDebugPrint__
+    }
+  else
+    {
+      sas_printf
+        ("SPHSinglePCQueueGetNextEntryDirect(%p, %ld) type check failed\n",
+         queue, alloc_round);
+#endif
+    }
+  return ((SPHLFEntryDirect_t)queue_entry);
+}
+
+int
+SPHSinglePCQueueFreeNextEntryDirect (SPHSinglePCQueue_t queue,
+                                     SPHLFEntryDirect_t next_entry)
+{
+  SPHPCQueueHeader *headerBlock = (SPHPCQueueHeader *) queue;
+  longPtr_t queue_entry, tail;
+  int rc = 0;
+
+  if (SOMSASCheckBlockSigAndType ((SASBlockHeader *) headerBlock,
+                                  SAS_RUNTIME_PCQUEUE))
+    {                           /* for Strided alloc increment is pre rounded */
+      SPHLFEntryHeader_t *entryPtr;
+      sphLFEntry_t entrytemp;
+
+      queue_entry = (longPtr_t) next_entry;
+      entryPtr = (SPHLFEntryHeader_t *) next_entry;
+      entrytemp.idUnit = entryPtr->entryID.idUnit;
+
+      tail = queue_entry + headerBlock->default_entry_stride;
+      if (tail >= headerBlock->endq)
+        tail = headerBlock->startq;
+
+      if (headerBlock->qhead != queue_entry
+          && entrytemp.detail.valid && entrytemp.detail.allocated)
+        {
+          /* Mark the entry unallocated and bump the queue tail pointer.
+           * This must be safe as only the consumer thread modifies
+           * the queue tail.
+           */
+          entryPtr->entryID.idUnit = 0;
+//          sas_write_barrier ();
+          headerBlock->qtail = tail;
+          rc = 1;
+        }
+#ifdef __SASDebugPrint__
+    }
+  else
+    {
+      sas_printf
+        ("SPHSinglePCQueueFreeNextEntry(%p) type check failed\n",
+         queue);
+#endif
+    }
+  return rc;
+}
+
+sphLFEntryID_t
+SPHSinglePCQueueGetEntryTemplate (SPHSinglePCQueue_t queue)
+{
+  SPHPCQueueHeader *headerBlock = (SPHPCQueueHeader *) queue;
+  longPtr_t alloc_round = 0;
+  sphLFEntry_t entrytemp;
+
+  entrytemp.idUnit = 0;
+  if (SOMSASCheckBlockSigAndType ((SASBlockHeader *) headerBlock,
+                                  SAS_RUNTIME_PCQUEUE))
+    {  /* for Strided alloc increment is pre rounded */
+      alloc_round = headerBlock->default_entry_stride;
+      /* initialize common entry details.  */
+      entrytemp.detail.valid = 0;
+      entrytemp.detail.timestamped = 0;
+      entrytemp.detail.allocated = 1;
+      entrytemp.detail.__reserved = 0;
+      entrytemp.detail.category = 0;
+      entrytemp.detail.subcat = 0;
+      entrytemp.detail.len = (alloc_round / DEFAULT_ALLOC_UNIT);
+
+#ifdef __SASDebugPrint__
+    }
+  else
+    {
+      sas_printf
+        ("SPHSinglePCQueueGetEntryTemplate(%p, %ld) type check failed\n",
+         queue, alloc_round);
+#endif
+    }
+  return (entrytemp.idUnit);
+}
+
 SPHLFEntryHandle_t *
 SPHSinglePCQueueAllocStrideEntry (SPHSinglePCQueue_t queue,
 				  int catcode, int subcode,
@@ -429,7 +950,7 @@ SPHSinglePCQueueAllocStrideEntry (SPHSinglePCQueue_t queue,
 	  handlespace = NULL;
 #ifdef __SASDebugPrint__
 	  sas_printf
-	    ("SPHSinglePCQueueAllocStrideTimeStamped(%p, %ld) alloc failed opt=%x\n",
+	    ("SPHSinglePCQueueAllocStrideEntry(%p, %ld) alloc failed opt=%x\n",
 	     queue, alloc_round, headerBlock->options);
 #endif
 	}
@@ -438,7 +959,7 @@ SPHSinglePCQueueAllocStrideEntry (SPHSinglePCQueue_t queue,
   else
     {
       sas_printf
-	("SPHSinglePCQueueAllocStrideTimeStamped(%p, %ld) type check failed\n",
+	("SPHSinglePCQueueAllocStrideEntry(%p, %ld) type check failed\n",
 	 queue, alloc_round);
 #endif
     }
@@ -637,8 +1158,8 @@ SPHSinglePCQueueFreeNextEntry (SPHSinglePCQueue_t queue)
 	   * the queue tail.
 	   */
 	  entryPtr->entryID.idUnit = 0;
+          sas_write_barrier ();
 	  headerBlock->qtail = tail;
-	  sas_write_barrier ();
 	  rc = 1;
 	}
 #ifdef __SASDebugPrint__

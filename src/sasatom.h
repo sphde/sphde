@@ -56,6 +56,11 @@ typedef void*         sas_lock_ptr_t;
 #define sas_full_barrier()  __arch_sas_full_barrier()
 
 /*!
+ * Memory barrier for compiler code motion.
+ */
+#define sas_code_barrier()  __asm ("" ::: "memory")
+
+/*!
  * Atomic fetch and add operation on memory referenced by \a pointer.
  *
  * Performs the atomic operation:

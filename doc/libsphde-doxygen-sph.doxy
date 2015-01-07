@@ -592,6 +592,7 @@ INPUT                  = \
 	$(SRCDIR)/src/sasindexkey.h \
 	$(SRCDIR)/src/sasindexenum.h \
 	$(SRCDIR)/src/sphsinglepcqueue.h \
+	$(SRCDIR)/src/sphdirectpcqueue.h \
 	$(SRCDIR)/src/sphtimer.h \
 	$(SRCDIR)/src/sphthread.h \
 	$(SRCDIR)/src/sphgtod.h

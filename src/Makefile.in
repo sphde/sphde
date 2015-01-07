@@ -45,7 +45,7 @@ TESTS = sphgtod_t$(EXEEXT) sasatom_t$(EXEEXT) bitvec_t$(EXEEXT) \
 	sphcontext_t$(EXEEXT) sasindex_t$(EXEEXT) sasindex_tt$(EXEEXT) \
 	sasstringbtree_t$(EXEEXT) sasstringbtree_tt$(EXEEXT) \
 	sphsinglepcqueue_t$(EXEEXT) sphsinglepcqueue_tt$(EXEEXT) \
-	sphsinglepcqueue_ttt$(EXEEXT)
+	sphsinglepcqueue_ttt$(EXEEXT) sphdirectpcqueue_ttt$(EXEEXT)
 noinst_PROGRAMS = $(am__EXEEXT_1)
 subdir = src
 DIST_COMMON = $(libsphdeinclude_HEADERS) $(libsphgtodinclude_HEADERS) \
@@ -121,7 +121,7 @@ am__EXEEXT_1 = sphgtod_t$(EXEEXT) sasatom_t$(EXEEXT) bitvec_t$(EXEEXT) \
 	sphcontext_t$(EXEEXT) sasindex_t$(EXEEXT) sasindex_tt$(EXEEXT) \
 	sasstringbtree_t$(EXEEXT) sasstringbtree_tt$(EXEEXT) \
 	sphsinglepcqueue_t$(EXEEXT) sphsinglepcqueue_tt$(EXEEXT) \
-	sphsinglepcqueue_ttt$(EXEEXT)
+	sphsinglepcqueue_ttt$(EXEEXT) sphdirectpcqueue_ttt$(EXEEXT)
 PROGRAMS = $(bin_PROGRAMS) $(noinst_PROGRAMS)
 am_bitvec_t_OBJECTS = bitvec_t.$(OBJEXT)
 bitvec_t_OBJECTS = $(am_bitvec_t_OBJECTS)
@@ -150,6 +150,9 @@ sasutil_DEPENDENCIES = libsphde.la
 am_sphcontext_t_OBJECTS = sphcontext_t.$(OBJEXT)
 sphcontext_t_OBJECTS = $(am_sphcontext_t_OBJECTS)
 sphcontext_t_DEPENDENCIES = libsphde.la
+am_sphdirectpcqueue_ttt_OBJECTS = sphdirectpcqueue_ttt.$(OBJEXT)
+sphdirectpcqueue_ttt_OBJECTS = $(am_sphdirectpcqueue_ttt_OBJECTS)
+sphdirectpcqueue_ttt_DEPENDENCIES = libsphde.la
 am_sphgtod_t_OBJECTS = sphgtod_t.$(OBJEXT)
 sphgtod_t_OBJECTS = $(am_sphgtod_t_OBJECTS)
 sphgtod_t_DEPENDENCIES = .libs/libsphgtod.a libsphde.la
@@ -217,23 +220,23 @@ SOURCES = $(libsphde_la_SOURCES) $(libsphgtod_la_SOURCES) \
 	$(sasindex_tt_SOURCES) $(sassim_t_SOURCES) \
 	$(sasstringbtree_t_SOURCES) $(sasstringbtree_tt_SOURCES) \
 	$(sasutil_SOURCES) $(sphcontext_t_SOURCES) \
-	$(sphgtod_t_SOURCES) $(sphlflogger_t_SOURCES) \
-	$(sphlflogger_tt_SOURCES) $(sphlflogger_ttt_SOURCES) \
-	$(sphlockfreeheap_t_SOURCES) $(sphlogportal_t_SOURCES) \
-	$(sphlogportal_tt_SOURCES) $(sphsinglepcqueue_t_SOURCES) \
-	$(sphsinglepcqueue_tt_SOURCES) $(sphsinglepcqueue_ttt_SOURCES) \
-	$(sphthread_t_SOURCES)
+	$(sphdirectpcqueue_ttt_SOURCES) $(sphgtod_t_SOURCES) \
+	$(sphlflogger_t_SOURCES) $(sphlflogger_tt_SOURCES) \
+	$(sphlflogger_ttt_SOURCES) $(sphlockfreeheap_t_SOURCES) \
+	$(sphlogportal_t_SOURCES) $(sphlogportal_tt_SOURCES) \
+	$(sphsinglepcqueue_t_SOURCES) $(sphsinglepcqueue_tt_SOURCES) \
+	$(sphsinglepcqueue_ttt_SOURCES) $(sphthread_t_SOURCES)
 DIST_SOURCES = $(libsphde_la_SOURCES) $(libsphgtod_la_SOURCES) \
 	$(bitvec_t_SOURCES) $(sasatom_t_SOURCES) $(sasindex_t_SOURCES) \
 	$(sasindex_tt_SOURCES) $(sassim_t_SOURCES) \
 	$(sasstringbtree_t_SOURCES) $(sasstringbtree_tt_SOURCES) \
 	$(sasutil_SOURCES) $(sphcontext_t_SOURCES) \
-	$(sphgtod_t_SOURCES) $(sphlflogger_t_SOURCES) \
-	$(sphlflogger_tt_SOURCES) $(sphlflogger_ttt_SOURCES) \
-	$(sphlockfreeheap_t_SOURCES) $(sphlogportal_t_SOURCES) \
-	$(sphlogportal_tt_SOURCES) $(sphsinglepcqueue_t_SOURCES) \
-	$(sphsinglepcqueue_tt_SOURCES) $(sphsinglepcqueue_ttt_SOURCES) \
-	$(sphthread_t_SOURCES)
+	$(sphdirectpcqueue_ttt_SOURCES) $(sphgtod_t_SOURCES) \
+	$(sphlflogger_t_SOURCES) $(sphlflogger_tt_SOURCES) \
+	$(sphlflogger_ttt_SOURCES) $(sphlockfreeheap_t_SOURCES) \
+	$(sphlogportal_t_SOURCES) $(sphlogportal_tt_SOURCES) \
+	$(sphsinglepcqueue_t_SOURCES) $(sphsinglepcqueue_tt_SOURCES) \
+	$(sphsinglepcqueue_ttt_SOURCES) $(sphthread_t_SOURCES)
 HEADERS = $(libsphdeinclude_HEADERS) $(libsphgtodinclude_HEADERS)
 ETAGS = etags
 CTAGS = ctags
@@ -417,6 +420,7 @@ libsphdeinclude_HEADERS = \
 	sasstringbtreeenum.h \
 	sasstringbtreenode.h \
 	sphsinglepcqueue.h \
+	sphdirectpcqueue.h \
 	sphlfentry.h \
 	sphlflogentry.h \
 	sphlflogger.h \
@@ -532,6 +536,8 @@ sphsinglepcqueue_tt_SOURCES = tests/sphsinglepcqueue_tt.c
 sphsinglepcqueue_tt_LDADD = libsphde.la
 sphsinglepcqueue_ttt_SOURCES = tests/sphsinglepcqueue_ttt.c
 sphsinglepcqueue_ttt_LDADD = libsphde.la
+sphdirectpcqueue_ttt_SOURCES = tests/sphdirectpcqueue_ttt.c
+sphdirectpcqueue_ttt_LDADD = libsphde.la
 all: all-am
 
 .SUFFIXES:
@@ -680,6 +686,9 @@ sasutil$(EXEEXT): $(sasutil_OBJECTS) $(sasutil_DEPENDENCIES)
 sphcontext_t$(EXEEXT): $(sphcontext_t_OBJECTS) $(sphcontext_t_DEPENDENCIES) 
 	@rm -f sphcontext_t$(EXEEXT)
 	$(LINK) $(sphcontext_t_OBJECTS) $(sphcontext_t_LDADD) $(LIBS)
+sphdirectpcqueue_ttt$(EXEEXT): $(sphdirectpcqueue_ttt_OBJECTS) $(sphdirectpcqueue_ttt_DEPENDENCIES) 
+	@rm -f sphdirectpcqueue_ttt$(EXEEXT)
+	$(LINK) $(sphdirectpcqueue_ttt_OBJECTS) $(sphdirectpcqueue_ttt_LDADD) $(LIBS)
 sphgtod_t$(EXEEXT): $(sphgtod_t_OBJECTS) $(sphgtod_t_DEPENDENCIES) 
 	@rm -f sphgtod_t$(EXEEXT)
 	$(LINK) $(sphgtod_t_OBJECTS) $(sphgtod_t_LDADD) $(LIBS)
@@ -759,6 +768,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sasstringbtree_tt.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sasutil.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sphcontext_t.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sphdirectpcqueue_ttt.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sphgtod_t.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sphlflogger_t.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sphlflogger_tt-sphlflogger_tt.Po@am__quote@
@@ -965,6 +975,20 @@ sphcontext_t.obj: tests/sphcontext_t.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='tests/sphcontext_t.c' object='sphcontext_t.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o sphcontext_t.obj `if test -f 'tests/sphcontext_t.c'; then $(CYGPATH_W) 'tests/sphcontext_t.c'; else $(CYGPATH_W) '$(srcdir)/tests/sphcontext_t.c'; fi`
+
+sphdirectpcqueue_ttt.o: tests/sphdirectpcqueue_ttt.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT sphdirectpcqueue_ttt.o -MD -MP -MF $(DEPDIR)/sphdirectpcqueue_ttt.Tpo -c -o sphdirectpcqueue_ttt.o `test -f 'tests/sphdirectpcqueue_ttt.c' || echo '$(srcdir)/'`tests/sphdirectpcqueue_ttt.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/sphdirectpcqueue_ttt.Tpo $(DEPDIR)/sphdirectpcqueue_ttt.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='tests/sphdirectpcqueue_ttt.c' object='sphdirectpcqueue_ttt.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o sphdirectpcqueue_ttt.o `test -f 'tests/sphdirectpcqueue_ttt.c' || echo '$(srcdir)/'`tests/sphdirectpcqueue_ttt.c
+
+sphdirectpcqueue_ttt.obj: tests/sphdirectpcqueue_ttt.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT sphdirectpcqueue_ttt.obj -MD -MP -MF $(DEPDIR)/sphdirectpcqueue_ttt.Tpo -c -o sphdirectpcqueue_ttt.obj `if test -f 'tests/sphdirectpcqueue_ttt.c'; then $(CYGPATH_W) 'tests/sphdirectpcqueue_ttt.c'; else $(CYGPATH_W) '$(srcdir)/tests/sphdirectpcqueue_ttt.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/sphdirectpcqueue_ttt.Tpo $(DEPDIR)/sphdirectpcqueue_ttt.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='tests/sphdirectpcqueue_ttt.c' object='sphdirectpcqueue_ttt.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o sphdirectpcqueue_ttt.obj `if test -f 'tests/sphdirectpcqueue_ttt.c'; then $(CYGPATH_W) 'tests/sphdirectpcqueue_ttt.c'; else $(CYGPATH_W) '$(srcdir)/tests/sphdirectpcqueue_ttt.c'; fi`
 
 sphgtod_t.o: tests/sphgtod_t.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT sphgtod_t.o -MD -MP -MF $(DEPDIR)/sphgtod_t.Tpo -c -o sphgtod_t.o `test -f 'tests/sphgtod_t.c' || echo '$(srcdir)/'`tests/sphgtod_t.c
