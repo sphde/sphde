@@ -535,7 +535,7 @@ SPHSinglePCQueueAllocStrideDirectSpin (SPHSinglePCQueue_t queue)
   else
     {
       sas_printf
-        ("SPHSinglePCQueueAllocStrideDirect(%p, %ld) type check failed\n",
+        ("SPHSinglePCQueueAllocStrideDirectSpin(%p, %ld) type check failed\n",
          queue, alloc_round);
 #endif
     }
@@ -615,7 +615,7 @@ SPHSinglePCQueueAllocStrideDirectSpinPause (SPHSinglePCQueue_t queue)
   else
     {
       sas_printf
-        ("SPHSinglePCQueueAllocStrideDirect(%p, %ld) type check failed\n",
+        ("SPHSinglePCQueueAllocStrideDirectSpinPause(%p, %ld) type check failed\n",
          queue, alloc_round);
 #endif
     }
@@ -671,7 +671,7 @@ SPHSinglePCQueueGetNextCompleteDirectSpin (SPHSinglePCQueue_t queue)
   else
     {
       sas_printf
-        ("SPHSinglePCQueueGetNextCompleteDirect(%p, %ld) type check failed\n",
+        ("SPHSinglePCQueueGetNextCompleteDirectSpin(%p, %ld) type check failed\n",
          queue, alloc_round);
 #endif
     }
@@ -733,7 +733,7 @@ SPHSinglePCQueueGetNextCompleteDirectSpinPause (SPHSinglePCQueue_t queue)
   else
     {
       sas_printf
-        ("SPHSinglePCQueueGetNextCompleteDirect(%p, %ld) type check failed\n",
+        ("SPHSinglePCQueueGetNextCompleteDirectSpinPause(%p, %ld) type check failed\n",
          queue, alloc_round);
 #endif
     }

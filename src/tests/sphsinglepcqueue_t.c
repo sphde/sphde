@@ -93,7 +93,7 @@ lfpcqueue_stride_direct_test (char *x4k)
       if (handle)
         {
           printf
-            ("lfpcqueue_stride_direct_test SPHSinglePCQueueAllocStrideEntry(%p) = %p\n",
+            ("lfpcqueue_stride_direct_test SPHSinglePCQueueAllocStrideDirect(%p) = %p\n",
              pcqueue, handle);
 
           temp0 = (char *) SPHLFEntryDirectGetFreePtr (handle);
@@ -187,7 +187,7 @@ lfpcqueue_stride_direct_test (char *x4k)
       if (handle)
         {
           printf
-            ("lfpcqueue_stride_direct_test SPHSinglePCQueueAllocStrideEntry(%p) = %p\n",
+            ("lfpcqueue_stride_direct_test SPHSinglePCQueueAllocStrideDirect(%p) = %p\n",
              pcqueue, handle);
 
           temp1 = (char *) SPHLFEntryDirectGetFreePtr (handle);
@@ -257,7 +257,7 @@ lfpcqueue_stride_direct_test (char *x4k)
       if (handle)
         {
           printf
-            ("lfpcqueue_stride_direct_test SPHSinglePCQueueAllocStrideEntry(%p) = %p\n",
+            ("lfpcqueue_stride_direct_test SPHSinglePCQueueAllocStrideDirect(%p) = %p\n",
              pcqueue, handle);
 
           temp2 = (char *) SPHLFEntryDirectGetFreePtr (handle);
@@ -280,7 +280,7 @@ lfpcqueue_stride_direct_test (char *x4k)
           if (SPHSinglePCQueueEntryIsCompleteDirect (handle))
             {
               printf
-                ("error lfpcqueue_stride_direct_test SPHSinglePCQueueEntryIsComplete(%p) failed)\n",
+                ("error lfpcqueue_stride_direct_test SPHSinglePCQueueEntryIsCompleteDirect(%p) failed)\n",
                  handle);
               rc++;
             }
@@ -293,7 +293,7 @@ lfpcqueue_stride_direct_test (char *x4k)
               if (!SPHSinglePCQueueEntryIsCompleteDirect (handle))
                 {
                   printf
-                    ("error lfpcqueue_stride_direct_test SPHSinglePCQueueEntryIsComplete(%p) failed)\n",
+                    ("error lfpcqueue_stride_direct_test SPHSinglePCQueueEntryIsCompleteDirect(%p) failed)\n",
                      handle);
                   rc++;
                 }
@@ -600,7 +600,7 @@ lfpcqueue_stride_direct_test (char *x4k)
                   else
                     {
                       printf
-                        ("error lfpcqueue_stride_direct_test SPHSinglePCQueueEntryComplete(%p) failed)\n",
+                        ("error lfpcqueue_stride_direct_test SPHLFEntryDirectComplete(%p) failed)\n",
                          handle);
                       rc++;
                     }
@@ -644,7 +644,7 @@ lfpcqueue_stride_direct_test (char *x4k)
       if (handlex)
         {
           printf
-            ("lfpcqueue_stride_direct_test SPHSinglePCQueueGetNextComplete(%p) = %p succeed \n",
+            ("lfpcqueue_stride_direct_test SPHSinglePCQueueGetNextCompleteDirect(%p) = %p succeed \n",
              pcqueue, handlex);
           tempx = SPHLFEntryDirectGetFreePtr (handlex);
           if (tempx)
@@ -782,7 +782,7 @@ lfpcqueue_stride_direct_test (char *x4k)
           if (SPHSinglePCQueueFreeNextEntryDirect (pcqueue, handlex))
             {
               printf
-                ("lfpcqueue_stride_direct_test SPHSinglePCQueueFreeNextEntry(%p,%p) succeed \n",
+                ("lfpcqueue_stride_direct_test SPHSinglePCQueueFreeNextEntryDirect(%p,%p) succeed \n",
                  pcqueue, handlex);
               lfspace = SPHSinglePCQueueFreeSpace (pcqueue);
               if (lfspace != 128L)
@@ -2457,7 +2457,7 @@ lfpcqueue_stride_test (char *x4k)
 	  if (SPHSinglePCQueueFreeNextEntry (pcqueue))
 	    {
 	      printf
-		("lfpcqueue_stride_test SPHSinglePCQueueFreeNextEntryDirect(%p) succeed \n",
+		("lfpcqueue_stride_test SPHSinglePCQueueFreeNextEntry(%p) succeed \n",
 		 pcqueue);
 	      lfspace = SPHSinglePCQueueFreeSpace (pcqueue);
 	      if (lfspace != 128L)
@@ -2525,8 +2525,8 @@ lfpcqueue_stride_test (char *x4k)
 	  else
 	    {
 	      printf
-		("lfpcqueue_stride_test SPHSinglePCQueueFreeNextEntryDirect(%p,%p) failed\n",
-		 pcqueue, handlex);
+		("lfpcqueue_stride_test SPHSinglePCQueueFreeNextEntry(%p) failed\n",
+		 pcqueue);
 	      rc++;
 	    }
 	}
@@ -2566,11 +2566,11 @@ lfpcqueue_stride_test (char *x4k)
 	      rc++;
 	    }
 
-	  if (SPHSinglePCQueueFreeNextEntryDirect (pcqueue, handlex))
+	  if (SPHSinglePCQueueFreeNextEntry (pcqueue))
 	    {
 	      printf
-		("lfpcqueue_stride_test SPHSinglePCQueueFreeNextEntryDirect(%p,%p) succeed \n",
-		 pcqueue, handlex);
+		("lfpcqueue_stride_test SPHSinglePCQueueFreeNextEntry(%p) succeed \n",
+		 pcqueue);
 	      lfspace = SPHSinglePCQueueFreeSpace (pcqueue);
 	      if (lfspace != 128L)
 		{
@@ -2637,8 +2637,8 @@ lfpcqueue_stride_test (char *x4k)
 	  else
 	    {
 	      printf
-		("lfpcqueue_stride_test SPHSinglePCQueueFreeNextEntryDirect(%p,%p) failed\n",
-		 pcqueue, handlex);
+		("lfpcqueue_stride_test SPHSinglePCQueueFreeNextEntry(%p) failed\n",
+		 pcqueue);
 	      rc++;
 	    }
 	}
@@ -7101,28 +7101,28 @@ main (int argc, char *argv[])
   printf ("source_address=%p, dest_address=%p\n",
 	  source_address, dest_address);
 #if 1
-  rc =+ lfpcqueue_basic_test (source_address);
+  rc += lfpcqueue_basic_test (source_address);
 #endif
 #if 1
-  rc =+ lfpcqueue_stride_test (source_address);
+  rc += lfpcqueue_stride_test (source_address);
 #endif
 #if 1
-  rc =+ lfpcqueue_stride_direct_test (source_address);
+  rc += lfpcqueue_stride_direct_test (source_address);
 #endif
 #if 1
-  rc =+ lfpcqueue_stride_timestamp_test (source_address);
+  rc += lfpcqueue_stride_timestamp_test (source_address);
 #endif
 #if 1
-  rc =+ lfpcqueue_large_stride_test (source_address, 1024, 128);
+  rc += lfpcqueue_large_stride_test (source_address, 1024, 128);
 #endif
 #if 1
-  rc =+ lfpcqueue_large_stride_test (source_address, 2 * 1024, 256);
+  rc += lfpcqueue_large_stride_test (source_address, 2 * 1024, 256);
 #endif
 #if 1
-  rc =+ lfpcqueue_large_stride_test (source_address, 8 * 1024, 1024);
+  rc += lfpcqueue_large_stride_test (source_address, 8 * 1024, 1024);
 #endif
 #if 1
-  rc =+ lfpcqueue_large_stride_test (source_address, 16 * 1024, 2048);
+  rc += lfpcqueue_large_stride_test (source_address, 16 * 1024, 2048);
 #endif
   return (rc);
 }
