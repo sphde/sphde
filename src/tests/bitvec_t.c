@@ -1140,22 +1140,22 @@ int main(int argc, char *argv[])
 	printf("alloc_mask = %lu\n", cb.alloc_mask);
 	printf("alloc_shift = %zu\n", cb.alloc_shift);
 #ifdef CHECK_BITV_PRIMATIVES
-	rc =+ bitv_mask_gen_test();
-	rc =+ bitv_popcountl_one_test();
-	rc =+ bitv_mask_to_end_mrk_test();
-	rc =+ bitv_mask_to_start_mrk_test();
+	rc += bitv_mask_gen_test();
+	rc += bitv_popcountl_one_test();
+	rc += bitv_mask_to_end_mrk_test();
+	rc += bitv_mask_to_start_mrk_test();
 #endif
-	rc =+ bitv_alloc_test();
+	rc += bitv_alloc_test();
 
-	rc =+ bitv_dealloc_test();
+	rc += bitv_dealloc_test();
 
-	rc =+ bitv_aligned_alloc_test();
+	rc += bitv_aligned_alloc_test();
 
-	rc =+ bitv_alloc_marked_test();
+	rc += bitv_alloc_marked_test();
 
-	rc =+ bitv_aligned_alloc_marked_test();
+	rc += bitv_aligned_alloc_marked_test();
 
-	rc =+ bitv_free_marked_test();
+	rc += bitv_free_marked_test();
 	
 	return (rc);
 }

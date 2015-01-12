@@ -2508,27 +2508,27 @@ int main(int argc, char *argv[])
     printf ("source_address=%p, dest_address=%p\n",
             source_address, dest_address);
 #if 1
-    rc =+ lockfree_basic_test(source_address);
+    rc += lockfree_basic_test(source_address);
 #endif
 #if 1
-    rc =+ lockfree_align_test(source_address);
+    rc += lockfree_align_test(source_address);
 #endif
 #if 1
     setmemrange (a4k, b4k+stack_block_size);
 
-    rc =+ lockfree_near_test (source_address);
+    rc += lockfree_near_test (source_address);
 #endif
 #if 1
     setmemrange (a4k, b4k+stack_block_size);
-    rc =+ lockfree_large_test (source_address);
+    rc += lockfree_large_test (source_address);
 #endif
 #if 0
     setmemrange (a4k, b4k+stack_block_size);
-    rc =+ lockfree_cycle_test (source_address);
+    rc += lockfree_cycle_test (source_address);
 #endif
 #if 0
     setmemrange (a4k, b4k+stack_block_size);
-    rc =+ lockfree_recycle_test (source_address, dest_address);
+    rc += lockfree_recycle_test (source_address, dest_address);
 #endif
     return rc;
 }

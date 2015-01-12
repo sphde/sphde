@@ -1224,7 +1224,7 @@ int main(int argc, char *argv[])
     printf ("source_address=%p, dest_address=%p dest2_address=%p dest3_address=%p\n",
             source_address, dest_address, dest2_address, dest3_address);
 #if 1
-    rc =+ logportal_basic_test(source_address, dest_address,
+    rc += logportal_basic_test(source_address, dest_address,
     		dest2_address, dest3_address);
 #endif
     return rc;

@@ -1,5 +1,11 @@
 2015-01-12 Rajalakshmi Srinivasaraghavan <raji@linux.vnet.ibm.com>
 
+	* src/tests/bitvec_t.c (main): correct rc addition.
+	* src/tests/sphlockfreeheap_t.c (main): Likewise.
+	* src/tests/sphlogportal_t.c (main): Likewise.
+
+2015-01-12 Rajalakshmi Srinivasaraghavan <raji@linux.vnet.ibm.com>
+
 	* src/sphsinglepcqueue.cpp: Correct error messages.
 	* src/tests/sphsinglepcqueue_t.c: Likewise.
 
