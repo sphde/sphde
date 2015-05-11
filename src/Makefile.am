@@ -215,4 +215,4 @@ TESTS                 += sphdirectpcqueue_ttt
 sphdirectpcqueue_ttt_SOURCES = tests/sphdirectpcqueue_ttt.c
 sphdirectpcqueue_ttt_LDADD   = libsphde.la
 
-noinst_PROGRAMS = $(TESTS)
+check_PROGRAMS = $(TESTS)

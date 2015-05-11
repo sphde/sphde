@@ -1,3 +1,8 @@
+2015-05-11  Rajalakshmi Srinivasaraghavan  <raji@linux.vnet.ibm.com>
+
+	* src/Makefile.am: Change noinst_PROGRAMS to check_PROGRAMS.
+	* src/Makefile.in: Regenerate.
+
 2015-01-12 Rajalakshmi Srinivasaraghavan <raji@linux.vnet.ibm.com>
 
 	* src/tests/bitvec_t.c (main): correct rc addition.
