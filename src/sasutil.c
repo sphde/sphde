@@ -71,7 +71,7 @@
  * <b>reset</b>
  *     Resets the anchor semaphore (used to access the control shared memory
  *     segment), the allocated segments and all internal locks. This command
- *     is usefull to reset the SPHDE state after an process finished with
+ *     is useful to reset the SPHDE state after an process finished with
  *     unexpected error (like a SEGFAULT).
  * </pre>
  *
