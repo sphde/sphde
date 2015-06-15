@@ -1,0 +1,14 @@
+.deps/
+.libs/
+Makefile
+autom4te.cache
+config.h
+config.status
+configure.scan
+stamp-h1
+*~
+*.DAT
+*.la
+*.lo
+*.log
+*.o
