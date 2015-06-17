@@ -10,6 +10,7 @@ AC_INIT([libsphde], [1.0.0], munroesj@us.ibm.com)
 AC_CONFIG_SRCDIR([src/sassim.cpp])
 AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([1.10 no-define foreign])
+AM_MAINTAINER_MODE([disable])
 
 # Update this value for every release: (A:B:C will map to foo.so.(A-C).C.B)
 # http://www.gnu.org/software/libtool/manual/html_node/Updating-version-info.html
