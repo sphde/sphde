@@ -8,6 +8,7 @@ AC_PREREQ(2.63)
 AC_INIT([libsphde], [1.0.0], munroesj@us.ibm.com)
 
 AC_CONFIG_SRCDIR([src/sassim.cpp])
+AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([1.10 no-define foreign])
 AM_MAINTAINER_MODE([disable])
@@ -36,13 +37,15 @@ fi
 # directive in the correct position of LDFLAGS
 LDFLAGS="$LDFLAGS -Wl,--no-as-needed -lrt"
 
-# Check for programs.
+# Checks for programs.
+AC_PROG_CXX
+AC_PROG_AWK
 AC_PROG_CC
 AC_PROG_CPP
-AC_PROG_CXX
+AC_PROG_INSTALL
 AC_PROG_LN_S
-
-AC_CONFIG_MACRO_DIR([m4])
+AC_PROG_MAKE_SET
+AC_PROG_RANLIB
 AC_PROG_LIBTOOL
 
 # Tools flags
@@ -68,6 +71,17 @@ x86_64*)
 ;;
 esac
 
+# Checks for header files.
+AC_CHECK_HEADERS([fcntl.h inttypes.h stddef.h stdint.h stdlib.h string.h sys/param.h sys/time.h unistd.h])
+
+# Checks for typedefs, structures, and compiler characteristics.
+AC_CHECK_HEADER_STDBOOL
+AC_C_INLINE
+AC_TYPE_OFF_T
+AC_TYPE_PID_T
+AC_TYPE_SIZE_T
+AC_TYPE_SSIZE_T
+AC_TYPE_UINT64_T
 
 # Checks for header files.
 AC_HEADER_STDC
@@ -77,6 +91,9 @@ AC_C_VOLATILE
 
 # Checks for library functions.
 AC_FUNC_MALLOC
+AC_FUNC_MMAP
+AC_FUNC_STRTOD
+AC_CHECK_FUNCS([clock_gettime ftruncate getcwd getpagesize gettimeofday memset munmap strerror])
 
 # Pthread check (on m4/acx_pthread.m4)
 ACX_PTHREAD
@@ -92,8 +109,8 @@ DX_INIT_DOXYGEN($PACKAGE_NAME, [ \
 
 AC_CONFIG_FILES([
   Makefile
-  src/Makefile
   examples/Makefile
+  src/Makefile
 ])
 
 AC_OUTPUT
