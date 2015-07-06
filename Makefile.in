@@ -187,7 +187,6 @@ am__define_uniq_tagged_files = \
 ETAGS = etags
 CTAGS = ctags
 CSCOPE = cscope
-DIST_SUBDIRS = $(SUBDIRS)
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 distdir = $(PACKAGE)-$(VERSION)
 top_distdir = $(distdir)
@@ -383,9 +382,10 @@ ACLOCAL_AMFLAGS = -I m4
 @DX_COND_doc_TRUE@    $(DX_CLEAN_PDF)
 
 man1_MANS = doc/man/man1/sasutil.1
-EXTRA_DIST = $(man1_MANS) ChangeLog.md generate-changelog.sh
+EXTRA_DIST = $(man1_MANS) ChangeLog.md doc generate-changelog.sh
 MOSTLYCLEANFILES = $(DX_CLEANFILES)
 SUBDIRS = src
+DIST_SUBDIRS = examples $(SUBDIRS)
 all: all-recursive
 
 .SUFFIXES:

@@ -766,7 +766,9 @@ libsphde_la_SOURCES = \
 	sphlockfreeheap.cpp \
 	sphlflogger.cpp \
 	sphlogportal.cpp \
-	sphsinglepcqueue.cpp
+	sphsinglepcqueue.cpp \
+	sasallocpriv.h \
+	sphcontextpriv.h
 
 libsphde_la_CFLAGS = -D__SASSIM__ $(AM_CFLAGS)
 libsphde_la_CXXFLAGS = -D__SASSIM__ $(AM_CXXFLAGS)
