@@ -2,6 +2,7 @@
 .libs/
 Makefile
 autom4te.cache
+ChangeLog.md
 config.h
 config.status
 configure.scan
