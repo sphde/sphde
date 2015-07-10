@@ -5,7 +5,12 @@ ACLOCAL_AMFLAGS = -I m4
 include $(top_srcdir)/aminclude.am
 man1_MANS = doc/man/man1/sasutil.1
 $(man1_MANS): doc
-EXTRA_DIST = $(man1_MANS)
+EXTRA_DIST = $(man1_MANS) ChangeLog.md doc
 MOSTLYCLEANFILES = $(DX_CLEANFILES)
 
 SUBDIRS = src
+DIST_SUBDIRS = examples $(SUBDIRS)
+
+ChangeLog.md:
+	$(am__cd) $(top_srcdir) && ./generate-changelog.sh \
+	  $(abs_top_builddir)/$@
