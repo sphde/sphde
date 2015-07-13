@@ -1,0 +1,12 @@
+#!/usr/bin/make -f
+export DH_VERBOSE = 1
+
+%:
+	dh $@  --with autoreconf
+
+override_dh_auto_configure:
+	dh_auto_configure -- --enable-doxygen-man
+
+override_dh_auto_clean:
+	rm -fr doc/latex/ doc/doxygen_sqlite3.db examples/Makefile
+	dh_auto_clean
