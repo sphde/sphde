@@ -9,6 +9,7 @@ EXTRA_DIST = $(man1_MANS) ChangeLog.md doc
 MOSTLYCLEANFILES = $(DX_CLEANFILES)
 
 SUBDIRS = src
+DIST_SUBDIRS = examples $(SUBDIRS)
 
 ChangeLog.md:
 	$(am__cd) $(top_srcdir) && ./generate-changelog.sh \
