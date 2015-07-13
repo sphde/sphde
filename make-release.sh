@@ -36,7 +36,7 @@ if [ ! -e ./configure ]; then
 fi
 
 config_opts=""
-if ./configure --help | grep -- --enable-maintainer-mode; then
+if ./configure --help | grep -- --enable-maintainer-mode > /dev/null; then
 	config_opts+=" --enable-maintainer_mode";
 fi
 
