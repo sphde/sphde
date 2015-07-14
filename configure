@@ -17619,6 +17619,7 @@ else
   DX_COND_pdf_FALSE=
 fi
 
+    DX_ENV="$DX_ENV GENERATE_PDF='YES'"
 
     :
 else
@@ -17630,6 +17631,7 @@ else
   DX_COND_pdf_FALSE=
 fi
 
+    DX_ENV="$DX_ENV GENERATE_PDF='NO'"
 
     :
 fi

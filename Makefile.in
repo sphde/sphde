@@ -379,11 +379,12 @@ top_srcdir = @top_srcdir@
 ACLOCAL_AMFLAGS = -I m4
 @DX_COND_doc_TRUE@@DX_COND_html_TRUE@DX_CLEAN_HTML = @DX_DOCDIR@/html
 @DX_COND_doc_TRUE@@DX_COND_man_TRUE@DX_CLEAN_MAN = @DX_DOCDIR@/man
-@DX_COND_doc_TRUE@@DX_COND_pdf_TRUE@DX_CLEAN_PDF = @DX_DOCDIR@/@PACKAGE@.pdf
+@DX_COND_doc_TRUE@@DX_COND_pdf_TRUE@DX_CLEAN_PDF = @DX_DOCDIR@/@PACKAGE@.pdf @DX_DOCDIR@/latex
 @DX_COND_doc_TRUE@@DX_COND_pdf_TRUE@DX_PDF_GOAL = pdf
 @DX_COND_doc_TRUE@DX_CLEANFILES = \
 @DX_COND_doc_TRUE@    @DX_DOCDIR@/@PACKAGE@.tag \
-@DX_COND_doc_TRUE@    -r \
+@DX_COND_doc_TRUE@    -rf \
+@DX_COND_doc_TRUE@    @DX_DOCDIR@/doxygen_sqlite3.db \
 @DX_COND_doc_TRUE@    $(DX_CLEAN_HTML) \
 @DX_COND_doc_TRUE@    $(DX_CLEAN_MAN) \
 @DX_COND_doc_TRUE@    $(DX_CLEAN_PDF)
@@ -861,7 +862,7 @@ distclean: distclean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
 	-rm -f Makefile
 distclean-am: clean-am distclean-generic distclean-hdr \
-	distclean-libtool distclean-local distclean-tags
+	distclean-libtool distclean-tags
 
 dvi: dvi-recursive
 
@@ -934,19 +935,18 @@ uninstall-man: uninstall-man1
 	clean-libtool cscope cscopelist-am ctags ctags-am dist \
 	dist-all dist-bzip2 dist-gzip dist-lzip dist-shar dist-tarZ \
 	dist-xz dist-zip distcheck distclean distclean-generic \
-	distclean-hdr distclean-libtool distclean-local distclean-tags \
-	distcleancheck distdir distuninstallcheck dvi dvi-am html \
-	html-am info info-am install install-am install-data \
-	install-data-am install-dist_docDATA install-dvi \
-	install-dvi-am install-exec install-exec-am install-html \
-	install-html-am install-info install-info-am install-man \
-	install-man1 install-pdf install-pdf-am install-ps \
-	install-ps-am install-strip installcheck installcheck-am \
-	installdirs installdirs-am maintainer-clean \
-	maintainer-clean-generic mostlyclean mostlyclean-generic \
-	mostlyclean-libtool pdf pdf-am ps ps-am tags tags-am uninstall \
-	uninstall-am uninstall-dist_docDATA uninstall-man \
-	uninstall-man1
+	distclean-hdr distclean-libtool distclean-tags distcleancheck \
+	distdir distuninstallcheck dvi dvi-am html html-am info \
+	info-am install install-am install-data install-data-am \
+	install-dist_docDATA install-dvi install-dvi-am install-exec \
+	install-exec-am install-html install-html-am install-info \
+	install-info-am install-man install-man1 install-pdf \
+	install-pdf-am install-ps install-ps-am install-strip \
+	installcheck installcheck-am installdirs installdirs-am \
+	maintainer-clean maintainer-clean-generic mostlyclean \
+	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
+	tags tags-am uninstall uninstall-am uninstall-dist_docDATA \
+	uninstall-man uninstall-man1
 
 
 @DX_COND_doc_TRUE@@DX_COND_pdf_TRUE@pdf: @DX_DOCDIR@/@PACKAGE@.pdf
@@ -980,11 +980,6 @@ uninstall-man: uninstall-man1
 @DX_COND_doc_TRUE@	done
 
 $(man1_MANS): doc
-
-distclean-local: distclean-local-doc
-.PHONY: distclean-local-doc
-distclean-local-doc:
-	-rm -rf doc/latex doc/doxygen_sqlite3.db
 
 ChangeLog.md:
 	$(am__cd) $(top_srcdir) && ./generate-changelog.sh > \
