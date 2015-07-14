@@ -2,13 +2,6 @@
 #
 # Generate markdown ChangeLog files based on git history.
 
-outfile=$1
-
-# Gracefully do nothing if the file exists
-if [ -e ${outfile} ]; then
-	exit 0;
-fi
-
 tmp=$(mktemp)
 touch ${tmp}
 
@@ -27,5 +20,7 @@ for tag in $(git tag -l [0-9]* | sort -V); do
 	prev_tag=${tag}
 done
 
-# Move the file to the final destination
-mv ${tmp} ${outfile}
+# Send the output to stdout.
+cat ${tmp}
+
+rm ${tmp}
