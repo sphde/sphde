@@ -651,3 +651,11 @@ EXPAND_AS_DEFINED      =
 
 SKIP_FUNCTION_MACROS   = YES
 
+#---------------------------------------------------------------------------
+# configuration options related to the LaTeX output
+#---------------------------------------------------------------------------
+
+# If the GENERATE_LATEX tag is set to YES (the default) Doxygen will
+# generate Latex output.
+
+GENERATE_LATEX         = $(GENERATE_PDF)

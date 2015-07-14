@@ -36,7 +36,7 @@ endif DX_COND_man
 
 if DX_COND_pdf
 
-DX_CLEAN_PDF = @DX_DOCDIR@/@PACKAGE@.pdf
+DX_CLEAN_PDF = @DX_DOCDIR@/@PACKAGE@.pdf @DX_DOCDIR@/latex
 
 DX_PDF_GOAL = pdf
 
@@ -74,7 +74,8 @@ doc: doc-run $(DX_PDF_GOAL)
 
 DX_CLEANFILES = \
     @DX_DOCDIR@/@PACKAGE@.tag \
-    -r \
+    -rf \
+    @DX_DOCDIR@/doxygen_sqlite3.db \
     $(DX_CLEAN_HTML) \
     $(DX_CLEAN_MAN) \
     $(DX_CLEAN_PDF)

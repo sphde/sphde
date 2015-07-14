@@ -16,11 +16,6 @@ $(man1_MANS): doc
 
 MOSTLYCLEANFILES = $(DX_CLEANFILES)
 
-distclean-local: distclean-local-doc
-.PHONY: distclean-local-doc
-distclean-local-doc:
-	-rm -rf doc/latex doc/doxygen_sqlite3.db
-
 ChangeLog.md:
 	$(am__cd) $(top_srcdir) && ./generate-changelog.sh > \
 	  $(abs_top_builddir)/$@

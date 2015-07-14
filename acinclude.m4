@@ -168,7 +168,9 @@ DX_ARG_ABLE(pdf, [generate doxygen PDF documentation],
             [DX_CLEAR_DEPEND(doc, 1)],
             [DX_REQUIRE_PROG([DX_PDFLATEX], pdflatex)
              DX_REQUIRE_PROG([DX_MAKEINDEX], makeindex)
-             DX_REQUIRE_PROG([DX_EGREP], egrep)])
+             DX_REQUIRE_PROG([DX_EGREP], egrep)],
+            [DX_ENV_APPEND(GENERATE_PDF, YES)],
+            [DX_ENV_APPEND(GENERATE_PDF, NO)])
 
 #For debugging:
 #echo DX_FLAG_doc=$DX_FLAG_doc
