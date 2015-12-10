@@ -164,7 +164,7 @@ bitv_alloc_marked (bitv_cb_t * cb, bitv_word * bvec, bitv_word * endvec,
 	      ;
 	      if (__sync_bool_compare_and_swap (bvec, cur_msk, new_msk))
 		{		/* cur_msk was still valid and update successful */
-		  bitv_word end_mrk, chk_mrk;
+		  bitv_word end_mrk, chk_mrk __attribute__((unused));
 		  end_mrk = bitv_mask_to_end_mrk (req_msk);
 		  chk_mrk = __sync_fetch_and_or (endvec, end_mrk);
 #ifdef PRINT_DEBUG
@@ -351,7 +351,7 @@ bitv_aligned_alloc_marked (bitv_cb_t * cb, bitv_word * bvec,
 	      ;
 	      if (__sync_bool_compare_and_swap (bvec, cur_msk, new_msk))
 		{		/* cur_msk was still valid and update successful */
-		  bitv_word end_mrk, chk_mrk;
+		  bitv_word end_mrk, chk_mrk __attribute__((unused));
 		  end_mrk = bitv_mask_to_end_mrk (req_msk);
 		  chk_mrk = __sync_fetch_and_or (endvec, end_mrk);
 #ifdef PRINT_DEBUG
@@ -480,7 +480,7 @@ bitv_free_marked (bitv_cb_t * cb, bitv_word * bvec, bitv_word * endvec,
   if (endmrk && !(bgnmrk & bit_zero))
     {
       int units = __builtin_clzl (endmrk);
-      bitv_word chkmsk;
+      bitv_word chkmsk __attribute__((unused));
 
       alloc_units = units + 1;
       endmrk = bit_zero >> (offset + units);
