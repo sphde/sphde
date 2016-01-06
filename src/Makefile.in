@@ -179,43 +179,46 @@ am__EXEEXT_1 = sphgtod_t$(EXEEXT) sasatom_t$(EXEEXT) bitvec_t$(EXEEXT) \
 	sphsinglepcqueue_t$(EXEEXT) sphsinglepcqueue_tt$(EXEEXT) \
 	sphsinglepcqueue_ttt$(EXEEXT) sphdirectpcqueue_ttt$(EXEEXT)
 PROGRAMS = $(bin_PROGRAMS)
-am_bitvec_t_OBJECTS = bitvec_t.$(OBJEXT)
+am__dirstamp = $(am__leading_dot)dirstamp
+am_bitvec_t_OBJECTS = tests/bitvec_t.$(OBJEXT)
 bitvec_t_OBJECTS = $(am_bitvec_t_OBJECTS)
 bitvec_t_DEPENDENCIES = libsphde.la
-am_sasatom_t_OBJECTS = sasatom_t.$(OBJEXT)
+am_sasatom_t_OBJECTS = tests/sasatom_t.$(OBJEXT)
 sasatom_t_OBJECTS = $(am_sasatom_t_OBJECTS)
 sasatom_t_DEPENDENCIES = libsphde.la
-am_sasindex_t_OBJECTS = sasindex_t.$(OBJEXT)
+am_sasindex_t_OBJECTS = tests/sasindex_t.$(OBJEXT)
 sasindex_t_OBJECTS = $(am_sasindex_t_OBJECTS)
 sasindex_t_DEPENDENCIES = libsphde.la
-am_sasindex_tt_OBJECTS = sasindex_tt.$(OBJEXT)
+am_sasindex_tt_OBJECTS = tests/sasindex_tt.$(OBJEXT)
 sasindex_tt_OBJECTS = $(am_sasindex_tt_OBJECTS)
 sasindex_tt_DEPENDENCIES = libsphde.la
-am_sassim_t_OBJECTS = sassim_t.$(OBJEXT)
+am_sassim_t_OBJECTS = tests/sassim_t.$(OBJEXT)
 sassim_t_OBJECTS = $(am_sassim_t_OBJECTS)
 sassim_t_DEPENDENCIES = libsphde.la
-am_sasstringbtree_t_OBJECTS = sasstringbtree_t.$(OBJEXT)
+am_sasstringbtree_t_OBJECTS = tests/sasstringbtree_t.$(OBJEXT)
 sasstringbtree_t_OBJECTS = $(am_sasstringbtree_t_OBJECTS)
 sasstringbtree_t_DEPENDENCIES = libsphde.la
-am_sasstringbtree_tt_OBJECTS = sasstringbtree_tt.$(OBJEXT)
+am_sasstringbtree_tt_OBJECTS = tests/sasstringbtree_tt.$(OBJEXT)
 sasstringbtree_tt_OBJECTS = $(am_sasstringbtree_tt_OBJECTS)
 sasstringbtree_tt_DEPENDENCIES = libsphde.la
 am_sasutil_OBJECTS = sasutil.$(OBJEXT)
 sasutil_OBJECTS = $(am_sasutil_OBJECTS)
 sasutil_DEPENDENCIES = libsphde.la
-am_sphcontext_t_OBJECTS = sphcontext_t.$(OBJEXT)
+am_sphcontext_t_OBJECTS = tests/sphcontext_t.$(OBJEXT)
 sphcontext_t_OBJECTS = $(am_sphcontext_t_OBJECTS)
 sphcontext_t_DEPENDENCIES = libsphde.la
-am_sphdirectpcqueue_ttt_OBJECTS = sphdirectpcqueue_ttt.$(OBJEXT)
+am_sphdirectpcqueue_ttt_OBJECTS =  \
+	tests/sphdirectpcqueue_ttt.$(OBJEXT)
 sphdirectpcqueue_ttt_OBJECTS = $(am_sphdirectpcqueue_ttt_OBJECTS)
 sphdirectpcqueue_ttt_DEPENDENCIES = libsphde.la
-am_sphgtod_t_OBJECTS = sphgtod_t.$(OBJEXT)
+am_sphgtod_t_OBJECTS = tests/sphgtod_t.$(OBJEXT)
 sphgtod_t_OBJECTS = $(am_sphgtod_t_OBJECTS)
 sphgtod_t_DEPENDENCIES = .libs/libsphgtod.a libsphde.la
-am_sphlflogger_t_OBJECTS = sphlflogger_t.$(OBJEXT)
+am_sphlflogger_t_OBJECTS = tests/sphlflogger_t.$(OBJEXT)
 sphlflogger_t_OBJECTS = $(am_sphlflogger_t_OBJECTS)
 sphlflogger_t_DEPENDENCIES = libsphde.la
-am_sphlflogger_tt_OBJECTS = sphlflogger_tt-sphlflogger_tt.$(OBJEXT)
+am_sphlflogger_tt_OBJECTS =  \
+	tests/sphlflogger_tt-sphlflogger_tt.$(OBJEXT)
 sphlflogger_tt_OBJECTS = $(am_sphlflogger_tt_OBJECTS)
 sphlflogger_tt_DEPENDENCIES = libsphde.la
 sphlflogger_tt_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
@@ -223,32 +226,33 @@ sphlflogger_tt_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
 	$(sphlflogger_tt_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o \
 	$@
 am_sphlflogger_ttt_OBJECTS =  \
-	sphlflogger_ttt-sphlflogger_ttt.$(OBJEXT)
+	tests/sphlflogger_ttt-sphlflogger_ttt.$(OBJEXT)
 sphlflogger_ttt_OBJECTS = $(am_sphlflogger_ttt_OBJECTS)
 sphlflogger_ttt_DEPENDENCIES = libsphde.la
 sphlflogger_ttt_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
 	$(sphlflogger_ttt_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) \
 	-o $@
-am_sphlockfreeheap_t_OBJECTS = sphlockfreeheap_t.$(OBJEXT)
+am_sphlockfreeheap_t_OBJECTS = tests/sphlockfreeheap_t.$(OBJEXT)
 sphlockfreeheap_t_OBJECTS = $(am_sphlockfreeheap_t_OBJECTS)
 sphlockfreeheap_t_DEPENDENCIES = libsphde.la
-am_sphlogportal_t_OBJECTS = sphlogportal_t.$(OBJEXT)
+am_sphlogportal_t_OBJECTS = tests/sphlogportal_t.$(OBJEXT)
 sphlogportal_t_OBJECTS = $(am_sphlogportal_t_OBJECTS)
 sphlogportal_t_DEPENDENCIES = libsphde.la
-am_sphlogportal_tt_OBJECTS = sphlogportal_t.$(OBJEXT)
+am_sphlogportal_tt_OBJECTS = tests/sphlogportal_t.$(OBJEXT)
 sphlogportal_tt_OBJECTS = $(am_sphlogportal_tt_OBJECTS)
 sphlogportal_tt_DEPENDENCIES = libsphde.la
-am_sphsinglepcqueue_t_OBJECTS = sphsinglepcqueue_t.$(OBJEXT)
+am_sphsinglepcqueue_t_OBJECTS = tests/sphsinglepcqueue_t.$(OBJEXT)
 sphsinglepcqueue_t_OBJECTS = $(am_sphsinglepcqueue_t_OBJECTS)
 sphsinglepcqueue_t_DEPENDENCIES = libsphde.la
-am_sphsinglepcqueue_tt_OBJECTS = sphsinglepcqueue_tt.$(OBJEXT)
+am_sphsinglepcqueue_tt_OBJECTS = tests/sphsinglepcqueue_tt.$(OBJEXT)
 sphsinglepcqueue_tt_OBJECTS = $(am_sphsinglepcqueue_tt_OBJECTS)
 sphsinglepcqueue_tt_DEPENDENCIES = libsphde.la
-am_sphsinglepcqueue_ttt_OBJECTS = sphsinglepcqueue_ttt.$(OBJEXT)
+am_sphsinglepcqueue_ttt_OBJECTS =  \
+	tests/sphsinglepcqueue_ttt.$(OBJEXT)
 sphsinglepcqueue_ttt_OBJECTS = $(am_sphsinglepcqueue_ttt_OBJECTS)
 sphsinglepcqueue_ttt_DEPENDENCIES = libsphde.la
-am_sphthread_t_OBJECTS = sphthread_t.$(OBJEXT)
+am_sphthread_t_OBJECTS = tests/sphthread_t.$(OBJEXT)
 sphthread_t_OBJECTS = $(am_sphthread_t_OBJECTS)
 sphthread_t_DEPENDENCIES = libsphde.la
 AM_V_P = $(am__v_P_@AM_V@)
@@ -961,30 +965,50 @@ clean-checkPROGRAMS:
 	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
 	echo " rm -f" $$list; \
 	rm -f $$list
+tests/$(am__dirstamp):
+	@$(MKDIR_P) tests
+	@: > tests/$(am__dirstamp)
+tests/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) tests/$(DEPDIR)
+	@: > tests/$(DEPDIR)/$(am__dirstamp)
+tests/bitvec_t.$(OBJEXT): tests/$(am__dirstamp) \
+	tests/$(DEPDIR)/$(am__dirstamp)
 
 bitvec_t$(EXEEXT): $(bitvec_t_OBJECTS) $(bitvec_t_DEPENDENCIES) $(EXTRA_bitvec_t_DEPENDENCIES) 
 	@rm -f bitvec_t$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(bitvec_t_OBJECTS) $(bitvec_t_LDADD) $(LIBS)
+tests/sasatom_t.$(OBJEXT): tests/$(am__dirstamp) \
+	tests/$(DEPDIR)/$(am__dirstamp)
 
 sasatom_t$(EXEEXT): $(sasatom_t_OBJECTS) $(sasatom_t_DEPENDENCIES) $(EXTRA_sasatom_t_DEPENDENCIES) 
 	@rm -f sasatom_t$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(sasatom_t_OBJECTS) $(sasatom_t_LDADD) $(LIBS)
+tests/sasindex_t.$(OBJEXT): tests/$(am__dirstamp) \
+	tests/$(DEPDIR)/$(am__dirstamp)
 
 sasindex_t$(EXEEXT): $(sasindex_t_OBJECTS) $(sasindex_t_DEPENDENCIES) $(EXTRA_sasindex_t_DEPENDENCIES) 
 	@rm -f sasindex_t$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(sasindex_t_OBJECTS) $(sasindex_t_LDADD) $(LIBS)
+tests/sasindex_tt.$(OBJEXT): tests/$(am__dirstamp) \
+	tests/$(DEPDIR)/$(am__dirstamp)
 
 sasindex_tt$(EXEEXT): $(sasindex_tt_OBJECTS) $(sasindex_tt_DEPENDENCIES) $(EXTRA_sasindex_tt_DEPENDENCIES) 
 	@rm -f sasindex_tt$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(sasindex_tt_OBJECTS) $(sasindex_tt_LDADD) $(LIBS)
+tests/sassim_t.$(OBJEXT): tests/$(am__dirstamp) \
+	tests/$(DEPDIR)/$(am__dirstamp)
 
 sassim_t$(EXEEXT): $(sassim_t_OBJECTS) $(sassim_t_DEPENDENCIES) $(EXTRA_sassim_t_DEPENDENCIES) 
 	@rm -f sassim_t$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(sassim_t_OBJECTS) $(sassim_t_LDADD) $(LIBS)
+tests/sasstringbtree_t.$(OBJEXT): tests/$(am__dirstamp) \
+	tests/$(DEPDIR)/$(am__dirstamp)
 
 sasstringbtree_t$(EXEEXT): $(sasstringbtree_t_OBJECTS) $(sasstringbtree_t_DEPENDENCIES) $(EXTRA_sasstringbtree_t_DEPENDENCIES) 
 	@rm -f sasstringbtree_t$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(sasstringbtree_t_OBJECTS) $(sasstringbtree_t_LDADD) $(LIBS)
+tests/sasstringbtree_tt.$(OBJEXT): tests/$(am__dirstamp) \
+	tests/$(DEPDIR)/$(am__dirstamp)
 
 sasstringbtree_tt$(EXEEXT): $(sasstringbtree_tt_OBJECTS) $(sasstringbtree_tt_DEPENDENCIES) $(EXTRA_sasstringbtree_tt_DEPENDENCIES) 
 	@rm -f sasstringbtree_tt$(EXEEXT)
@@ -993,34 +1017,50 @@ sasstringbtree_tt$(EXEEXT): $(sasstringbtree_tt_OBJECTS) $(sasstringbtree_tt_DEP
 sasutil$(EXEEXT): $(sasutil_OBJECTS) $(sasutil_DEPENDENCIES) $(EXTRA_sasutil_DEPENDENCIES) 
 	@rm -f sasutil$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(sasutil_OBJECTS) $(sasutil_LDADD) $(LIBS)
+tests/sphcontext_t.$(OBJEXT): tests/$(am__dirstamp) \
+	tests/$(DEPDIR)/$(am__dirstamp)
 
 sphcontext_t$(EXEEXT): $(sphcontext_t_OBJECTS) $(sphcontext_t_DEPENDENCIES) $(EXTRA_sphcontext_t_DEPENDENCIES) 
 	@rm -f sphcontext_t$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(sphcontext_t_OBJECTS) $(sphcontext_t_LDADD) $(LIBS)
+tests/sphdirectpcqueue_ttt.$(OBJEXT): tests/$(am__dirstamp) \
+	tests/$(DEPDIR)/$(am__dirstamp)
 
 sphdirectpcqueue_ttt$(EXEEXT): $(sphdirectpcqueue_ttt_OBJECTS) $(sphdirectpcqueue_ttt_DEPENDENCIES) $(EXTRA_sphdirectpcqueue_ttt_DEPENDENCIES) 
 	@rm -f sphdirectpcqueue_ttt$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(sphdirectpcqueue_ttt_OBJECTS) $(sphdirectpcqueue_ttt_LDADD) $(LIBS)
+tests/sphgtod_t.$(OBJEXT): tests/$(am__dirstamp) \
+	tests/$(DEPDIR)/$(am__dirstamp)
 
 sphgtod_t$(EXEEXT): $(sphgtod_t_OBJECTS) $(sphgtod_t_DEPENDENCIES) $(EXTRA_sphgtod_t_DEPENDENCIES) 
 	@rm -f sphgtod_t$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(sphgtod_t_OBJECTS) $(sphgtod_t_LDADD) $(LIBS)
+tests/sphlflogger_t.$(OBJEXT): tests/$(am__dirstamp) \
+	tests/$(DEPDIR)/$(am__dirstamp)
 
 sphlflogger_t$(EXEEXT): $(sphlflogger_t_OBJECTS) $(sphlflogger_t_DEPENDENCIES) $(EXTRA_sphlflogger_t_DEPENDENCIES) 
 	@rm -f sphlflogger_t$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(sphlflogger_t_OBJECTS) $(sphlflogger_t_LDADD) $(LIBS)
+tests/sphlflogger_tt-sphlflogger_tt.$(OBJEXT): tests/$(am__dirstamp) \
+	tests/$(DEPDIR)/$(am__dirstamp)
 
 sphlflogger_tt$(EXEEXT): $(sphlflogger_tt_OBJECTS) $(sphlflogger_tt_DEPENDENCIES) $(EXTRA_sphlflogger_tt_DEPENDENCIES) 
 	@rm -f sphlflogger_tt$(EXEEXT)
 	$(AM_V_CCLD)$(sphlflogger_tt_LINK) $(sphlflogger_tt_OBJECTS) $(sphlflogger_tt_LDADD) $(LIBS)
+tests/sphlflogger_ttt-sphlflogger_ttt.$(OBJEXT):  \
+	tests/$(am__dirstamp) tests/$(DEPDIR)/$(am__dirstamp)
 
 sphlflogger_ttt$(EXEEXT): $(sphlflogger_ttt_OBJECTS) $(sphlflogger_ttt_DEPENDENCIES) $(EXTRA_sphlflogger_ttt_DEPENDENCIES) 
 	@rm -f sphlflogger_ttt$(EXEEXT)
 	$(AM_V_CCLD)$(sphlflogger_ttt_LINK) $(sphlflogger_ttt_OBJECTS) $(sphlflogger_ttt_LDADD) $(LIBS)
+tests/sphlockfreeheap_t.$(OBJEXT): tests/$(am__dirstamp) \
+	tests/$(DEPDIR)/$(am__dirstamp)
 
 sphlockfreeheap_t$(EXEEXT): $(sphlockfreeheap_t_OBJECTS) $(sphlockfreeheap_t_DEPENDENCIES) $(EXTRA_sphlockfreeheap_t_DEPENDENCIES) 
 	@rm -f sphlockfreeheap_t$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(sphlockfreeheap_t_OBJECTS) $(sphlockfreeheap_t_LDADD) $(LIBS)
+tests/sphlogportal_t.$(OBJEXT): tests/$(am__dirstamp) \
+	tests/$(DEPDIR)/$(am__dirstamp)
 
 sphlogportal_t$(EXEEXT): $(sphlogportal_t_OBJECTS) $(sphlogportal_t_DEPENDENCIES) $(EXTRA_sphlogportal_t_DEPENDENCIES) 
 	@rm -f sphlogportal_t$(EXEEXT)
@@ -1029,18 +1069,26 @@ sphlogportal_t$(EXEEXT): $(sphlogportal_t_OBJECTS) $(sphlogportal_t_DEPENDENCIES
 sphlogportal_tt$(EXEEXT): $(sphlogportal_tt_OBJECTS) $(sphlogportal_tt_DEPENDENCIES) $(EXTRA_sphlogportal_tt_DEPENDENCIES) 
 	@rm -f sphlogportal_tt$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(sphlogportal_tt_OBJECTS) $(sphlogportal_tt_LDADD) $(LIBS)
+tests/sphsinglepcqueue_t.$(OBJEXT): tests/$(am__dirstamp) \
+	tests/$(DEPDIR)/$(am__dirstamp)
 
 sphsinglepcqueue_t$(EXEEXT): $(sphsinglepcqueue_t_OBJECTS) $(sphsinglepcqueue_t_DEPENDENCIES) $(EXTRA_sphsinglepcqueue_t_DEPENDENCIES) 
 	@rm -f sphsinglepcqueue_t$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(sphsinglepcqueue_t_OBJECTS) $(sphsinglepcqueue_t_LDADD) $(LIBS)
+tests/sphsinglepcqueue_tt.$(OBJEXT): tests/$(am__dirstamp) \
+	tests/$(DEPDIR)/$(am__dirstamp)
 
 sphsinglepcqueue_tt$(EXEEXT): $(sphsinglepcqueue_tt_OBJECTS) $(sphsinglepcqueue_tt_DEPENDENCIES) $(EXTRA_sphsinglepcqueue_tt_DEPENDENCIES) 
 	@rm -f sphsinglepcqueue_tt$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(sphsinglepcqueue_tt_OBJECTS) $(sphsinglepcqueue_tt_LDADD) $(LIBS)
+tests/sphsinglepcqueue_ttt.$(OBJEXT): tests/$(am__dirstamp) \
+	tests/$(DEPDIR)/$(am__dirstamp)
 
 sphsinglepcqueue_ttt$(EXEEXT): $(sphsinglepcqueue_ttt_OBJECTS) $(sphsinglepcqueue_ttt_DEPENDENCIES) $(EXTRA_sphsinglepcqueue_ttt_DEPENDENCIES) 
 	@rm -f sphsinglepcqueue_ttt$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(sphsinglepcqueue_ttt_OBJECTS) $(sphsinglepcqueue_ttt_LDADD) $(LIBS)
+tests/sphthread_t.$(OBJEXT): tests/$(am__dirstamp) \
+	tests/$(DEPDIR)/$(am__dirstamp)
 
 sphthread_t$(EXEEXT): $(sphthread_t_OBJECTS) $(sphthread_t_DEPENDENCIES) $(EXTRA_sphthread_t_DEPENDENCIES) 
 	@rm -f sphthread_t$(EXEEXT)
@@ -1048,11 +1096,11 @@ sphthread_t$(EXEEXT): $(sphthread_t_OBJECTS) $(sphthread_t_DEPENDENCIES) $(EXTRA
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
+	-rm -f tests/*.$(OBJEXT)
 
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bitvec_t.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsphde_la-bitv.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsphde_la-freenode.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsphde_la-sasalloc.Plo@am__quote@
@@ -1083,43 +1131,47 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsphde_la-sphtimer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsphde_la-ultree.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsphgtod_la-sphgtod.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sasatom_t.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sasindex_t.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sasindex_tt.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sassim_t.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sasstringbtree_t.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sasstringbtree_tt.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sasutil.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sphcontext_t.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sphdirectpcqueue_ttt.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sphgtod_t.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sphlflogger_t.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sphlflogger_tt-sphlflogger_tt.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sphlflogger_ttt-sphlflogger_ttt.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sphlockfreeheap_t.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sphlogportal_t.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sphsinglepcqueue_t.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sphsinglepcqueue_tt.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sphsinglepcqueue_ttt.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sphthread_t.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/bitvec_t.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/sasatom_t.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/sasindex_t.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/sasindex_tt.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/sassim_t.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/sasstringbtree_t.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/sasstringbtree_tt.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/sphcontext_t.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/sphdirectpcqueue_ttt.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/sphgtod_t.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/sphlflogger_t.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/sphlflogger_tt-sphlflogger_tt.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/sphlflogger_ttt-sphlflogger_ttt.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/sphlockfreeheap_t.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/sphlogportal_t.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/sphsinglepcqueue_t.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/sphsinglepcqueue_tt.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/sphsinglepcqueue_ttt.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/sphthread_t.Po@am__quote@
 
 .c.o:
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+@am__fastdepCC_TRUE@	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
+@am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ $< &&\
+@am__fastdepCC_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Po
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(COMPILE) -c -o $@ $<
 
 .c.obj:
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ `$(CYGPATH_W) '$<'`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+@am__fastdepCC_TRUE@	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.obj$$||'`;\
+@am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ `$(CYGPATH_W) '$<'` &&\
+@am__fastdepCC_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Po
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(COMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
 
 .c.lo:
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LTCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Plo
+@am__fastdepCC_TRUE@	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.lo$$||'`;\
+@am__fastdepCC_TRUE@	$(LTCOMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ $< &&\
+@am__fastdepCC_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Plo
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LTCOMPILE) -c -o $@ $<
@@ -1187,289 +1239,54 @@ libsphgtod_la-sphgtod.lo: sphgtod.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsphgtod_la_CFLAGS) $(CFLAGS) -c -o libsphgtod_la-sphgtod.lo `test -f 'sphgtod.c' || echo '$(srcdir)/'`sphgtod.c
 
-bitvec_t.o: tests/bitvec_t.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT bitvec_t.o -MD -MP -MF $(DEPDIR)/bitvec_t.Tpo -c -o bitvec_t.o `test -f 'tests/bitvec_t.c' || echo '$(srcdir)/'`tests/bitvec_t.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/bitvec_t.Tpo $(DEPDIR)/bitvec_t.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='tests/bitvec_t.c' object='bitvec_t.o' libtool=no @AMDEPBACKSLASH@
+tests/sphlflogger_tt-sphlflogger_tt.o: tests/sphlflogger_tt.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sphlflogger_tt_CFLAGS) $(CFLAGS) -MT tests/sphlflogger_tt-sphlflogger_tt.o -MD -MP -MF tests/$(DEPDIR)/sphlflogger_tt-sphlflogger_tt.Tpo -c -o tests/sphlflogger_tt-sphlflogger_tt.o `test -f 'tests/sphlflogger_tt.c' || echo '$(srcdir)/'`tests/sphlflogger_tt.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) tests/$(DEPDIR)/sphlflogger_tt-sphlflogger_tt.Tpo tests/$(DEPDIR)/sphlflogger_tt-sphlflogger_tt.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='tests/sphlflogger_tt.c' object='tests/sphlflogger_tt-sphlflogger_tt.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o bitvec_t.o `test -f 'tests/bitvec_t.c' || echo '$(srcdir)/'`tests/bitvec_t.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sphlflogger_tt_CFLAGS) $(CFLAGS) -c -o tests/sphlflogger_tt-sphlflogger_tt.o `test -f 'tests/sphlflogger_tt.c' || echo '$(srcdir)/'`tests/sphlflogger_tt.c
 
-bitvec_t.obj: tests/bitvec_t.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT bitvec_t.obj -MD -MP -MF $(DEPDIR)/bitvec_t.Tpo -c -o bitvec_t.obj `if test -f 'tests/bitvec_t.c'; then $(CYGPATH_W) 'tests/bitvec_t.c'; else $(CYGPATH_W) '$(srcdir)/tests/bitvec_t.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/bitvec_t.Tpo $(DEPDIR)/bitvec_t.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='tests/bitvec_t.c' object='bitvec_t.obj' libtool=no @AMDEPBACKSLASH@
+tests/sphlflogger_tt-sphlflogger_tt.obj: tests/sphlflogger_tt.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sphlflogger_tt_CFLAGS) $(CFLAGS) -MT tests/sphlflogger_tt-sphlflogger_tt.obj -MD -MP -MF tests/$(DEPDIR)/sphlflogger_tt-sphlflogger_tt.Tpo -c -o tests/sphlflogger_tt-sphlflogger_tt.obj `if test -f 'tests/sphlflogger_tt.c'; then $(CYGPATH_W) 'tests/sphlflogger_tt.c'; else $(CYGPATH_W) '$(srcdir)/tests/sphlflogger_tt.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) tests/$(DEPDIR)/sphlflogger_tt-sphlflogger_tt.Tpo tests/$(DEPDIR)/sphlflogger_tt-sphlflogger_tt.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='tests/sphlflogger_tt.c' object='tests/sphlflogger_tt-sphlflogger_tt.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o bitvec_t.obj `if test -f 'tests/bitvec_t.c'; then $(CYGPATH_W) 'tests/bitvec_t.c'; else $(CYGPATH_W) '$(srcdir)/tests/bitvec_t.c'; fi`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sphlflogger_tt_CFLAGS) $(CFLAGS) -c -o tests/sphlflogger_tt-sphlflogger_tt.obj `if test -f 'tests/sphlflogger_tt.c'; then $(CYGPATH_W) 'tests/sphlflogger_tt.c'; else $(CYGPATH_W) '$(srcdir)/tests/sphlflogger_tt.c'; fi`
 
-sasatom_t.o: tests/sasatom_t.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT sasatom_t.o -MD -MP -MF $(DEPDIR)/sasatom_t.Tpo -c -o sasatom_t.o `test -f 'tests/sasatom_t.c' || echo '$(srcdir)/'`tests/sasatom_t.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/sasatom_t.Tpo $(DEPDIR)/sasatom_t.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='tests/sasatom_t.c' object='sasatom_t.o' libtool=no @AMDEPBACKSLASH@
+tests/sphlflogger_ttt-sphlflogger_ttt.o: tests/sphlflogger_ttt.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sphlflogger_ttt_CFLAGS) $(CFLAGS) -MT tests/sphlflogger_ttt-sphlflogger_ttt.o -MD -MP -MF tests/$(DEPDIR)/sphlflogger_ttt-sphlflogger_ttt.Tpo -c -o tests/sphlflogger_ttt-sphlflogger_ttt.o `test -f 'tests/sphlflogger_ttt.c' || echo '$(srcdir)/'`tests/sphlflogger_ttt.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) tests/$(DEPDIR)/sphlflogger_ttt-sphlflogger_ttt.Tpo tests/$(DEPDIR)/sphlflogger_ttt-sphlflogger_ttt.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='tests/sphlflogger_ttt.c' object='tests/sphlflogger_ttt-sphlflogger_ttt.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o sasatom_t.o `test -f 'tests/sasatom_t.c' || echo '$(srcdir)/'`tests/sasatom_t.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sphlflogger_ttt_CFLAGS) $(CFLAGS) -c -o tests/sphlflogger_ttt-sphlflogger_ttt.o `test -f 'tests/sphlflogger_ttt.c' || echo '$(srcdir)/'`tests/sphlflogger_ttt.c
 
-sasatom_t.obj: tests/sasatom_t.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT sasatom_t.obj -MD -MP -MF $(DEPDIR)/sasatom_t.Tpo -c -o sasatom_t.obj `if test -f 'tests/sasatom_t.c'; then $(CYGPATH_W) 'tests/sasatom_t.c'; else $(CYGPATH_W) '$(srcdir)/tests/sasatom_t.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/sasatom_t.Tpo $(DEPDIR)/sasatom_t.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='tests/sasatom_t.c' object='sasatom_t.obj' libtool=no @AMDEPBACKSLASH@
+tests/sphlflogger_ttt-sphlflogger_ttt.obj: tests/sphlflogger_ttt.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sphlflogger_ttt_CFLAGS) $(CFLAGS) -MT tests/sphlflogger_ttt-sphlflogger_ttt.obj -MD -MP -MF tests/$(DEPDIR)/sphlflogger_ttt-sphlflogger_ttt.Tpo -c -o tests/sphlflogger_ttt-sphlflogger_ttt.obj `if test -f 'tests/sphlflogger_ttt.c'; then $(CYGPATH_W) 'tests/sphlflogger_ttt.c'; else $(CYGPATH_W) '$(srcdir)/tests/sphlflogger_ttt.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) tests/$(DEPDIR)/sphlflogger_ttt-sphlflogger_ttt.Tpo tests/$(DEPDIR)/sphlflogger_ttt-sphlflogger_ttt.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='tests/sphlflogger_ttt.c' object='tests/sphlflogger_ttt-sphlflogger_ttt.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o sasatom_t.obj `if test -f 'tests/sasatom_t.c'; then $(CYGPATH_W) 'tests/sasatom_t.c'; else $(CYGPATH_W) '$(srcdir)/tests/sasatom_t.c'; fi`
-
-sasindex_t.o: tests/sasindex_t.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT sasindex_t.o -MD -MP -MF $(DEPDIR)/sasindex_t.Tpo -c -o sasindex_t.o `test -f 'tests/sasindex_t.c' || echo '$(srcdir)/'`tests/sasindex_t.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/sasindex_t.Tpo $(DEPDIR)/sasindex_t.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='tests/sasindex_t.c' object='sasindex_t.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o sasindex_t.o `test -f 'tests/sasindex_t.c' || echo '$(srcdir)/'`tests/sasindex_t.c
-
-sasindex_t.obj: tests/sasindex_t.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT sasindex_t.obj -MD -MP -MF $(DEPDIR)/sasindex_t.Tpo -c -o sasindex_t.obj `if test -f 'tests/sasindex_t.c'; then $(CYGPATH_W) 'tests/sasindex_t.c'; else $(CYGPATH_W) '$(srcdir)/tests/sasindex_t.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/sasindex_t.Tpo $(DEPDIR)/sasindex_t.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='tests/sasindex_t.c' object='sasindex_t.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o sasindex_t.obj `if test -f 'tests/sasindex_t.c'; then $(CYGPATH_W) 'tests/sasindex_t.c'; else $(CYGPATH_W) '$(srcdir)/tests/sasindex_t.c'; fi`
-
-sasindex_tt.o: tests/sasindex_tt.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT sasindex_tt.o -MD -MP -MF $(DEPDIR)/sasindex_tt.Tpo -c -o sasindex_tt.o `test -f 'tests/sasindex_tt.c' || echo '$(srcdir)/'`tests/sasindex_tt.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/sasindex_tt.Tpo $(DEPDIR)/sasindex_tt.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='tests/sasindex_tt.c' object='sasindex_tt.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o sasindex_tt.o `test -f 'tests/sasindex_tt.c' || echo '$(srcdir)/'`tests/sasindex_tt.c
-
-sasindex_tt.obj: tests/sasindex_tt.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT sasindex_tt.obj -MD -MP -MF $(DEPDIR)/sasindex_tt.Tpo -c -o sasindex_tt.obj `if test -f 'tests/sasindex_tt.c'; then $(CYGPATH_W) 'tests/sasindex_tt.c'; else $(CYGPATH_W) '$(srcdir)/tests/sasindex_tt.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/sasindex_tt.Tpo $(DEPDIR)/sasindex_tt.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='tests/sasindex_tt.c' object='sasindex_tt.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o sasindex_tt.obj `if test -f 'tests/sasindex_tt.c'; then $(CYGPATH_W) 'tests/sasindex_tt.c'; else $(CYGPATH_W) '$(srcdir)/tests/sasindex_tt.c'; fi`
-
-sassim_t.o: tests/sassim_t.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT sassim_t.o -MD -MP -MF $(DEPDIR)/sassim_t.Tpo -c -o sassim_t.o `test -f 'tests/sassim_t.c' || echo '$(srcdir)/'`tests/sassim_t.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/sassim_t.Tpo $(DEPDIR)/sassim_t.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='tests/sassim_t.c' object='sassim_t.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o sassim_t.o `test -f 'tests/sassim_t.c' || echo '$(srcdir)/'`tests/sassim_t.c
-
-sassim_t.obj: tests/sassim_t.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT sassim_t.obj -MD -MP -MF $(DEPDIR)/sassim_t.Tpo -c -o sassim_t.obj `if test -f 'tests/sassim_t.c'; then $(CYGPATH_W) 'tests/sassim_t.c'; else $(CYGPATH_W) '$(srcdir)/tests/sassim_t.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/sassim_t.Tpo $(DEPDIR)/sassim_t.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='tests/sassim_t.c' object='sassim_t.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o sassim_t.obj `if test -f 'tests/sassim_t.c'; then $(CYGPATH_W) 'tests/sassim_t.c'; else $(CYGPATH_W) '$(srcdir)/tests/sassim_t.c'; fi`
-
-sasstringbtree_t.o: tests/sasstringbtree_t.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT sasstringbtree_t.o -MD -MP -MF $(DEPDIR)/sasstringbtree_t.Tpo -c -o sasstringbtree_t.o `test -f 'tests/sasstringbtree_t.c' || echo '$(srcdir)/'`tests/sasstringbtree_t.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/sasstringbtree_t.Tpo $(DEPDIR)/sasstringbtree_t.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='tests/sasstringbtree_t.c' object='sasstringbtree_t.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o sasstringbtree_t.o `test -f 'tests/sasstringbtree_t.c' || echo '$(srcdir)/'`tests/sasstringbtree_t.c
-
-sasstringbtree_t.obj: tests/sasstringbtree_t.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT sasstringbtree_t.obj -MD -MP -MF $(DEPDIR)/sasstringbtree_t.Tpo -c -o sasstringbtree_t.obj `if test -f 'tests/sasstringbtree_t.c'; then $(CYGPATH_W) 'tests/sasstringbtree_t.c'; else $(CYGPATH_W) '$(srcdir)/tests/sasstringbtree_t.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/sasstringbtree_t.Tpo $(DEPDIR)/sasstringbtree_t.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='tests/sasstringbtree_t.c' object='sasstringbtree_t.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o sasstringbtree_t.obj `if test -f 'tests/sasstringbtree_t.c'; then $(CYGPATH_W) 'tests/sasstringbtree_t.c'; else $(CYGPATH_W) '$(srcdir)/tests/sasstringbtree_t.c'; fi`
-
-sasstringbtree_tt.o: tests/sasstringbtree_tt.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT sasstringbtree_tt.o -MD -MP -MF $(DEPDIR)/sasstringbtree_tt.Tpo -c -o sasstringbtree_tt.o `test -f 'tests/sasstringbtree_tt.c' || echo '$(srcdir)/'`tests/sasstringbtree_tt.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/sasstringbtree_tt.Tpo $(DEPDIR)/sasstringbtree_tt.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='tests/sasstringbtree_tt.c' object='sasstringbtree_tt.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o sasstringbtree_tt.o `test -f 'tests/sasstringbtree_tt.c' || echo '$(srcdir)/'`tests/sasstringbtree_tt.c
-
-sasstringbtree_tt.obj: tests/sasstringbtree_tt.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT sasstringbtree_tt.obj -MD -MP -MF $(DEPDIR)/sasstringbtree_tt.Tpo -c -o sasstringbtree_tt.obj `if test -f 'tests/sasstringbtree_tt.c'; then $(CYGPATH_W) 'tests/sasstringbtree_tt.c'; else $(CYGPATH_W) '$(srcdir)/tests/sasstringbtree_tt.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/sasstringbtree_tt.Tpo $(DEPDIR)/sasstringbtree_tt.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='tests/sasstringbtree_tt.c' object='sasstringbtree_tt.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o sasstringbtree_tt.obj `if test -f 'tests/sasstringbtree_tt.c'; then $(CYGPATH_W) 'tests/sasstringbtree_tt.c'; else $(CYGPATH_W) '$(srcdir)/tests/sasstringbtree_tt.c'; fi`
-
-sphcontext_t.o: tests/sphcontext_t.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT sphcontext_t.o -MD -MP -MF $(DEPDIR)/sphcontext_t.Tpo -c -o sphcontext_t.o `test -f 'tests/sphcontext_t.c' || echo '$(srcdir)/'`tests/sphcontext_t.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/sphcontext_t.Tpo $(DEPDIR)/sphcontext_t.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='tests/sphcontext_t.c' object='sphcontext_t.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o sphcontext_t.o `test -f 'tests/sphcontext_t.c' || echo '$(srcdir)/'`tests/sphcontext_t.c
-
-sphcontext_t.obj: tests/sphcontext_t.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT sphcontext_t.obj -MD -MP -MF $(DEPDIR)/sphcontext_t.Tpo -c -o sphcontext_t.obj `if test -f 'tests/sphcontext_t.c'; then $(CYGPATH_W) 'tests/sphcontext_t.c'; else $(CYGPATH_W) '$(srcdir)/tests/sphcontext_t.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/sphcontext_t.Tpo $(DEPDIR)/sphcontext_t.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='tests/sphcontext_t.c' object='sphcontext_t.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o sphcontext_t.obj `if test -f 'tests/sphcontext_t.c'; then $(CYGPATH_W) 'tests/sphcontext_t.c'; else $(CYGPATH_W) '$(srcdir)/tests/sphcontext_t.c'; fi`
-
-sphdirectpcqueue_ttt.o: tests/sphdirectpcqueue_ttt.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT sphdirectpcqueue_ttt.o -MD -MP -MF $(DEPDIR)/sphdirectpcqueue_ttt.Tpo -c -o sphdirectpcqueue_ttt.o `test -f 'tests/sphdirectpcqueue_ttt.c' || echo '$(srcdir)/'`tests/sphdirectpcqueue_ttt.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/sphdirectpcqueue_ttt.Tpo $(DEPDIR)/sphdirectpcqueue_ttt.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='tests/sphdirectpcqueue_ttt.c' object='sphdirectpcqueue_ttt.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o sphdirectpcqueue_ttt.o `test -f 'tests/sphdirectpcqueue_ttt.c' || echo '$(srcdir)/'`tests/sphdirectpcqueue_ttt.c
-
-sphdirectpcqueue_ttt.obj: tests/sphdirectpcqueue_ttt.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT sphdirectpcqueue_ttt.obj -MD -MP -MF $(DEPDIR)/sphdirectpcqueue_ttt.Tpo -c -o sphdirectpcqueue_ttt.obj `if test -f 'tests/sphdirectpcqueue_ttt.c'; then $(CYGPATH_W) 'tests/sphdirectpcqueue_ttt.c'; else $(CYGPATH_W) '$(srcdir)/tests/sphdirectpcqueue_ttt.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/sphdirectpcqueue_ttt.Tpo $(DEPDIR)/sphdirectpcqueue_ttt.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='tests/sphdirectpcqueue_ttt.c' object='sphdirectpcqueue_ttt.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o sphdirectpcqueue_ttt.obj `if test -f 'tests/sphdirectpcqueue_ttt.c'; then $(CYGPATH_W) 'tests/sphdirectpcqueue_ttt.c'; else $(CYGPATH_W) '$(srcdir)/tests/sphdirectpcqueue_ttt.c'; fi`
-
-sphgtod_t.o: tests/sphgtod_t.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT sphgtod_t.o -MD -MP -MF $(DEPDIR)/sphgtod_t.Tpo -c -o sphgtod_t.o `test -f 'tests/sphgtod_t.c' || echo '$(srcdir)/'`tests/sphgtod_t.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/sphgtod_t.Tpo $(DEPDIR)/sphgtod_t.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='tests/sphgtod_t.c' object='sphgtod_t.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o sphgtod_t.o `test -f 'tests/sphgtod_t.c' || echo '$(srcdir)/'`tests/sphgtod_t.c
-
-sphgtod_t.obj: tests/sphgtod_t.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT sphgtod_t.obj -MD -MP -MF $(DEPDIR)/sphgtod_t.Tpo -c -o sphgtod_t.obj `if test -f 'tests/sphgtod_t.c'; then $(CYGPATH_W) 'tests/sphgtod_t.c'; else $(CYGPATH_W) '$(srcdir)/tests/sphgtod_t.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/sphgtod_t.Tpo $(DEPDIR)/sphgtod_t.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='tests/sphgtod_t.c' object='sphgtod_t.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o sphgtod_t.obj `if test -f 'tests/sphgtod_t.c'; then $(CYGPATH_W) 'tests/sphgtod_t.c'; else $(CYGPATH_W) '$(srcdir)/tests/sphgtod_t.c'; fi`
-
-sphlflogger_t.o: tests/sphlflogger_t.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT sphlflogger_t.o -MD -MP -MF $(DEPDIR)/sphlflogger_t.Tpo -c -o sphlflogger_t.o `test -f 'tests/sphlflogger_t.c' || echo '$(srcdir)/'`tests/sphlflogger_t.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/sphlflogger_t.Tpo $(DEPDIR)/sphlflogger_t.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='tests/sphlflogger_t.c' object='sphlflogger_t.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o sphlflogger_t.o `test -f 'tests/sphlflogger_t.c' || echo '$(srcdir)/'`tests/sphlflogger_t.c
-
-sphlflogger_t.obj: tests/sphlflogger_t.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT sphlflogger_t.obj -MD -MP -MF $(DEPDIR)/sphlflogger_t.Tpo -c -o sphlflogger_t.obj `if test -f 'tests/sphlflogger_t.c'; then $(CYGPATH_W) 'tests/sphlflogger_t.c'; else $(CYGPATH_W) '$(srcdir)/tests/sphlflogger_t.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/sphlflogger_t.Tpo $(DEPDIR)/sphlflogger_t.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='tests/sphlflogger_t.c' object='sphlflogger_t.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o sphlflogger_t.obj `if test -f 'tests/sphlflogger_t.c'; then $(CYGPATH_W) 'tests/sphlflogger_t.c'; else $(CYGPATH_W) '$(srcdir)/tests/sphlflogger_t.c'; fi`
-
-sphlflogger_tt-sphlflogger_tt.o: tests/sphlflogger_tt.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sphlflogger_tt_CFLAGS) $(CFLAGS) -MT sphlflogger_tt-sphlflogger_tt.o -MD -MP -MF $(DEPDIR)/sphlflogger_tt-sphlflogger_tt.Tpo -c -o sphlflogger_tt-sphlflogger_tt.o `test -f 'tests/sphlflogger_tt.c' || echo '$(srcdir)/'`tests/sphlflogger_tt.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/sphlflogger_tt-sphlflogger_tt.Tpo $(DEPDIR)/sphlflogger_tt-sphlflogger_tt.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='tests/sphlflogger_tt.c' object='sphlflogger_tt-sphlflogger_tt.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sphlflogger_tt_CFLAGS) $(CFLAGS) -c -o sphlflogger_tt-sphlflogger_tt.o `test -f 'tests/sphlflogger_tt.c' || echo '$(srcdir)/'`tests/sphlflogger_tt.c
-
-sphlflogger_tt-sphlflogger_tt.obj: tests/sphlflogger_tt.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sphlflogger_tt_CFLAGS) $(CFLAGS) -MT sphlflogger_tt-sphlflogger_tt.obj -MD -MP -MF $(DEPDIR)/sphlflogger_tt-sphlflogger_tt.Tpo -c -o sphlflogger_tt-sphlflogger_tt.obj `if test -f 'tests/sphlflogger_tt.c'; then $(CYGPATH_W) 'tests/sphlflogger_tt.c'; else $(CYGPATH_W) '$(srcdir)/tests/sphlflogger_tt.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/sphlflogger_tt-sphlflogger_tt.Tpo $(DEPDIR)/sphlflogger_tt-sphlflogger_tt.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='tests/sphlflogger_tt.c' object='sphlflogger_tt-sphlflogger_tt.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sphlflogger_tt_CFLAGS) $(CFLAGS) -c -o sphlflogger_tt-sphlflogger_tt.obj `if test -f 'tests/sphlflogger_tt.c'; then $(CYGPATH_W) 'tests/sphlflogger_tt.c'; else $(CYGPATH_W) '$(srcdir)/tests/sphlflogger_tt.c'; fi`
-
-sphlflogger_ttt-sphlflogger_ttt.o: tests/sphlflogger_ttt.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sphlflogger_ttt_CFLAGS) $(CFLAGS) -MT sphlflogger_ttt-sphlflogger_ttt.o -MD -MP -MF $(DEPDIR)/sphlflogger_ttt-sphlflogger_ttt.Tpo -c -o sphlflogger_ttt-sphlflogger_ttt.o `test -f 'tests/sphlflogger_ttt.c' || echo '$(srcdir)/'`tests/sphlflogger_ttt.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/sphlflogger_ttt-sphlflogger_ttt.Tpo $(DEPDIR)/sphlflogger_ttt-sphlflogger_ttt.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='tests/sphlflogger_ttt.c' object='sphlflogger_ttt-sphlflogger_ttt.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sphlflogger_ttt_CFLAGS) $(CFLAGS) -c -o sphlflogger_ttt-sphlflogger_ttt.o `test -f 'tests/sphlflogger_ttt.c' || echo '$(srcdir)/'`tests/sphlflogger_ttt.c
-
-sphlflogger_ttt-sphlflogger_ttt.obj: tests/sphlflogger_ttt.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sphlflogger_ttt_CFLAGS) $(CFLAGS) -MT sphlflogger_ttt-sphlflogger_ttt.obj -MD -MP -MF $(DEPDIR)/sphlflogger_ttt-sphlflogger_ttt.Tpo -c -o sphlflogger_ttt-sphlflogger_ttt.obj `if test -f 'tests/sphlflogger_ttt.c'; then $(CYGPATH_W) 'tests/sphlflogger_ttt.c'; else $(CYGPATH_W) '$(srcdir)/tests/sphlflogger_ttt.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/sphlflogger_ttt-sphlflogger_ttt.Tpo $(DEPDIR)/sphlflogger_ttt-sphlflogger_ttt.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='tests/sphlflogger_ttt.c' object='sphlflogger_ttt-sphlflogger_ttt.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sphlflogger_ttt_CFLAGS) $(CFLAGS) -c -o sphlflogger_ttt-sphlflogger_ttt.obj `if test -f 'tests/sphlflogger_ttt.c'; then $(CYGPATH_W) 'tests/sphlflogger_ttt.c'; else $(CYGPATH_W) '$(srcdir)/tests/sphlflogger_ttt.c'; fi`
-
-sphlockfreeheap_t.o: tests/sphlockfreeheap_t.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT sphlockfreeheap_t.o -MD -MP -MF $(DEPDIR)/sphlockfreeheap_t.Tpo -c -o sphlockfreeheap_t.o `test -f 'tests/sphlockfreeheap_t.c' || echo '$(srcdir)/'`tests/sphlockfreeheap_t.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/sphlockfreeheap_t.Tpo $(DEPDIR)/sphlockfreeheap_t.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='tests/sphlockfreeheap_t.c' object='sphlockfreeheap_t.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o sphlockfreeheap_t.o `test -f 'tests/sphlockfreeheap_t.c' || echo '$(srcdir)/'`tests/sphlockfreeheap_t.c
-
-sphlockfreeheap_t.obj: tests/sphlockfreeheap_t.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT sphlockfreeheap_t.obj -MD -MP -MF $(DEPDIR)/sphlockfreeheap_t.Tpo -c -o sphlockfreeheap_t.obj `if test -f 'tests/sphlockfreeheap_t.c'; then $(CYGPATH_W) 'tests/sphlockfreeheap_t.c'; else $(CYGPATH_W) '$(srcdir)/tests/sphlockfreeheap_t.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/sphlockfreeheap_t.Tpo $(DEPDIR)/sphlockfreeheap_t.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='tests/sphlockfreeheap_t.c' object='sphlockfreeheap_t.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o sphlockfreeheap_t.obj `if test -f 'tests/sphlockfreeheap_t.c'; then $(CYGPATH_W) 'tests/sphlockfreeheap_t.c'; else $(CYGPATH_W) '$(srcdir)/tests/sphlockfreeheap_t.c'; fi`
-
-sphlogportal_t.o: tests/sphlogportal_t.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT sphlogportal_t.o -MD -MP -MF $(DEPDIR)/sphlogportal_t.Tpo -c -o sphlogportal_t.o `test -f 'tests/sphlogportal_t.c' || echo '$(srcdir)/'`tests/sphlogportal_t.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/sphlogportal_t.Tpo $(DEPDIR)/sphlogportal_t.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='tests/sphlogportal_t.c' object='sphlogportal_t.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o sphlogportal_t.o `test -f 'tests/sphlogportal_t.c' || echo '$(srcdir)/'`tests/sphlogportal_t.c
-
-sphlogportal_t.obj: tests/sphlogportal_t.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT sphlogportal_t.obj -MD -MP -MF $(DEPDIR)/sphlogportal_t.Tpo -c -o sphlogportal_t.obj `if test -f 'tests/sphlogportal_t.c'; then $(CYGPATH_W) 'tests/sphlogportal_t.c'; else $(CYGPATH_W) '$(srcdir)/tests/sphlogportal_t.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/sphlogportal_t.Tpo $(DEPDIR)/sphlogportal_t.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='tests/sphlogportal_t.c' object='sphlogportal_t.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o sphlogportal_t.obj `if test -f 'tests/sphlogportal_t.c'; then $(CYGPATH_W) 'tests/sphlogportal_t.c'; else $(CYGPATH_W) '$(srcdir)/tests/sphlogportal_t.c'; fi`
-
-sphsinglepcqueue_t.o: tests/sphsinglepcqueue_t.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT sphsinglepcqueue_t.o -MD -MP -MF $(DEPDIR)/sphsinglepcqueue_t.Tpo -c -o sphsinglepcqueue_t.o `test -f 'tests/sphsinglepcqueue_t.c' || echo '$(srcdir)/'`tests/sphsinglepcqueue_t.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/sphsinglepcqueue_t.Tpo $(DEPDIR)/sphsinglepcqueue_t.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='tests/sphsinglepcqueue_t.c' object='sphsinglepcqueue_t.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o sphsinglepcqueue_t.o `test -f 'tests/sphsinglepcqueue_t.c' || echo '$(srcdir)/'`tests/sphsinglepcqueue_t.c
-
-sphsinglepcqueue_t.obj: tests/sphsinglepcqueue_t.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT sphsinglepcqueue_t.obj -MD -MP -MF $(DEPDIR)/sphsinglepcqueue_t.Tpo -c -o sphsinglepcqueue_t.obj `if test -f 'tests/sphsinglepcqueue_t.c'; then $(CYGPATH_W) 'tests/sphsinglepcqueue_t.c'; else $(CYGPATH_W) '$(srcdir)/tests/sphsinglepcqueue_t.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/sphsinglepcqueue_t.Tpo $(DEPDIR)/sphsinglepcqueue_t.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='tests/sphsinglepcqueue_t.c' object='sphsinglepcqueue_t.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o sphsinglepcqueue_t.obj `if test -f 'tests/sphsinglepcqueue_t.c'; then $(CYGPATH_W) 'tests/sphsinglepcqueue_t.c'; else $(CYGPATH_W) '$(srcdir)/tests/sphsinglepcqueue_t.c'; fi`
-
-sphsinglepcqueue_tt.o: tests/sphsinglepcqueue_tt.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT sphsinglepcqueue_tt.o -MD -MP -MF $(DEPDIR)/sphsinglepcqueue_tt.Tpo -c -o sphsinglepcqueue_tt.o `test -f 'tests/sphsinglepcqueue_tt.c' || echo '$(srcdir)/'`tests/sphsinglepcqueue_tt.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/sphsinglepcqueue_tt.Tpo $(DEPDIR)/sphsinglepcqueue_tt.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='tests/sphsinglepcqueue_tt.c' object='sphsinglepcqueue_tt.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o sphsinglepcqueue_tt.o `test -f 'tests/sphsinglepcqueue_tt.c' || echo '$(srcdir)/'`tests/sphsinglepcqueue_tt.c
-
-sphsinglepcqueue_tt.obj: tests/sphsinglepcqueue_tt.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT sphsinglepcqueue_tt.obj -MD -MP -MF $(DEPDIR)/sphsinglepcqueue_tt.Tpo -c -o sphsinglepcqueue_tt.obj `if test -f 'tests/sphsinglepcqueue_tt.c'; then $(CYGPATH_W) 'tests/sphsinglepcqueue_tt.c'; else $(CYGPATH_W) '$(srcdir)/tests/sphsinglepcqueue_tt.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/sphsinglepcqueue_tt.Tpo $(DEPDIR)/sphsinglepcqueue_tt.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='tests/sphsinglepcqueue_tt.c' object='sphsinglepcqueue_tt.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o sphsinglepcqueue_tt.obj `if test -f 'tests/sphsinglepcqueue_tt.c'; then $(CYGPATH_W) 'tests/sphsinglepcqueue_tt.c'; else $(CYGPATH_W) '$(srcdir)/tests/sphsinglepcqueue_tt.c'; fi`
-
-sphsinglepcqueue_ttt.o: tests/sphsinglepcqueue_ttt.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT sphsinglepcqueue_ttt.o -MD -MP -MF $(DEPDIR)/sphsinglepcqueue_ttt.Tpo -c -o sphsinglepcqueue_ttt.o `test -f 'tests/sphsinglepcqueue_ttt.c' || echo '$(srcdir)/'`tests/sphsinglepcqueue_ttt.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/sphsinglepcqueue_ttt.Tpo $(DEPDIR)/sphsinglepcqueue_ttt.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='tests/sphsinglepcqueue_ttt.c' object='sphsinglepcqueue_ttt.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o sphsinglepcqueue_ttt.o `test -f 'tests/sphsinglepcqueue_ttt.c' || echo '$(srcdir)/'`tests/sphsinglepcqueue_ttt.c
-
-sphsinglepcqueue_ttt.obj: tests/sphsinglepcqueue_ttt.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT sphsinglepcqueue_ttt.obj -MD -MP -MF $(DEPDIR)/sphsinglepcqueue_ttt.Tpo -c -o sphsinglepcqueue_ttt.obj `if test -f 'tests/sphsinglepcqueue_ttt.c'; then $(CYGPATH_W) 'tests/sphsinglepcqueue_ttt.c'; else $(CYGPATH_W) '$(srcdir)/tests/sphsinglepcqueue_ttt.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/sphsinglepcqueue_ttt.Tpo $(DEPDIR)/sphsinglepcqueue_ttt.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='tests/sphsinglepcqueue_ttt.c' object='sphsinglepcqueue_ttt.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o sphsinglepcqueue_ttt.obj `if test -f 'tests/sphsinglepcqueue_ttt.c'; then $(CYGPATH_W) 'tests/sphsinglepcqueue_ttt.c'; else $(CYGPATH_W) '$(srcdir)/tests/sphsinglepcqueue_ttt.c'; fi`
-
-sphthread_t.o: tests/sphthread_t.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT sphthread_t.o -MD -MP -MF $(DEPDIR)/sphthread_t.Tpo -c -o sphthread_t.o `test -f 'tests/sphthread_t.c' || echo '$(srcdir)/'`tests/sphthread_t.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/sphthread_t.Tpo $(DEPDIR)/sphthread_t.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='tests/sphthread_t.c' object='sphthread_t.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o sphthread_t.o `test -f 'tests/sphthread_t.c' || echo '$(srcdir)/'`tests/sphthread_t.c
-
-sphthread_t.obj: tests/sphthread_t.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT sphthread_t.obj -MD -MP -MF $(DEPDIR)/sphthread_t.Tpo -c -o sphthread_t.obj `if test -f 'tests/sphthread_t.c'; then $(CYGPATH_W) 'tests/sphthread_t.c'; else $(CYGPATH_W) '$(srcdir)/tests/sphthread_t.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/sphthread_t.Tpo $(DEPDIR)/sphthread_t.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='tests/sphthread_t.c' object='sphthread_t.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o sphthread_t.obj `if test -f 'tests/sphthread_t.c'; then $(CYGPATH_W) 'tests/sphthread_t.c'; else $(CYGPATH_W) '$(srcdir)/tests/sphthread_t.c'; fi`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sphlflogger_ttt_CFLAGS) $(CFLAGS) -c -o tests/sphlflogger_ttt-sphlflogger_ttt.obj `if test -f 'tests/sphlflogger_ttt.c'; then $(CYGPATH_W) 'tests/sphlflogger_ttt.c'; else $(CYGPATH_W) '$(srcdir)/tests/sphlflogger_ttt.c'; fi`
 
 .cpp.o:
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
+@am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ $< &&\
+@am__fastdepCXX_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Po
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXXCOMPILE) -c -o $@ $<
 
 .cpp.obj:
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ `$(CYGPATH_W) '$<'`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.obj$$||'`;\
+@am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ `$(CYGPATH_W) '$<'` &&\
+@am__fastdepCXX_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Po
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXXCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
 
 .cpp.lo:
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LTCXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Plo
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.lo$$||'`;\
+@am__fastdepCXX_TRUE@	$(LTCXXCOMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ $< &&\
+@am__fastdepCXX_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LTCXXCOMPILE) -c -o $@ $<
@@ -2087,6 +1904,8 @@ clean-generic:
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
 	-test . = "$(srcdir)" || test -z "$(CONFIG_CLEAN_VPATH_FILES)" || rm -f $(CONFIG_CLEAN_VPATH_FILES)
+	-rm -f tests/$(DEPDIR)/$(am__dirstamp)
+	-rm -f tests/$(am__dirstamp)
 
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
@@ -2097,7 +1916,7 @@ clean-am: clean-binPROGRAMS clean-checkPROGRAMS clean-generic \
 	clean-libLTLIBRARIES clean-libtool mostlyclean-am
 
 distclean: distclean-am
-	-rm -rf ./$(DEPDIR)
+	-rm -rf ./$(DEPDIR) tests/$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
@@ -2144,7 +1963,7 @@ install-ps-am:
 installcheck-am:
 
 maintainer-clean: maintainer-clean-am
-	-rm -rf ./$(DEPDIR)
+	-rm -rf ./$(DEPDIR) tests/$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 

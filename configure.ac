@@ -10,7 +10,7 @@ AC_INIT([libsphde], [1.1.0], munroesj@us.ibm.com)
 AC_CONFIG_SRCDIR([src/sassim.cpp])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIR([m4])
-AM_INIT_AUTOMAKE([1.10 no-define foreign])
+AM_INIT_AUTOMAKE([1.10 no-define foreign subdir-objects])
 AM_MAINTAINER_MODE([disable])
 
 # Update this value for every release: (A:B:C will map to foo.so.(A-C).C.B)
