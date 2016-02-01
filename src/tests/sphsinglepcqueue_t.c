@@ -198,12 +198,12 @@ lfpcqueue_stride_direct_test (char *x4k)
           if(tptr & (sizeof(double) -1))
           {
               printf
-                ("error lfpcqueue_stride_direct_test SPHLFEntryDirectGetPtrAligned(%p, %ld) failed)\n",
+                ("error lfpcqueue_stride_direct_test SPHLFEntryDirectGetPtrAligned(%p, %zu) failed)\n",
                 		handle, (sizeof(double)));
               rc++;
           } else {
               printf
-                ("lfpcqueue_stride_direct_test SPHLFEntryDirectGetPtrAligned(%p, %ld)) = %p\n",
+                ("lfpcqueue_stride_direct_test SPHLFEntryDirectGetPtrAligned(%p, %zu)) = %p\n",
                 		handle, (sizeof(double)), (void*)tptr);
           }
 
@@ -268,12 +268,12 @@ lfpcqueue_stride_direct_test (char *x4k)
           if(tptr & (sizeof(double) -1))
           {
               printf
-                ("error lfpcqueue_stride_direct_test SPHLFEntryDirectIncAndAlign(%p, %ld, %ld) failed)\n",
+                ("error lfpcqueue_stride_direct_test SPHLFEntryDirectIncAndAlign(%p, %zu, %zu) failed)\n",
                 		temp2, (strlen(temp2)+1), (sizeof(double)));
               rc++;
           } else {
               printf
-                ("lfpcqueue_stride_direct_test SPHLFEntryDirectIncAndAlign(%p, %ld, %ld)) = %p\n",
+                ("lfpcqueue_stride_direct_test SPHLFEntryDirectIncAndAlign(%p, %zu, %zu)) = %p\n",
                 		temp2, (strlen(temp2)+1), (sizeof(double)), (void*)tptr);
           }
 
