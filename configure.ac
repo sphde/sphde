@@ -5,7 +5,7 @@
 AC_PREREQ(2.63)
 
 #Autoconf versioning is A:C:B
-AC_INIT([libsphde], [1.1.0], munroesj@us.ibm.com)
+AC_INIT([libsphde], [1.1.0], munroesj@us.ibm.com raji@linux.vnet.ibm.com tulioqm@br.ibm.com)
 
 AC_CONFIG_SRCDIR([src/sassim.cpp])
 AC_CONFIG_HEADERS([config.h])
