@@ -10,7 +10,7 @@ SUBDIRS = src
 DIST_SUBDIRS = examples $(SUBDIRS)
 
 man1_MANS = doc/man/man1/sasutil.1
-EXTRA_DIST = $(man1_MANS) doc
+EXTRA_DIST = $(DX_CONFIG) doc/sphmaindox.h
 
 $(man1_MANS): doc
 
