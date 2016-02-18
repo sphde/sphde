@@ -177,6 +177,7 @@ SASIndexKeyInitRef (SASIndexKey_t * dest, void *value)
 /** \brief Union of value types and key machine integer types.
 */
 typedef union {
+    /*! data area containing the binary key. */
 #ifdef __WORDSIZE_64
 	machine_uint_t	key_element;
 #else
@@ -190,8 +191,11 @@ typedef union {
 #endif
     } key_element;
 #endif
+    /*! key element type as an unsigned 64-bit integer. */
     unsigned long long	uint64_key;
+    /*! key element type as a signed 64-bit integer. */
     long long			int64_key;
+    /*! key element type as a double. */
     double				double_key;
 	} sasindexkeymap_t;
 

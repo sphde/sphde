@@ -53,6 +53,7 @@
  * \endcode
  */
 
+/** \brief ignore this macro behind the curtain. **/
 #ifdef __cplusplus
 #define __C__ "C"
 #else
@@ -116,6 +117,7 @@ typedef unsigned long long int sphtimer_t;
   } while (0)
 #else
 #include <time.h>
+/** \brief Read the Time Base value. **/
 #define __TIME_BASE(__time_v)				\
   do {							\
     struct timespec __ts;					\
