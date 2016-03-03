@@ -392,9 +392,9 @@ ACLOCAL_AMFLAGS = -I m4
 dist_doc_DATA = COPYING ChangeLog.md
 SUBDIRS = src
 DIST_SUBDIRS = examples $(SUBDIRS)
-man1_MANS = doc/man/man1/sasutil.1
-EXTRA_DIST = $(man1_MANS) doc
-MOSTLYCLEANFILES = $(DX_CLEANFILES)
+EXTRA_DIST = $(DX_CONFIG) doc/sphmaindox.h
+@DX_COND_doc_TRUE@man1_MANS = doc/man/man1/sasutil.1
+@DX_COND_doc_TRUE@MOSTLYCLEANFILES = $(DX_CLEANFILES)
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 
@@ -979,7 +979,7 @@ uninstall-man: uninstall-man1
 @DX_COND_doc_TRUE@		$(DX_ENV) $(DX_DOXYGEN) $(srcdir)/$$doxyfile; \
 @DX_COND_doc_TRUE@	done
 
-$(man1_MANS): doc
+@DX_COND_doc_TRUE@$(man1_MANS): doc
 
 ChangeLog.md:
 	$(am__cd) $(top_srcdir) && ./generate-changelog.sh > \
