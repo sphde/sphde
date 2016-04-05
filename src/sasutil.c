@@ -634,7 +634,7 @@ main(int argc, char *argv[])
       exit(EXIT_SUCCESS);
     }
   }
-  sasutil_usage("invalid command: %s\n", cmd);
+  sasutil_help("invalid command: %s\n", cmd);
 
 
   return 0;
