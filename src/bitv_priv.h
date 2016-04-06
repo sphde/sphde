@@ -132,7 +132,7 @@ bitv_allocated_size (bitv_cb_t *cb, bitv_word *bvec, bitv_word *endvec, bitv_wor
 	That an end mark is set between the starting offset and the
 	end of end makr vector.
    returns:
-	Non-zero allocation size in bytes 0 if the deallocation was sucessful from this bitv_word
+	Non-zero allocation size in bytes 0 if the deallocation was successful from this bitv_word
 	or zero of  no allocation
 */
 	size_t alloc_units = 0;
@@ -160,7 +160,7 @@ bitv_allocated_size_chk (bitv_cb_t *cb, bitv_word *bvec, bitv_word *endvec, bitv
 	That an end mark is set between the starting offset and the
 	end of end makr vector.
    returns:
-	Non-zero allocation size in bytes 0 if the deallocation was sucessful from this bitv_word
+	Non-zero allocation size in bytes 0 if the deallocation was successful from this bitv_word
 	or zero of  no allocation
 */
 	size_t alloc_units = 0;

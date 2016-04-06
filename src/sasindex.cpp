@@ -671,7 +671,7 @@ SASIndexNearAlloc(void *nearObj)
 }
 
 /* This section handles allocation of spill heaps and adds them to the 
- * spillList.  The preference is to allocate a spill heap withing the same
+ * spillList.  The preference is to allocate a spill heap within the same
  * compoundHead as the near object.  If space is not available in the near
  * compoundHeap it will allocate from another compoundHeap in the expanded
  * list.  If the local spill list is full or the a spill heap can not be

@@ -43,10 +43,10 @@
 *
 *       -This class also enables collection and printing of lock table
 *       statistics, such as distribution info (i.e., load factor) and
-*       useage.  The printHighLevelStats() method prints load factor
+*       usage.  The printHighLevelStats() method prints load factor
 *       info and other totals.  printDetailedStats() prints info
 *       on each table entry containing one or more locks, and also
-*       prints out how many times each lock was locked (useage).
+*       prints out how many times each lock was locked (usage).
 *       In order to collect and print this detailed information, the
 *       user must compile with "collectstats" defined.
 *

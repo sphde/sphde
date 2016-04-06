@@ -239,7 +239,7 @@ sas_set_locked_ptr (volatile sas_lock_ptr_t *lock, sas_lock_ptr_t newptr)
 }
 
 /*!
- * The function tried to lock \a lock. If the operation is successfull the
+ * The function tried to lock \a lock. If the operation is successful the
  * function return 0 or 1 otherwise.
  */
 static inline int

@@ -174,7 +174,7 @@ extern __C__ SASCompoundHeap_t SASCompoundHeapCreate (block_size_t heap_size);
  * \brief Create a new SAS Compound Heap with \a heap_size size and \a 
  * page_size page size.
  *
- * Similiar to ::SASCompoundHeapCreate but with additional option to set the
+ * Similar to ::SASCompoundHeapCreate but with additional option to set the
  * internal page size.
  *
  * @param heap_size Size of the Compound Heap to create.
@@ -188,7 +188,7 @@ SASCompoundHeapCreatePageSize (block_size_t heap_size,
 /*!
  * \brief Create a new non expanding SAS Compound heap with \a heap_size.
  *
- * Similiar to ::SASCompoundHeapCreate but without the option to expand when
+ * Similar to ::SASCompoundHeapCreate but without the option to expand when
  * load factor allows it.
  *
  * @param heap_size Size of the Compound Heap to create.
@@ -390,7 +390,7 @@ extern __C__ void SASCompoundHeapNearDealloc (void *memAddr);
 /*!
  * \brief Destroy the SAS Compound Heap \a heap.
  *
- * Similiar to ::SASCompoundHeapDestroy but do not hold the write lock on the
+ * Similar to ::SASCompoundHeapDestroy but do not hold the write lock on the
  * memory address.
  *
  * @param heap Handle of the SASCompoundHeap_t.

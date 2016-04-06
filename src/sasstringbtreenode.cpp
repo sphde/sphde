@@ -681,7 +681,7 @@ SASStringBTreeNodeGetCount (SASStringBTreeNode_t header)
 
 // we must return
 // a combined "found" and "position" result. If "found"
-// result is >=0 and == "postion". Otherwise result < 0 and
+// result is >=0 and == "position". Otherwise result < 0 and
 // "position == result + 256;
 short
 SASStringBTreeNodeSearchNode (SASStringBTreeNode_t header, char *target)
@@ -1617,7 +1617,7 @@ SASStringBTreeNodeRemove (SASStringBTreeNode_t node_t, short pos,
 #endif
 
   if (q != NULL)
-    {				// dispose of q, since it is no longer accessable 
+    {				// dispose of q, since it is no longer accessible 
 #ifdef __SASDebugPrint__
       sas_printf ("Remove: delete branch for pos=%hd @%p\n", pos, q);
 #endif
@@ -1966,7 +1966,7 @@ SASStringBTreeNodeRecDelete (SASStringBTreeNode_t header, char *target,
 	    {
 	      found = SASStringBTreeNodeRecDelete (q, node->keys[k], lock_on);
 #if __SASDebugPrint__ > 1
-	      sas_printf ("RecDelete after Sucessor found=%d\n", found);
+	      sas_printf ("RecDelete after Successor found=%d\n", found);
 	      sas_printf ("RecDelete: subtree=");
 	      SASStringBTreeNodePrint (header);
 	      sas_printf ("\n");

@@ -400,7 +400,7 @@ bitv_dealloc_internal (bitv_word * bvec, bitv_word offset, size_t alloc_units)
    verifies:
 	That alloc_units fit within a bitv_word
    returns:
-	0 if the deallocation was sucessful from this bitv_word
+	0 if the deallocation was successful from this bitv_word
 	or nonzero if something failed
 */
   bitv_word req_msk = bitv_units_to_mask (alloc_units);
@@ -412,7 +412,7 @@ bitv_dealloc_internal (bitv_word * bvec, bitv_word offset, size_t alloc_units)
   req_msk >>= offset;
   prv_msk = __sync_fetch_and_or (bvec, req_msk);
   /* Insure that we are deallocating units that were previously
-     allocated. If so the logical and of the orginal unit mask
+     allocated. If so the logical and of the orignal unit mask
      and the requested mask should be 0s. */
   prv_msk &= req_msk;
 #ifdef PRINT_DEBUG
@@ -431,7 +431,7 @@ bitv_dealloc (bitv_cb_t * cb, bitv_word * bvec, bitv_word at, size_t size)
    verifies:
 	That size fits within a bitv_word
    returns:
-	0 if the deallocation was sucessful from this bitv_word
+	0 if the deallocation was successful from this bitv_word
 	or nonzero if something failed
 */
   size_t alloc_units = bitv_round_unit (cb, size);
@@ -460,7 +460,7 @@ bitv_free_marked (bitv_cb_t * cb, bitv_word * bvec, bitv_word * endvec,
 	That an end mark is set between the starting offset and the
 	end of end makr vector.
    returns:
-	0 if the deallocation was sucessful from this bitv_word
+	0 if the deallocation was successful from this bitv_word
 	or nonzero if something failed
 */
   int rc = -1;

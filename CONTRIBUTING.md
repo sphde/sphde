@@ -1,7 +1,7 @@
 # Process For Accepting Third Party Code Contributions
 
 To improve tracking of contributions to this project we will use a process
-modeled on the modified DCO 1.1 and use a "sign-off" procedure on patches that
+modelled on the modified DCO 1.1 and use a "sign-off" procedure on patches that
 are being emailed around or contributed in any other way.
 
 The sign-off is a simple line at the end of the explanation for the patch, which
