@@ -31,7 +31,7 @@
 *
 *	A portal is used when the required capacity for logger entries
 *	exceeds that posible for a single logger. Or we need to support
-*	rolling/continous logs over a long period of time. By switching out
+*	rolling/continuous logs over a long period of time. By switching out
 *	filled loggers with new/empty loggers, logging can continue indeffinitely.
 */
 
@@ -244,7 +244,7 @@ SPHLFPortalCreateIterator (SPHLogPortal_t portal,
 *	the next logger allocated to this portal.
 *	If we are at the end of the list of allocated loggers we are done.
 *
-*	@param iterator Handle asociated with a Log Portal.
+*	@param iterator Handle associated with a Log Portal.
 *	@param handlespace Address of local area that will be initialied as a
 *	SPHLFLoggerHandle_t for the allocated entry.
 *	@return the address of the provided handlespace or NULL.

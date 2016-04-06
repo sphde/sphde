@@ -146,7 +146,7 @@ SASIndexExpandCreate (SASIndex_t btree);
  * \brief Create a new expanding SAS B-Tree with \a heap_size size
  * and \a page_size node size.
  *
- * Similiar to ::SASIndexCreate but with additional option to set the
+ * Similar to ::SASIndexCreate but with additional option to set the
  * internal node page size.
  *
  * @param block_size Size of the B-Tree to create.

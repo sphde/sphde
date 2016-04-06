@@ -91,7 +91,7 @@ lflogger_basic_test (char *x4k)
 	}
       else
 	{
-	  printf ("lflogger_basic_test SPHLFLoggerEmpty(%p) false, suceeds\n",
+	  printf ("lflogger_basic_test SPHLFLoggerEmpty(%p) false, succeeds\n",
 		  lfLog);
 	}
 
@@ -253,7 +253,7 @@ lflogger_basic_test (char *x4k)
 	}
       else
 	{
-	  printf ("lflogger_basic_test SPHLFLoggerFull(%p) true, suceeds\n",
+	  printf ("lflogger_basic_test SPHLFLoggerFull(%p) true, succeeds\n",
 		  lfLog);
 	}
     }
@@ -334,7 +334,7 @@ lflogger_basic_test (char *x4k)
 	}
       else
 	{
-	  printf ("lflogger_basic_test SPHLFLoggerEmpty(%p) false, suceeds\n",
+	  printf ("lflogger_basic_test SPHLFLoggerEmpty(%p) false, succeeds\n",
 		  lfLog);
 	}
 
@@ -452,7 +452,7 @@ lflogger_basic_test (char *x4k)
 	}
       else
 	{
-	  printf ("lflogger_basic_test SPHLFLoggerFull(%p) true, suceeds\n",
+	  printf ("lflogger_basic_test SPHLFLoggerFull(%p) true, succeeds\n",
 		  lfLog);
 	}
     }
@@ -627,7 +627,7 @@ lflogger_timestamp_test (char *x4k)
       else
 	{
 	  printf
-	    ("lflogger_timestamp_test SPHLFLoggerEmpty(%p) false, suceeds\n",
+	    ("lflogger_timestamp_test SPHLFLoggerEmpty(%p) false, succeeds\n",
 	     lfLog);
 	}
 
@@ -1107,7 +1107,7 @@ lflogger_timestamp_test (char *x4k)
       else
 	{
 	  printf
-	    ("lflogger_timestamp_test SPHLFLoggerFull(%p) true, suceeds\n",
+	    ("lflogger_timestamp_test SPHLFLoggerFull(%p) true, succeeds\n",
 	     lfLog);
 	}
     }
@@ -3008,7 +3008,7 @@ lflogger_dataget_test (char *x4k)
       valc = SPHLFlogEntryGetNextChar (&handle1);
       if (valc == 'a')
 	{
-	  printf ("sucess SPHLFlogEntryGetNextChar(%p) returned %c\n",
+	  printf ("success SPHLFlogEntryGetNextChar(%p) returned %c\n",
 		  &handle1, valc);
 	}
       else
@@ -3026,7 +3026,7 @@ lflogger_dataget_test (char *x4k)
       valsi = SPHLFlogEntryGetNextShort (&handle1);
       if (valsi == 1234)
 	{
-	  printf ("sucess SPHLFlogEntryGetNextShort(%p) returned %hd\n",
+	  printf ("success SPHLFlogEntryGetNextShort(%p) returned %hd\n",
 		  &handle1, valsi);
 	}
       else
@@ -3043,7 +3043,7 @@ lflogger_dataget_test (char *x4k)
       valsi = SPHLFlogEntryGetNextShort (&handle1);
       if (valsi == 12345)
 	{
-	  printf ("sucess SPHLFlogEntryGetNextShort(%p) returned %hd\n",
+	  printf ("success SPHLFlogEntryGetNextShort(%p) returned %hd\n",
 		  &handle1, valsi);
 	}
       else
@@ -3060,7 +3060,7 @@ lflogger_dataget_test (char *x4k)
       valc = SPHLFlogEntryGetNextChar (&handle1);
       if (valc == 'b')
 	{
-	  printf ("sucess SPHLFlogEntryGetNextChar(%p) returned %c\n",
+	  printf ("success SPHLFlogEntryGetNextChar(%p) returned %c\n",
 		  &handle1, valc);
 	}
       else
@@ -3078,7 +3078,7 @@ lflogger_dataget_test (char *x4k)
       vali = SPHLFlogEntryGetNextInt (&handle1);
       if (vali == 123456)
 	{
-	  printf ("sucess SPHLFlogEntryGetNextInt(%p) returned %d\n",
+	  printf ("success SPHLFlogEntryGetNextInt(%p) returned %d\n",
 		  &handle1, vali);
 	}
       else
@@ -3095,7 +3095,7 @@ lflogger_dataget_test (char *x4k)
       vali = SPHLFlogEntryGetNextInt (&handle1);
       if (vali == 1234567)
 	{
-	  printf ("sucess SPHLFlogEntryGetNextInt(%p) returned %d\n",
+	  printf ("success SPHLFlogEntryGetNextInt(%p) returned %d\n",
 		  &handle1, vali);
 	}
       else
@@ -3112,7 +3112,7 @@ lflogger_dataget_test (char *x4k)
       valc = SPHLFlogEntryGetNextChar (&handle1);
       if (valc == 'c')
 	{
-	  printf ("sucess SPHLFlogEntryGetNextChar(%p) returned %c\n",
+	  printf ("success SPHLFlogEntryGetNextChar(%p) returned %c\n",
 		  &handle1, valc);
 	}
       else
@@ -3130,7 +3130,7 @@ lflogger_dataget_test (char *x4k)
       valll = SPHLFlogEntryGetNextLongLong (&handle1);
       if (valll == 1234567890LL)
 	{
-	  printf ("sucess SPHLFlogEntryGetNextLongLong(%p) returned %lld\n",
+	  printf ("success SPHLFlogEntryGetNextLongLong(%p) returned %lld\n",
 		  &handle1, valll);
 	}
       else
@@ -3147,7 +3147,7 @@ lflogger_dataget_test (char *x4k)
       valll = SPHLFlogEntryGetNextLongLong (&handle1);
       if (valll == 12345678901LL)
 	{
-	  printf ("sucess SPHLFlogEntryGetNextLongLong(%p) returned %lld\n",
+	  printf ("success SPHLFlogEntryGetNextLongLong(%p) returned %lld\n",
 		  &handle1, valll);
 	}
       else
@@ -3164,7 +3164,7 @@ lflogger_dataget_test (char *x4k)
       valc = SPHLFlogEntryGetNextChar (&handle1);
       if (valc == 'd')
 	{
-	  printf ("sucess SPHLFlogEntryGetNextChar(%p) returned %c\n",
+	  printf ("success SPHLFlogEntryGetNextChar(%p) returned %c\n",
 		  &handle1, valc);
 	}
       else
@@ -3182,7 +3182,7 @@ lflogger_dataget_test (char *x4k)
       valp = SPHLFlogEntryGetNextPtr (&handle1);
       if (valp == &handle0)
 	{
-	  printf ("sucess SPHLFlogEntryGetNextPtr(%p) returned %p\n",
+	  printf ("success SPHLFlogEntryGetNextPtr(%p) returned %p\n",
 		  &handle1, valp);
 	}
       else
@@ -3199,7 +3199,7 @@ lflogger_dataget_test (char *x4k)
       valp = SPHLFlogEntryGetNextPtr (&handle1);
       if (valp == &handle1)
 	{
-	  printf ("sucess SPHLFlogEntryGetNextPtr(%p) returned %p\n",
+	  printf ("success SPHLFlogEntryGetNextPtr(%p) returned %p\n",
 		  &handle1, valp);
 	}
       else
@@ -3216,7 +3216,7 @@ lflogger_dataget_test (char *x4k)
       valc = SPHLFlogEntryGetNextChar (&handle1);
       if (valc == 'e')
 	{
-	  printf ("sucess SPHLFlogEntryGetNextChar(%p) returned %c\n",
+	  printf ("success SPHLFlogEntryGetNextChar(%p) returned %c\n",
 		  &handle1, valc);
 	}
       else
@@ -3235,7 +3235,7 @@ lflogger_dataget_test (char *x4k)
       valf = SPHLFlogEntryGetNextFloat (&handle1);
       if (valf == testf)
 	{
-	  printf ("sucess SPHLFlogEntryGetNextFloat(%p) returned %f\n",
+	  printf ("success SPHLFlogEntryGetNextFloat(%p) returned %f\n",
 		  &handle1, valf);
 	}
       else
@@ -3253,7 +3253,7 @@ lflogger_dataget_test (char *x4k)
       valf = SPHLFlogEntryGetNextFloat (&handle1);
       if (valf == testf)
 	{
-	  printf ("sucess SPHLFlogEntryGetNextFloat(%p) returned %f\n",
+	  printf ("success SPHLFlogEntryGetNextFloat(%p) returned %f\n",
 		  &handle1, valf);
 	}
       else
@@ -3270,7 +3270,7 @@ lflogger_dataget_test (char *x4k)
       valc = SPHLFlogEntryGetNextChar (&handle1);
       if (valc == 'f')
 	{
-	  printf ("sucess SPHLFlogEntryGetNextChar(%p) returned %c\n",
+	  printf ("success SPHLFlogEntryGetNextChar(%p) returned %c\n",
 		  &handle1, valc);
 	}
       else
@@ -3289,7 +3289,7 @@ lflogger_dataget_test (char *x4k)
       vald = SPHLFlogEntryGetNextDouble (&handle1);
       if (vald == testd)
 	{
-	  printf ("sucess SPHLFlogEntryGetNextDouble(%p) returned %f\n",
+	  printf ("success SPHLFlogEntryGetNextDouble(%p) returned %f\n",
 		  &handle1, vald);
 	}
       else
@@ -3307,7 +3307,7 @@ lflogger_dataget_test (char *x4k)
       vald = SPHLFlogEntryGetNextDouble (&handle1);
       if (vald == testd)
 	{
-	  printf ("sucess SPHLFlogEntryGetNextDouble(%p) returned %f\n",
+	  printf ("success SPHLFlogEntryGetNextDouble(%p) returned %f\n",
 		  &handle1, vald);
 	}
       else
@@ -3325,7 +3325,7 @@ lflogger_dataget_test (char *x4k)
       valstr = SPHLFlogEntryGetNextString (&handle1);
       if (!strcmp (valstr, "mnopqrstuvwxyz"))
 	{
-	  printf ("sucess SPHLFlogEntryGetNextString(%p) returned %s\n",
+	  printf ("success SPHLFlogEntryGetNextString(%p) returned %s\n",
 		  &handle1, valstr);
 	}
       else

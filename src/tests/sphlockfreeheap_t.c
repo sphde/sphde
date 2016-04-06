@@ -887,7 +887,7 @@ lockfree_basic_test (char *x4k)
 		lfHeap);
 	    rc++;
 	} else {
-	    printf("lockfree_basic_test SPHLockFreeHeapEmpty(%p) suceeds\n",
+	    printf("lockfree_basic_test SPHLockFreeHeapEmpty(%p) succeeds\n",
 		lfHeap);
 	}
 
@@ -1066,7 +1066,7 @@ lockfree_basic_test (char *x4k)
 		lfHeap);
 	    rc++;
 	} else {
-	    printf("lockfree_basic_test SPHLockFreeHeapEmpty(%p) suceeds\n",
+	    printf("lockfree_basic_test SPHLockFreeHeapEmpty(%p) succeeds\n",
 		lfHeap);
 	}
 
@@ -1389,7 +1389,7 @@ lockfree_near_test (char *x4k)
 		lfHeap);
 	    rc++;
 	} else {
-	    printf("lockfree_near_test SPHLockFreeHeapEmpty(%p) suceeds\n",
+	    printf("lockfree_near_test SPHLockFreeHeapEmpty(%p) succeeds\n",
 		lfHeap);
 	}
 

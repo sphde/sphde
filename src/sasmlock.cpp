@@ -253,9 +253,9 @@ SasMasterLock::printHighLevelStats(void)
    printf ("Number of table slots with items: %u\n", tallyOfSlotsWithLocks);
    printf ("Highest item density: %u\n", lockDensity);
    #ifdef collectstats
-   cout << "Highest useage count = " << runningHighestUseage
+   cout << "Highest usage count = " << runningHighestUseage
      << " in slot #" << highestUseageSlot << endl;
-   cout << "Lowest useage count = " << runningLowestUseage
+   cout << "Lowest usage count = " << runningLowestUseage
      << " in slot #" << lowestUseageSlot << endl;
    #endif
 }

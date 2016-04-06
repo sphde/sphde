@@ -133,7 +133,7 @@ SASSimpleHeapAlloc (SASSimpleHeap_t heap, block_size_t alloc_size);
  * @param free_block Memory block previously allocated using SASSimpleHeapAlloc
  * function.
  * @param alloc_size Size in bytes of the allocated block size.
- * @return 0 if the block was sucessfully freed, -1 if \a alloc_size is
+ * @return 0 if the block was successfully freed, -1 if \a alloc_size is
  * incorrect, or -2 if \a heap is not a SAS_RUNTIME_SIMPLEHEAP.
  */
 extern __C__ int 
@@ -174,7 +174,7 @@ SASSimpleHeapNearAlloc(void *nearObj, long allocSize);
  *
  * @param memAddr Handle of a SAS Simple Heap.
  * @param allocSize Size in bytes of the allocated block size.
- * @return 0 if the block was sucessfully freed, -1 if \a alloc_size is
+ * @return 0 if the block was successfully freed, -1 if \a alloc_size is
  * incorrect, or -2 if \a heap is not a SAS_RUNTIME_SIMPLEHEAP.
  */
 extern __C__ void
@@ -183,7 +183,7 @@ SASSimpleHeapNearDealloc(void *memAddr, long allocSize);
 /*!
  * \brief Destroy a SASSimpleHeap_t and free the shared storage block.
  *
- * Similiar to ::SASSimpleHeapDestroy but do not hold any write lock.
+ * Similar to ::SASSimpleHeapDestroy but do not hold any write lock.
  *
  * @param heap handle of the SASSimpleHeap_t to be destroyed.
  * @return a 0 value indicates success, otherwise failure.
@@ -226,7 +226,7 @@ SASSimpleHeapAllocNoLock (SASSimpleHeap_t heap,
  * @param free_block Memory block previously allocated using SASSimpleHeapAlloc
  * function.
  * @param alloc_size Size in bytes of the allocated block size.
- * @return 0 if the block was sucessfully freed, -1 if \a alloc_size is
+ * @return 0 if the block was successfully freed, -1 if \a alloc_size is
  * incorrect, or -2 if \a heap is not a SAS_RUNTIME_SIMPLEHEAP.
  */
 extern __C__ int 
@@ -254,7 +254,7 @@ SASSimpleHeapNearAllocNoLock(void *nearObj, long allocSize);
  *
  * @param memAddr Handle of a SAS Simple Heap.
  * @param allocSize Size in bytes of the allocated block size.
- * @return 0 if the block was sucessfully freed, -1 if \a alloc_size is
+ * @return 0 if the block was successfully freed, -1 if \a alloc_size is
  * \a alloc_size if incorrect, or -2 if \a heap is not a SAS_RUNTIME_SIMPLEHEAP.
  */
 extern __C__ void
