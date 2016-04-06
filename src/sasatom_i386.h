@@ -25,6 +25,7 @@ __arch_pause (void)
    :
    : "memory"
   );
+}
 
 static inline void *
 __arch_fetch_and_add_ptr (void**pointer, long int delta)
