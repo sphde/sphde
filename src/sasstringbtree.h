@@ -153,7 +153,7 @@ SASStringBTreeCreate (block_size_t block_size);
  * \brief Create a new expanding SAS B-Tree with \a heap_size size
  * and \a page_size node size.
  *
- * Similiar to ::SASStringBTreeCreate but with additional option to set the
+ * Similar to ::SASStringBTreeCreate but with additional option to set the
  * internal node page size.
  *
  * @param block_size Size of the B-Tree to create.
@@ -684,7 +684,7 @@ SASStringBTreeAllocNoLock (SASStringBTree_t btree);
  *
  * Similar to ::SASStringBTreeNearAlloc but this function holds no lock.
  *
- * @param nearObj Memory addres of the handle to the SASStringBTree_t.
+ * @param nearObj Memory address of the handle to the SASStringBTree_t.
  * @return A new SASStringBTreeNode_t handle or 0 if creation fails.
  */
 extern __C__ SASStringBTreeNode_t

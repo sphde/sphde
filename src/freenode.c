@@ -7,7 +7,7 @@
  * 
  * Contributors:
  *     IBM Corporation, Steven Munroe      - initial API and implementation
- *     IBM Corporation, Adhemerval Zanella - C code convertion
+ *     IBM Corporation, Adhemerval Zanella - C code conversion
  */
 
 // utility class for managing a heap

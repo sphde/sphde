@@ -24,7 +24,7 @@
  *
  * The basic function to allocate entries is ::SASStringBTreeAlloc and it
  * returns a ::SASStringBTreeNode_t (mode info on sasstringbtreenode.h). The
- * function ::SASStringBTreeNearAlloc is similiar, but it accepts a memory
+ * function ::SASStringBTreeNearAlloc is similar, but it accepts a memory
  * pointer to SASStringBTree_t as argument.
  *
  * Once a SAS B-Tree is created its member can be accessed using the functions
@@ -254,7 +254,7 @@ SASStringBTreeNodeNearAlloc (void *nearObj, long allocSize, lock_on_t lock_on);
 /*!
  * \brief Destroy the SAS B-Tree element \a heap.
  *
- * Similiar to ::SASStringBTreeNodeDestroy but the function holds no lock.
+ * Similar to ::SASStringBTreeNodeDestroy but the function holds no lock.
  *
  * @param heap Handle of the SASStringBTreeNode_t to be destroyed.
  */

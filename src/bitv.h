@@ -69,7 +69,7 @@ bitv_alloc(bitv_cb_t *cb, bitv_word *bvec, size_t size);
 
 /* 
    Allocate size (rounded up to alloc_units) from the bit vector.
-   The resulting allocation is alligned to boundary specified.
+   The resulting allocation is aligned to boundary specified.
 
    Assumes:
 	cb has been initialized by bitv_init()
@@ -94,7 +94,7 @@ bitv_aligned_alloc(bitv_cb_t *cb, bitv_word *bvec, size_t size, size_t align);
    verifies:
 	That size fits within a bitv_word
    returns:
-	0 if the deallocation was sucessful from this bitv_word
+	0 if the deallocation was successful from this bitv_word
 	or nonzero if something failed
 */
 extern __C__ int
@@ -120,7 +120,7 @@ bitv_alloc_marked(bitv_cb_t *cb, bitv_word *bvec, bitv_word *endvec, size_t size
 /* 
    Allocate size (rounded up to alloc_units) from the bit vector (*bvec)
    then mark the last unit of the allocation (*endvec). The resulting
-   allocation is alligned to boundary specified.
+   allocation is aligned to boundary specified.
 
    Assumes:
 	cb has been initialized by bitv_init()
@@ -157,7 +157,7 @@ bitv_free_marked (bitv_cb_t *cb, bitv_word *bvec, bitv_word *endvec,
 	That an end mark is set between the starting offset and the
 	end of end makr vector.
    returns:
-	0 if the deallocation was sucessful from this bitv_word
+	0 if the deallocation was successful from this bitv_word
 	or nonzero if something failed
 */
 extern __C__ size_t
