@@ -531,7 +531,7 @@ SPHLFLoggerEntryIsTimestamped (SPHLFLoggerHandle_t *entryhandle);
 *	The resulting entry handle can be used to read the contents of
 *	the Logger entry.
 *
-*	@param iterator Handle asociated with a Logger.
+*	@param iterator Handle associated with a Logger.
 *	@param handlespace Address of local area that will be initialied as a
 *	SPHLFLoggerHandle_t for the allocated entry.
 *	@return a pointer to the handle space provided, initialized as a

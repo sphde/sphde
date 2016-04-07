@@ -178,7 +178,7 @@ SasUserLock::read_lock(SasUserLock * lockObj, vm_address_t lockAddr)
   pid_t this_task = getpid();
 #ifdef mylockdebug
   fprintf (stderr, "%s\n", __FUNCTION__);
-  fprintf (stderr, " thread[%ld,%ld] - beggining attempt to lock",
+  fprintf (stderr, " thread[%ld,%ld] - beginning attempt to lock",
       (long int) this_task, (long int) this_thread);
   fprintf (stderr, " object = %p\n", this);
 #endif
@@ -416,7 +416,7 @@ SasUserLock::write_lock(SasUserLock * lockObj, vm_address_t lockAddr)
       writers_waiting--;
   } // while
 
-  // mark status so other threads can not aquire NEW read locks
+  // mark status so other threads can not acquire NEW read locks
   status = SasUserLock__exclusive;
 
   // now wait until all other users get done

@@ -311,8 +311,8 @@ SasLockList<Item, Key>::printStats(int slotNum)
       cout << "Number of lock objects created in this slot: "
         << count << endl;
       int k = 1;
-      cout << '\t' << "LOCK #" << '\t' << "USEAGE" << endl;
-      // Run the list to get useage info on each lock; also check if lock is in
+      cout << '\t' << "LOCK #" << '\t' << "USAGE" << endl;
+      // Run the list to get usage info on each lock; also check if lock is in
       // a locked state.
       for (iteratorPtr = headPtr;
            iteratorPtr != NULL;
