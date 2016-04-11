@@ -117,6 +117,14 @@
 *  allocate, deallocate, reference and update blocks (normal C pointer
 *  semantics) within the region.
 *
+*  \note To insure that segments of memory allocated by one process, can
+*  be accessed by any other process sharing a SAS Region, the SPHDE
+*  runtime establishes a sigaction handler for SIGSEGV within each
+*  process and thread.  This is enabled as part of the Join process
+*  and remains enabled until the process leaves Region by calling
+*  SASCleanup.  Applications that use signal/sigaction handlers should
+*  be aware of this.
+*
 *  Processes that use a different region name are independent from any
 *  other region and only see the region that they have joined.  There is
 *  no limit to the number of independent regions per process other than

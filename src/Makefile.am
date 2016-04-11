@@ -151,6 +151,10 @@ TESTS            += sassim_t
 sassim_t_SOURCES  = tests/sassim_t.c
 sassim_t_LDADD    = libsphde.la
 
+TESTS            += sasseg_t
+sasseg_t_SOURCES  = tests/sasseg_t.c
+sasseg_t_LDADD    = libsphde.la
+
 TESTS                    += sphlockfreeheap_t
 sphlockfreeheap_t_SOURCES = tests/sphlockfreeheap_t.c
 sphlockfreeheap_t_LDADD   = libsphde.la

@@ -71,6 +71,32 @@
 *   alignment, in currently allocated segments, is depleted).
 *   This is done implicitly under the block allocate call.
 *
+*   \note SASJoinRegion and related functions (SASTHreadSetUp)
+*   establish a sigaction handler for signal SIGSEGV.
+*   This handles the case when one process,
+*   sharing a named Region allocates a new segment and backing.  Other
+*   processes (sharing the same Region) are not immediately aware of
+*   this and need not perform any specific actions until or unless that
+*   process references data in that segment.  This will generate a
+*   SIGSEGV and the SAS sigaction handler will attach this segment by
+*   mmapping the associated backing file into the faulting process at
+*   the assigned address.
+*
+*   \note Applications that set their own signal to sigaction handlers
+*   for SIGSEGV should be aware of this and plan for proper nesting.
+*   Applications should establish their SIGSEGV handlers before
+*   joining.  The SASJoinRegion will preserve the the "old action" as
+*   part of setting it own SIGSEGV handler.
+*
+*   \note When the SPHDE runtime handler gets control it will verify
+*   that the faulting address is within the SAS Region. If it is not,
+*   it is likely a error or something that the application should
+*   handle itself. The SPHDE runtime handler  will check if the
+*   "old action" was SIG_DFL or has it own signal or sigaction handler.
+*   If the application defined it own handler SPHDE will attempt to
+*   call that handler.  Otherwise SPHDE runtime handler will print a
+*   back trace and exit the effected process (or thread).
+*
 *   The runtime also sets up shared memory segments (shmat) for SAS locks.
 *   SAS locks need to be shared but should not persist across reboot
 *   (like memory mapped files do). Different SAS stores must have

@@ -25,6 +25,7 @@
 #include <sys/stat.h>
 */
 #include <ucontext.h>
+#include <signal.h>
 #include <string.h>
 #include <unistd.h>
 
@@ -32,6 +33,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
+#include <pthread.h>
 
 #include "sasio.h"
 #include "freenode.h"
@@ -1032,6 +1034,8 @@ SASCreateAnchorSeg (void *regionBase, size_t regionSize, size_t segmentSize)
   return rc;
 }
 
+
+
 /* Obtain a backtrace and print it to stdout. */
 static void
 print_trace (void)
@@ -1051,33 +1055,49 @@ print_trace (void)
   free (strings);
 }
 
-void
-SASSigSegvHandler (int signal, siginfo_t * info, void *context)
-{
-#ifdef __SASDebugPrint__
-  sas_printf ("Signal received: %d\n", signal);
-  sas_printf ("si_signo=%d si_code=%d\n", info->si_signo, info->si_code);
-#endif
-  if (signal == SIGSEGV)
-    {
-      unsigned long reg_low = (unsigned long) memLow;
-      unsigned long reg_high = (unsigned long) memHigh;
-      unsigned long segv_addr = (unsigned long) info->si_addr;
-      if ((segv_addr >= reg_low) && (segv_addr < reg_high))
-	{
-	  SASAttachAllocatedAddr (info->si_addr);
-	}
-      else
-	{
-	  void SASDisableSigSegv ();
-	  sas_printf ("SIGSEGV@%p\n", info->si_addr);
-	  print_trace ();
-	  exit (1);
-	}
-    }
-}
+void SASDisableSigSegv ();
 
 static struct sigaction oldSigSegV;
+
+void
+SASSigSegvHandler(int signal, siginfo_t * info, void *context)
+{
+#ifdef __SASDebugPrint__
+	sas_printf ("Signal received: %d\n", signal);
+	sas_printf ("si_signo=%d si_code=%d\n", info->si_signo, info->si_code);
+#endif
+	if (signal == SIGSEGV) {
+		unsigned long reg_low = (unsigned long) memLow;
+		unsigned long reg_high = (unsigned long) memHigh;
+		unsigned long segv_addr = (unsigned long) info->si_addr;
+		if ((segv_addr >= reg_low) && (segv_addr < reg_high))
+		{
+			SASAttachAllocatedAddr(info->si_addr);
+		} else {
+			if (oldSigSegV.sa_handler != SIG_DFL)
+			{
+				/* assume the app has its own signal handler.
+				 * If so call it and hope it handles the situation */
+				if (oldSigSegV.sa_flags & SA_SIGINFO)
+				{
+					(*oldSigSegV.sa_sigaction)(signal, info, context);
+				} else {
+					(*oldSigSegV.sa_handler)(signal);
+				}
+			} else {
+				/* Else print an helpful message include back trace
+				 * then exit.  We can not continue because the sigsegv
+				 * condition persists and we would end up in a
+				 * recurring signal loop.
+				 */
+				void SASDisableSigSegv();
+				sas_printf("SIGSEGV@%p\n", info->si_addr);
+				print_trace();
+				exit (1);
+			}
+		}
+	}
+}
 
 void
 SASEnableSigSegv ()
@@ -1097,7 +1117,12 @@ void
 SASDisableSigSegv ()
 {
 #if 1
-  sigaction (SIGSEGV, &oldSigSegV, NULL);
+  int rc;
+  rc = sigaction (SIGSEGV, &oldSigSegV, NULL);
+  if (rc)
+  {
+	  perror ("SASDisableSigSegv Failed");
+  }
 #endif
 }
 
@@ -1170,7 +1195,7 @@ SASJoinRegionByName (const char *store_name)
     }
 
   SASLockInit ();
-  //SASEnableSigSegv ();
+  SASEnableSigSegv ();
 
   return rc;
 }
@@ -1393,25 +1418,72 @@ SASRemove ()
   free (mem_IDs);
 }
 
-void
-SASThreadEnableSigSegv ()
-{
-#if 1
-  struct sigaction sa;
-  /* register signal handler via sigaction.  
-     Remove SA_ONESHOT for the real thing.  */
-  sa.sa_flags = SA_SIGINFO | SA_RESTART /* | SA_ONESHOT */ ;
-  sa.sa_sigaction = &SASSigSegvHandler;
-  sigemptyset (&sa.sa_mask);
-  sigaction (SIGSEGV, &sa, NULL);
-#endif
-}
+static __thread struct sigaction oldThreadSigSegV;
 
 void
 SASThreadDisableSigSegv ()
 {
 #if 1
-  sigaction (SIGSEGV, &oldSigSegV, NULL);
+  int rc;
+  rc = sigaction (SIGSEGV, &oldThreadSigSegV, NULL);
+  if (rc)
+  {
+	  perror ("SASThreadDisableSigSegv Failed");
+  }
+#endif
+}
+
+void
+SASThreadSigSegvHandler(int signal, siginfo_t * info, void *context)
+{
+#ifdef __SASDebugPrint__
+	sas_printf ("Signal received: %d\n", signal);
+	sas_printf ("si_signo=%d si_code=%d\n", info->si_signo, info->si_code);
+#endif
+	if (signal == SIGSEGV)
+	{
+		unsigned long reg_low = (unsigned long) memLow;
+		unsigned long reg_high = (unsigned long) memHigh;
+		unsigned long segv_addr = (unsigned long) info->si_addr;
+		if ((segv_addr >= reg_low) && (segv_addr < reg_high)) {
+			SASAttachAllocatedAddr(info->si_addr);
+		} else {
+			if (oldThreadSigSegV.sa_handler != SIG_DFL)
+			{
+				/* assume the app has its own signal handler.
+				 * If so call it and hope it handles the situation */
+				if (oldThreadSigSegV.sa_flags & SA_SIGINFO)
+				{
+					(*oldThreadSigSegV.sa_sigaction)(signal, info, context);
+				} else {
+					(*oldThreadSigSegV.sa_handler)(signal);
+				}
+			} else {
+				/* Else print an helpful message include back trace
+				 * then exit.  We can not continue because the sigsegv
+				 * condition persists and we would end up in a
+				 * recurring signal loop.
+				 */
+				void SASThreadDisableSigSegv();
+				sas_printf("SIGSEGV@%p\n", info->si_addr);
+				print_trace();
+				pthread_exit ((void*)1);
+			}
+		}
+	}
+}
+
+void
+SASThreadEnableSigSegv ()
+{
+#if 1
+  struct sigaction sa;
+  /* register signal handler via sigaction.
+     Remove SA_ONESHOT for the real thing.  */
+  sa.sa_flags = SA_SIGINFO | SA_RESTART /* | SA_ONESHOT */ ;
+  sa.sa_sigaction = &SASThreadSigSegvHandler;
+  sigemptyset (&sa.sa_mask);
+  sigaction (SIGSEGV, &sa, &oldThreadSigSegV);
 #endif
 }
 

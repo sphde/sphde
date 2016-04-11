@@ -11,6 +11,8 @@
 
 #ifndef __SASANCHOR__H
 #define __SASANCHOR__H
+//TODO SASSIM is now the default and only supported mode
+#define __SASSIM__ 1
 
 # ifdef __SASSIM__
 #include "ultree.h"

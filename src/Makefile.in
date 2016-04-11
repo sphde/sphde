@@ -82,7 +82,7 @@ build_triplet = @build@
 host_triplet = @host@
 bin_PROGRAMS = sasutil$(EXEEXT)
 TESTS = sphgtod_t$(EXEEXT) sasatom_t$(EXEEXT) bitvec_t$(EXEEXT) \
-	sassim_t$(EXEEXT) sphlockfreeheap_t$(EXEEXT) \
+	sassim_t$(EXEEXT) sasseg_t$(EXEEXT) sphlockfreeheap_t$(EXEEXT) \
 	sphlflogger_t$(EXEEXT) sphthread_t$(EXEEXT) \
 	sphlflogger_tt$(EXEEXT) sphlflogger_ttt$(EXEEXT) \
 	sphlogportal_t$(EXEEXT) sphlogportal_tt$(EXEEXT) \
@@ -170,7 +170,7 @@ libsphgtod_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(libsphgtod_la_CFLAGS) \
 	$(CFLAGS) $(libsphgtod_la_LDFLAGS) $(LDFLAGS) -o $@
 am__EXEEXT_1 = sphgtod_t$(EXEEXT) sasatom_t$(EXEEXT) bitvec_t$(EXEEXT) \
-	sassim_t$(EXEEXT) sphlockfreeheap_t$(EXEEXT) \
+	sassim_t$(EXEEXT) sasseg_t$(EXEEXT) sphlockfreeheap_t$(EXEEXT) \
 	sphlflogger_t$(EXEEXT) sphthread_t$(EXEEXT) \
 	sphlflogger_tt$(EXEEXT) sphlflogger_ttt$(EXEEXT) \
 	sphlogportal_t$(EXEEXT) sphlogportal_tt$(EXEEXT) \
@@ -192,6 +192,9 @@ sasindex_t_DEPENDENCIES = libsphde.la
 am_sasindex_tt_OBJECTS = tests/sasindex_tt.$(OBJEXT)
 sasindex_tt_OBJECTS = $(am_sasindex_tt_OBJECTS)
 sasindex_tt_DEPENDENCIES = libsphde.la
+am_sasseg_t_OBJECTS = tests/sasseg_t.$(OBJEXT)
+sasseg_t_OBJECTS = $(am_sasseg_t_OBJECTS)
+sasseg_t_DEPENDENCIES = libsphde.la
 am_sassim_t_OBJECTS = tests/sassim_t.$(OBJEXT)
 sassim_t_OBJECTS = $(am_sassim_t_OBJECTS)
 sassim_t_DEPENDENCIES = libsphde.la
@@ -309,7 +312,7 @@ am__v_CXXLD_0 = @echo "  CXXLD   " $@;
 am__v_CXXLD_1 = 
 SOURCES = $(libsphde_la_SOURCES) $(libsphgtod_la_SOURCES) \
 	$(bitvec_t_SOURCES) $(sasatom_t_SOURCES) $(sasindex_t_SOURCES) \
-	$(sasindex_tt_SOURCES) $(sassim_t_SOURCES) \
+	$(sasindex_tt_SOURCES) $(sasseg_t_SOURCES) $(sassim_t_SOURCES) \
 	$(sasstringbtree_t_SOURCES) $(sasstringbtree_tt_SOURCES) \
 	$(sasutil_SOURCES) $(sphcontext_t_SOURCES) \
 	$(sphdirectpcqueue_ttt_SOURCES) $(sphgtod_t_SOURCES) \
@@ -320,7 +323,7 @@ SOURCES = $(libsphde_la_SOURCES) $(libsphgtod_la_SOURCES) \
 	$(sphsinglepcqueue_ttt_SOURCES) $(sphthread_t_SOURCES)
 DIST_SOURCES = $(libsphde_la_SOURCES) $(libsphgtod_la_SOURCES) \
 	$(bitvec_t_SOURCES) $(sasatom_t_SOURCES) $(sasindex_t_SOURCES) \
-	$(sasindex_tt_SOURCES) $(sassim_t_SOURCES) \
+	$(sasindex_tt_SOURCES) $(sasseg_t_SOURCES) $(sassim_t_SOURCES) \
 	$(sasstringbtree_t_SOURCES) $(sasstringbtree_tt_SOURCES) \
 	$(sasutil_SOURCES) $(sphcontext_t_SOURCES) \
 	$(sphdirectpcqueue_ttt_SOURCES) $(sphgtod_t_SOURCES) \
@@ -798,6 +801,8 @@ bitvec_t_SOURCES = tests/bitvec_t.c
 bitvec_t_LDADD = libsphde.la
 sassim_t_SOURCES = tests/sassim_t.c
 sassim_t_LDADD = libsphde.la
+sasseg_t_SOURCES = tests/sasseg_t.c
+sasseg_t_LDADD = libsphde.la
 sphlockfreeheap_t_SOURCES = tests/sphlockfreeheap_t.c
 sphlockfreeheap_t_LDADD = libsphde.la
 sphlflogger_t_SOURCES = tests/sphlflogger_t.c
@@ -995,6 +1000,12 @@ tests/sasindex_tt.$(OBJEXT): tests/$(am__dirstamp) \
 sasindex_tt$(EXEEXT): $(sasindex_tt_OBJECTS) $(sasindex_tt_DEPENDENCIES) $(EXTRA_sasindex_tt_DEPENDENCIES) 
 	@rm -f sasindex_tt$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(sasindex_tt_OBJECTS) $(sasindex_tt_LDADD) $(LIBS)
+tests/sasseg_t.$(OBJEXT): tests/$(am__dirstamp) \
+	tests/$(DEPDIR)/$(am__dirstamp)
+
+sasseg_t$(EXEEXT): $(sasseg_t_OBJECTS) $(sasseg_t_DEPENDENCIES) $(EXTRA_sasseg_t_DEPENDENCIES) 
+	@rm -f sasseg_t$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(sasseg_t_OBJECTS) $(sasseg_t_LDADD) $(LIBS)
 tests/sassim_t.$(OBJEXT): tests/$(am__dirstamp) \
 	tests/$(DEPDIR)/$(am__dirstamp)
 
@@ -1136,6 +1147,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/sasatom_t.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/sasindex_t.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/sasindex_tt.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/sasseg_t.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/sassim_t.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/sasstringbtree_t.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/sasstringbtree_tt.Po@am__quote@
@@ -1703,6 +1715,13 @@ bitvec_t.log: bitvec_t$(EXEEXT)
 sassim_t.log: sassim_t$(EXEEXT)
 	@p='sassim_t$(EXEEXT)'; \
 	b='sassim_t'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+sasseg_t.log: sasseg_t$(EXEEXT)
+	@p='sasseg_t$(EXEEXT)'; \
+	b='sasseg_t'; \
 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
