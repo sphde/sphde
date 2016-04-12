@@ -98,6 +98,15 @@ AC_CHECK_FUNCS([clock_gettime ftruncate getcwd getpagesize gettimeofday memset m
 # Pthread check (on m4/acx_pthread.m4)
 ACX_PTHREAD
 
+# Check for static libc
+if test "$enable_static" = yes ; then
+SAVE_LDFLAGS="$LDFLAGS"
+LDFLAGS="-static $LDFLAGS"
+AC_CHECK_LIB([c], [printf], [],
+             AC_MSG_ERROR([*** No static libc found. Try to install glibc-static or libc6-dev.]))
+LDFLAGS="$SAVE_LDFLAGS"
+fi
+
 # Doxygen support
 DX_HTML_FEATURE(ON)
 DX_MAN_FEATURE(ON)
