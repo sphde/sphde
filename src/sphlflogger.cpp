@@ -269,7 +269,7 @@ SPHLFLoggerAllocTimeStamped (SPHLFLogger_t log,
 						      start_log_buf);
 		    }
 		  while (!done);
-		  __sync_fetch_and_or (&headerBlock->options,
+		  fetch_and_or (&headerBlock->options,
 					      SPHLFLOGGER_CIRCULAR_WRAPED);
 #ifdef __SASDebugPrint__
 		  sas_printf
@@ -400,7 +400,7 @@ SPHLFLoggerAllocStrideTimeStamped (SPHLFLogger_t log,
 						      start_log_buf);
 		    }
 		  while (!done);
-		  __sync_fetch_and_or (&headerBlock->options,
+		  fetch_and_or (&headerBlock->options,
 					      SPHLFLOGGER_CIRCULAR_WRAPED);
 #ifdef __SASDebugPrint__
 		  sas_printf
@@ -1014,9 +1014,8 @@ SPHLFLoggerSetCachePrefetch (SPHLFLogger_t log, int prefetch)
 	  if (prefetch == 1)
 	    prefetch_opt = SPHLFLOGGER_CACHE_PREFETCH0;
 	}
-
-      temp = __sync_fetch_and_and (&headerBlock->options, temp);
-      temp = __sync_fetch_and_or (&headerBlock->options, prefetch_opt);
+      temp = fetch_and_and (&headerBlock->options, temp);
+      temp = fetch_and_or (&headerBlock->options, prefetch_opt);
     }
   else
     {

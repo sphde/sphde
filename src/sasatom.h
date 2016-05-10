@@ -40,6 +40,8 @@ typedef void*         sas_lock_ptr_t;
 #include "sasatom_generic.h"
 #endif
 
+#define GCC_VERSION \
+        (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
 /*!
  * Memory barrier for store operations.
  */
@@ -88,6 +90,77 @@ fetch_and_add(void *pointer, long int delta)
   return __arch_fetch_and_add(pointer, delta);
 }
 
+/*!
+ * Atomic fetch and and operation on memory \a pointer of int type.
+ *
+ * Performs the atomic operation:
+ * { tmp = *pointer; *pointer = tmp & delta; return *pointer }
+ *
+ * Returns \a *pointer before update.
+ */
+static inline long int
+fetch_and_and(unsigned int *pointer, int delta)
+{
+#if GCC_VERSION >= 40700
+  return __atomic_fetch_and(pointer, delta, __ATOMIC_ACQUIRE);
+#else
+  return __sync_fetch_and_and(pointer, delta);
+#endif
+}
+
+/*!
+ * Atomic fetch and and operation on memory \a pointer of long type.
+ *
+ * Performs the atomic operation:
+ * { tmp = *pointer; *pointer = tmp & delta; return *pointer }
+ *
+ * Returns \a *pointer before update.
+ */
+static inline long int
+fetch_and_and_long(unsigned long *pointer, long int delta)
+{
+#if GCC_VERSION >= 40700
+  return __atomic_fetch_and(pointer, delta, __ATOMIC_ACQUIRE);
+#else
+  return __sync_fetch_and_and(pointer, delta);
+#endif
+}
+
+/*!
+ * Atomic fetch and or operation on memory \a pointer of int type.
+ *
+ * Performs the atomic operation:
+ * { tmp = *pointer; *pointer = tmp | delta; return *pointer }
+ *
+ * Returns \a *pointer before update.
+ */
+static inline long int
+fetch_and_or(unsigned int *pointer, int delta)
+{
+#if GCC_VERSION >= 40700
+  return __atomic_fetch_or(pointer, delta, __ATOMIC_ACQUIRE);
+#else
+  return __sync_fetch_and_or(pointer, delta);
+#endif
+}
+
+/*!
+ * Atomic fetch and or operation on memory \a pointer of long type.
+ *
+ * Performs the atomic operation:
+ * { tmp = *pointer; *pointer = tmp | delta; return *pointer }
+ *
+ * Returns \a *pointer before update.
+ */
+static inline long int
+fetch_and_or_long(unsigned long *pointer, long int delta)
+{
+#if GCC_VERSION >= 40700
+  return __atomic_fetch_or(pointer, delta, __ATOMIC_ACQUIRE);
+#else
+  return __sync_fetch_and_or(pointer, delta);
+#endif
+}
 /*!
  * Atomic compare and swap operation.
  *
