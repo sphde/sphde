@@ -1198,8 +1198,8 @@ SPHSinglePCQueueSetCachePrefetch (SPHSinglePCQueue_t queue, int prefetch)
 	    prefetch_opt = SPHSPCQUEUE_CACHE_PREFETCH0;
 	}
 
-      temp = __sync_fetch_and_and (&headerBlock->options, temp);
-      temp = __sync_fetch_and_or (&headerBlock->options, prefetch_opt);
+      temp = fetch_and_and (&headerBlock->options, temp);
+      temp = fetch_and_or (&headerBlock->options, prefetch_opt);
     }
   else
     {
@@ -1213,7 +1213,7 @@ SPHSinglePCQueueSetCachePrefetch (SPHSinglePCQueue_t queue, int prefetch)
 }
 
 int
-SPHSinglePCQueueSetCachePrefetch (SPHSinglePCQueue_t queue)
+SPHSinglePCQueuePrefetch (SPHSinglePCQueue_t queue)
 {
   SPHPCQueueHeader *headerBlock = (SPHPCQueueHeader *) queue;
   block_size_t logsize, pagesz, i;
@@ -1232,14 +1232,14 @@ SPHSinglePCQueueSetCachePrefetch (SPHSinglePCQueue_t queue)
 	  touchptr += pagesz;
 	  touch += *touchptr;
 #if 0
-	  printf ("SPHSinglePCQueueSetCachePrefetch@%p\n", touchptr);
+	  printf ("SPHSinglePCQueuePrefetch@%p\n", touchptr);
 #endif
 	}
     }
   else
     {
 #ifdef __SASDebugPrint__
-      sas_printf ("SPHSinglePCQueueSetCachePrefetch(%p) type check failed\n",
+      sas_printf ("SPHSinglePCQueuePrefetch(%p) type check failed\n",
     		  queue);
 #endif
       rc = 1;

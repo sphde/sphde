@@ -146,7 +146,7 @@
 typedef void* SPHLFEntryDirect_t;
 
 /** \brief Marks the entry specified by the entry handle as complete.
-*   Also executes write memory barries required by the platform to ensure
+*   Also executes any memory barriers required by the platform to ensure
 *   that all previous stores by this thread to this entry are complete.
 *
 *   @param directHandle Entry Handle for an allocated entry.
