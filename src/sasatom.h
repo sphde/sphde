@@ -102,7 +102,7 @@ static inline long int
 fetch_and_and(unsigned int *pointer, int delta)
 {
 #if GCC_VERSION >= 40700
-  return __atomic_fetch_and(pointer, delta, __ATOMIC_ACQUIRE);
+  return __atomic_fetch_and(pointer, delta, __ATOMIC_ACQ_REL);
 #else
   return __sync_fetch_and_and(pointer, delta);
 #endif
@@ -120,7 +120,7 @@ static inline long int
 fetch_and_and_long(unsigned long *pointer, long int delta)
 {
 #if GCC_VERSION >= 40700
-  return __atomic_fetch_and(pointer, delta, __ATOMIC_ACQUIRE);
+  return __atomic_fetch_and(pointer, delta, __ATOMIC_ACQ_REL);
 #else
   return __sync_fetch_and_and(pointer, delta);
 #endif
@@ -138,7 +138,7 @@ static inline long int
 fetch_and_or(unsigned int *pointer, int delta)
 {
 #if GCC_VERSION >= 40700
-  return __atomic_fetch_or(pointer, delta, __ATOMIC_ACQUIRE);
+  return __atomic_fetch_or(pointer, delta, __ATOMIC_ACQ_REL);
 #else
   return __sync_fetch_and_or(pointer, delta);
 #endif
@@ -156,7 +156,7 @@ static inline long int
 fetch_and_or_long(unsigned long *pointer, long int delta)
 {
 #if GCC_VERSION >= 40700
-  return __atomic_fetch_or(pointer, delta, __ATOMIC_ACQUIRE);
+  return __atomic_fetch_or(pointer, delta, __ATOMIC_ACQ_REL);
 #else
   return __sync_fetch_and_or(pointer, delta);
 #endif
