@@ -1,7 +1,7 @@
 ## Process this file with autoconf to produce configure.
 
-AM_CFLAGS   = -Wall -Wwrite-strings $(PTHREAD_CFLAGS)
-AM_CXXFLAGS = -Wall -Wwrite-strings -Woverloaded-virtual $(PTHREAD_CFLAGS)
+AM_CFLAGS   = $(HTM) -fgnu-tm -Wall -Wwrite-strings $(PTHREAD_CFLAGS)
+AM_CXXFLAGS = $(HTM) -fgnu-tm -Wall -Wwrite-strings -Woverloaded-virtual $(PTHREAD_CFLAGS)
 
 lib_LTLIBRARIES = libsphde.la libsphgtod.la libsphgettime.la
 bin_PROGRAMS    = sasutil
@@ -46,6 +46,7 @@ libsphdeinclude_HEADERS = \
 	sasstringbtree.h \
 	sasstringbtreeenum.h \
 	sasstringbtreenode.h \
+	sphmultipcqueue.h \
 	sphsinglepcqueue.h \
 	sphdirectpcqueue.h \
 	sphlfentry.h \
@@ -114,6 +115,7 @@ libsphde_la_SOURCES = \
 	sphlockfreeheap.cpp \
 	sphlflogger.cpp \
 	sphlogportal.cpp \
+	sphmultipcqueue.cpp \
 	sphsinglepcqueue.cpp \
 	sasallocpriv.h \
 	sphcontextpriv.h
@@ -238,5 +240,13 @@ sphsinglepcqueue_ttt_LDADD   = libsphde.la
 TESTS                 += sphdirectpcqueue_ttt
 sphdirectpcqueue_ttt_SOURCES = tests/sphdirectpcqueue_ttt.c
 sphdirectpcqueue_ttt_LDADD   = libsphde.la
+
+TESTS                 += sphmultipcqueue_t
+sphmultipcqueue_t_SOURCES = tests/sphmultipcqueue_t.c
+sphmultipcqueue_t_LDADD   = libsphde.la
+
+TESTS                 += sphmultipcqueue_ttt
+sphmultipcqueue_ttt_SOURCES = tests/sphmultipcqueue_ttt.c
+sphmultipcqueue_ttt_LDADD   = libsphde.la
 
 check_PROGRAMS = $(TESTS)
