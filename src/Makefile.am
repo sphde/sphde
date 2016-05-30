@@ -1,9 +1,9 @@
 ## Process this file with autoconf to produce configure.
 
-AM_CFLAGS   = -Wall -Wwrite-strings $(PTHREAD_CFLAGS)
-AM_CXXFLAGS = -Wall -Wwrite-strings -Woverloaded-virtual $(PTHREAD_CFLAGS)
+AM_CFLAGS   = $(HTM) -fgnu-tm -Wall -Wwrite-strings $(PTHREAD_CFLAGS)
+AM_CXXFLAGS = $(HTM) -fgnu-tm -Wall -Wwrite-strings -Woverloaded-virtual $(PTHREAD_CFLAGS)
 
-lib_LTLIBRARIES = libsphde.la libsphgtod.la
+lib_LTLIBRARIES = libsphde.la libsphgtod.la libsphgettime.la
 bin_PROGRAMS    = sasutil
 EXTRA_DIST      =
 
@@ -11,10 +11,12 @@ EXTRA_DIST      =
 # .libs/libsphgtod.a and if make is executed in parallel (-jN) the sphgtod_t
 # rule may be run before .libs/lisphgtod.a is built.
 .libs/libsphgtod.a: libsphgtod.la
+.libs/libsphgettime.a: libsphgettime.la
 
 # libsphde definitions
 libsphdeincludedir = $(includedir)/sphde
 libsphgtodincludedir = $(includedir)/sphde
+libsphgettimeincludedir = $(includedir)/sphde
 
 # The headers in 'libsphdeinclude_HEADERS' are meant to be the ones installed
 # on 'make install'
@@ -44,6 +46,7 @@ libsphdeinclude_HEADERS = \
 	sasstringbtree.h \
 	sasstringbtreeenum.h \
 	sasstringbtreenode.h \
+	sphmultipcqueue.h \
 	sphsinglepcqueue.h \
 	sphdirectpcqueue.h \
 	sphlfentry.h \
@@ -55,6 +58,8 @@ libsphdeinclude_HEADERS = \
 	sphtimer.h
 
 libsphgtodinclude_HEADERS = sphgtod.h
+
+libsphgettimeinclude_HEADERS = sphgettime.h
 
 libsphde_la_INCLUDES = \
 	$(libsphdeinclude_HEADERS) \
@@ -78,6 +83,8 @@ libsphde_la_INCLUDES = \
 	sasstdio.h 
 
 libsphgtod_la_SOURCES = sphgtod.c
+
+libsphgettime_la_SOURCES = sphgettime.c
 
 libsphde_la_SOURCES = \
 	sasshm.c \
@@ -108,6 +115,7 @@ libsphde_la_SOURCES = \
 	sphlockfreeheap.cpp \
 	sphlflogger.cpp \
 	sphlogportal.cpp \
+	sphmultipcqueue.cpp \
 	sphsinglepcqueue.cpp \
 	sasallocpriv.h \
 	sphcontextpriv.h
@@ -118,10 +126,18 @@ libsphde_la_CXXFLAGS = -D__SASSIM__ $(AM_CXXFLAGS)
 libsphgtod_la_CFLAGS   = $(AM_CFLAGS)
 libsphgtod_la_CXXFLAGS = $(AM_CXXFLAGS)
 
+libsphgettime_la_CFLAGS   = $(AM_CFLAGS)
+libsphgettime_la_CXXFLAGS = $(AM_CXXFLAGS)
+
 # libsphgtod.a is ONLY to be a static archive in order to benefit from
 # the performance aspects of inlining the emulated gettimeofday code.
 libsphgtod_la_LDFLAGS = -all-static
 libsphgtod_la_LIBADD = -lrt
+
+# libsphgettime.a is ONLY to be a static archive in order to benefit from
+# the performance aspects of inlining the emulated clock_gettime code.
+libsphgettime_la_LDFLAGS = -all-static
+libsphgettime_la_LIBADD = -lrt
 
 libsphde_la_LDFLAGS  = -version-info $(SPHDE_SO_VERSION)
 libsphde_la_LIBADD   = $(PTHREAD_LIBS) -lrt
@@ -138,6 +154,10 @@ TESTS =
 TESTS            += sphgtod_t
 sphgtod_t_SOURCES = tests/sphgtod_t.c
 sphgtod_t_LDADD   = .libs/libsphgtod.a libsphde.la
+
+TESTS            += sphgettime_t
+sphgettime_t_SOURCES = tests/sphgettime_t.c
+sphgettime_t_LDADD   = .libs/libsphgettime.a libsphde.la
 
 TESTS            += sasatom_t
 sasatom_t_SOURCES = tests/sasatom_t.c
@@ -220,5 +240,13 @@ sphsinglepcqueue_ttt_LDADD   = libsphde.la
 TESTS                 += sphdirectpcqueue_ttt
 sphdirectpcqueue_ttt_SOURCES = tests/sphdirectpcqueue_ttt.c
 sphdirectpcqueue_ttt_LDADD   = libsphde.la
+
+TESTS                 += sphmultipcqueue_t
+sphmultipcqueue_t_SOURCES = tests/sphmultipcqueue_t.c
+sphmultipcqueue_t_LDADD   = libsphde.la
+
+TESTS                 += sphmultipcqueue_ttt
+sphmultipcqueue_ttt_SOURCES = tests/sphmultipcqueue_ttt.c
+sphmultipcqueue_ttt_LDADD   = libsphde.la
 
 check_PROGRAMS = $(TESTS)

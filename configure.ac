@@ -33,6 +33,17 @@ if test "x$enable_debug" = "xyes" ; then
   CXXFLAGS="$CXXFLAGS -D__SOMDebugPrint__ -Dmylockdebug -DcoherenceCheck -D__SASDebugPrint__"
 fi
 
+# Hardware Transactional Memory option
+AC_ARG_ENABLE([htm],
+  [AS_HELP_STRING([--enable-htm],
+    [Enable Hardware Transactional Memory])],
+  [],
+  [enable_htm=no])
+
+HTM=""
+AS_IF([test "x$enable_htm" != xno],
+  [AC_SUBST([HTM], [-mcpu=power8])])
+
 # This directive is to avoid buggy libtool that don't add the -Wl,--no-as-needed
 # directive in the correct position of LDFLAGS
 LDFLAGS="$LDFLAGS -Wl,--no-as-needed -lrt"
