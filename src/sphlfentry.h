@@ -131,7 +131,7 @@ typedef struct {
 *   @param handlespace Entry Handle for an allocated entry.
 *	@return a 0 value indicates success.
 */
-inline int
+static inline int
 SPHLFEntryStrongComplete (SPHLFEntryHandle_t *handlespace)
 {
     int rc = 0;
@@ -154,7 +154,7 @@ SPHLFEntryStrongComplete (SPHLFEntryHandle_t *handlespace)
 *   @param handlespace Entry Handle for an allocated entry.
 *	@return a 0 value indicates success.
 */
-inline int
+static inline int
 SPHLFEntryWeakComplete (SPHLFEntryHandle_t *handlespace)
 {
     int rc = 0;
@@ -175,7 +175,7 @@ SPHLFEntryWeakComplete (SPHLFEntryHandle_t *handlespace)
 *   @param handlespace Entry Handle for an allocated entry.
 *	@return a 0 value indicates success.
 */
-inline int
+static inline int
 SPHLFEntryComplete (SPHLFEntryHandle_t *handlespace)
 {
     int rc = 0;
@@ -196,7 +196,7 @@ SPHLFEntryComplete (SPHLFEntryHandle_t *handlespace)
 *	@return true if the entry was complete (SPHLFLoggerEntryComplete
 *	has been called fo this entry). Otherwise False.
 */
-inline int
+static inline int
 SPHLFEntryIsComplete (SPHLFEntryHandle_t *handlespace)
 {
     SPHLFEntryHeader_t	*entryPtr = handlespace->entry;
@@ -209,7 +209,7 @@ SPHLFEntryIsComplete (SPHLFEntryHandle_t *handlespace)
 *   @param handlespace Entry Handle for an allocated entry.
 *	@return true if the entry was time stamped. Otherwise False.
 */
-inline int
+static inline int
 SPHLFEntryIsTimestamped (SPHLFEntryHandle_t *handlespace)
 {
     SPHLFEntryHeader_t	*entryPtr = handlespace->entry;
@@ -224,7 +224,7 @@ SPHLFEntryIsTimestamped (SPHLFEntryHandle_t *handlespace)
 *	@return the time stamp value from the entry, if the entry was valid
 *	and time stamped. Otherwise return 0.
 */
-inline sphtimer_t
+static inline sphtimer_t
 SPHLFEntryTimeStamp (SPHLFEntryHandle_t *handlespace)
 {
     SPHLFEntryHeader_t	*entryPtr = handlespace->entry;
@@ -243,7 +243,7 @@ SPHLFEntryTimeStamp (SPHLFEntryHandle_t *handlespace)
 *	@return the PID from the entry, if the entry was valid
 *	and time stamped. Otherwise return 0.
 */
-inline sphpid16_t
+static inline sphpid16_t
 SPHLFEntryPID (SPHLFEntryHandle_t *handlespace)
 {
     SPHLFEntryHeader_t	*entryPtr = handlespace->entry;
@@ -262,7 +262,7 @@ SPHLFEntryPID (SPHLFEntryHandle_t *handlespace)
 *	@return the TID from the entry, if the entry was valid
 *	and time stamped. Otherwise return 0.
 */
-inline sphpid16_t
+static inline sphpid16_t
 SPHLFEntryTID (SPHLFEntryHandle_t *handlespace)
 {
     SPHLFEntryHeader_t	*entryPtr = handlespace->entry;
@@ -281,7 +281,7 @@ SPHLFEntryTID (SPHLFEntryHandle_t *handlespace)
 *	@return the address from the entry header, if the entry was valid.
 *	Otherwise return NULL.
 */
-inline SPHLFEntryHeader_t*
+static inline SPHLFEntryHeader_t*
 SPHLFEntryHeader (SPHLFEntryHandle_t *handlespace)
 {
     SPHLFEntryHeader_t	*entryPtr = handlespace->entry;
@@ -298,7 +298,7 @@ SPHLFEntryHeader (SPHLFEntryHandle_t *handlespace)
 *	@return the category from the entry, if the entry was valid.
 *	Otherwise return 0.
 */
-inline int
+static inline int
 SPHLFEntryCategory (SPHLFEntryHandle_t *handlespace)
 {
     SPHLFEntryHeader_t	*entryPtr = handlespace->entry;
@@ -319,7 +319,7 @@ SPHLFEntryCategory (SPHLFEntryHandle_t *handlespace)
 *	@return the sub-category from the entry, if the entry was valid.
 *	Otherwise return 0.
 */
-inline int
+static inline int
 SPHLFEntrySubcat (SPHLFEntryHandle_t *handlespace)
 {
     SPHLFEntryHeader_t	*entryPtr = handlespace->entry;
@@ -349,7 +349,7 @@ SPHLFEntrySubcat (SPHLFEntryHandle_t *handlespace)
 *   @param handle Entry Handle for an allocated entry.
 *	@return address the entries free space.
 */
-inline void*
+static inline void*
 SPHLFEntryGetFreePtr (SPHLFEntryHandle_t *handle)
 {
 	char		*ptr	= handle->next;
@@ -380,7 +380,7 @@ SPHLFEntryGetFreePtr (SPHLFEntryHandle_t *handle)
 *	For example if remaining entry space
 *	is insufficient to hold the struct at the required alignment.
 */
-inline  void*
+static inline  void*
 SPHLFEntryGetStructPtr (SPHLFEntryHandle_t *handle,
 		unsigned long __size, unsigned long __align)
 {
@@ -435,7 +435,7 @@ SPHLFEntryGetStructPtr (SPHLFEntryHandle_t *handle,
 *	For example if remaining entry space
 *	is insufficient to hold the struct at the required alignment.
 */
-inline  void*
+static inline  void*
 SPHLFEntryAllocStruct (SPHLFEntryHandle_t *handle,
 		unsigned long __size, unsigned long __align)
 {
@@ -473,7 +473,7 @@ SPHLFEntryAllocStruct (SPHLFEntryHandle_t *handle,
 *	For example if the string is too
 *	large for the remain entry free space.
 */
-inline int
+static inline int
 SPHLFEntryAddString (SPHLFEntryHandle_t *handle,
 			char *value)
 {
@@ -503,7 +503,7 @@ SPHLFEntryAddString (SPHLFEntryHandle_t *handle,
 *	For example if remaining entry space
 *	is insufficient to hold a char.
 */
-inline int
+static inline int
 SPHLFEntryAddChar (SPHLFEntryHandle_t *handle,
 			char value)
 {
@@ -531,7 +531,7 @@ SPHLFEntryAddChar (SPHLFEntryHandle_t *handle,
 *	For example if remaining entry space
 *	is insufficient to hold a short int plus any required alignment.
 */
-inline  int
+static inline  int
 SPHLFEntryAddShort (SPHLFEntryHandle_t *handle,
 			short int value)
 {
@@ -572,7 +572,7 @@ SPHLFEntryAddShort (SPHLFEntryHandle_t *handle,
 *	For example if remaining entry space
 *	is insufficient to hold a int plus any required alignment.
 */
-inline  int
+static inline  int
 SPHLFEntryAddInt (SPHLFEntryHandle_t *handle,
 			int value)
 {
@@ -610,7 +610,7 @@ SPHLFEntryAddInt (SPHLFEntryHandle_t *handle,
 *	For example if remaining entry space
 *	is insufficient to hold a long int plus any required alignment.
 */
-inline  int
+static inline  int
 SPHLFEntryAddLong (SPHLFEntryHandle_t *handle,
 			long value)
 {
@@ -648,7 +648,7 @@ SPHLFEntryAddLong (SPHLFEntryHandle_t *handle,
 *	For example if remaining entry space
 *	is insufficient to hold a void* plus any required alignment.
 */
-inline  int
+static inline  int
 SPHLFEntryAddPtr (SPHLFEntryHandle_t *handle,
 			void *value)
 {
@@ -686,7 +686,7 @@ SPHLFEntryAddPtr (SPHLFEntryHandle_t *handle,
 *	For example if remaining entry space
 *	is insufficient to hold a long long int plus any required alignment.
 */
-inline  int
+static inline  int
 SPHLFEntryAddLongLong (SPHLFEntryHandle_t *handle,
 			long long value)
 {
@@ -724,7 +724,7 @@ SPHLFEntryAddLongLong (SPHLFEntryHandle_t *handle,
 *	For example if remaining entry space
 *	is insufficient to hold a float plus any required alignment.
 */
-inline  int
+static inline  int
 SPHLFEntryAddFloat (SPHLFEntryHandle_t *handle,
 			float value)
 {
@@ -762,7 +762,7 @@ SPHLFEntryAddFloat (SPHLFEntryHandle_t *handle,
 *	For example if remaining entry space
 *	is insufficient to hold a double plus any required alignment.
 */
-inline  int
+static inline  int
 SPHLFEntryAddDouble (SPHLFEntryHandle_t *handle,
 			double value)
 {
@@ -800,7 +800,7 @@ SPHLFEntryAddDouble (SPHLFEntryHandle_t *handle,
 *	@return the char value if successful, 0 (NUL) if the get fails.
 *	For example if the next is at the end of the Logger entry.
 */
-inline  char
+static inline  char
 SPHLFEntryGetNextChar (SPHLFEntryHandle_t *handle)
 {
 	char	*ptr	= handle->next;
@@ -825,7 +825,7 @@ SPHLFEntryGetNextChar (SPHLFEntryHandle_t *handle)
 *	@return the C string pointer value if successful, 0 (NULL) if the get fails.
 *	For example if the next is at the end of the Logger entry.
 */
-inline  char*
+static inline  char*
 SPHLFEntryGetNextString (SPHLFEntryHandle_t *handle)
 {
 	char		*ptr	= handle->next;
@@ -853,7 +853,7 @@ SPHLFEntryGetNextString (SPHLFEntryHandle_t *handle)
 *	@return the short int value if successful, 0 if the get fails.
 *	For example if the next is at the end of the Logger entry.
 */
-inline short int
+static inline short int
 SPHLFEntryGetNextShort (SPHLFEntryHandle_t *handle)
 {
 	short int	*ptr	= (short int*)handle->next;
@@ -892,7 +892,7 @@ SPHLFEntryGetNextShort (SPHLFEntryHandle_t *handle)
 *	@return the int value if successful, 0 if the get fails.
 *	For example if the next is at the end of the Logger entry.
 */
-inline  int
+static inline  int
 SPHLFEntryGetNextInt (SPHLFEntryHandle_t *handle)
 {
 	int		*ptr	= (int*)handle->next;
@@ -928,7 +928,7 @@ SPHLFEntryGetNextInt (SPHLFEntryHandle_t *handle)
 *	@return the long int value if successful, 0 if the get fails.
 *	For example if the next is at the end of the Logger entry.
 */
-inline  long
+static inline  long
 SPHLFEntryGetNextLong (SPHLFEntryHandle_t *handle)
 {
 	long		*ptr	= (long*)handle->next;
@@ -964,7 +964,7 @@ SPHLFEntryGetNextLong (SPHLFEntryHandle_t *handle)
 *	@return the void* value if successful, 0 (NULL) if the get fails.
 *	For example if the next is at the end of the Logger entry.
 */
-inline  void*
+static inline  void*
 SPHLFEntryGetNextPtr (SPHLFEntryHandle_t *handle)
 {
 	void		**ptr	= (void**)handle->next;
@@ -1000,7 +1000,7 @@ SPHLFEntryGetNextPtr (SPHLFEntryHandle_t *handle)
 *	@return the long long int value if successful,0 if the get fails. For example if the next is at the end
 *	of the Logger entry.
 */
-inline  long long
+static inline  long long
 SPHLFEntryGetNextLongLong (SPHLFEntryHandle_t *handle)
 {
 	long long	*ptr	= (long long*)handle->next;
@@ -1036,7 +1036,7 @@ SPHLFEntryGetNextLongLong (SPHLFEntryHandle_t *handle)
 *	@return the float value if successful, 0.0 if the get fails.
 *	For example if the next is at the end of the Logger entry.
 */
-inline  float
+static inline  float
 SPHLFEntryGetNextFloat (SPHLFEntryHandle_t *handle)
 {
 	float		*ptr	= (float*)handle->next;
@@ -1072,7 +1072,7 @@ SPHLFEntryGetNextFloat (SPHLFEntryHandle_t *handle)
 *	@return the double value if successful, 0.0 if the get fails.
 *	For example if the next is at the end of the Logger entry.
 */
-inline  double
+static inline  double
 SPHLFEntryGetNextDouble (SPHLFEntryHandle_t *handle)
 {
 	double		*ptr	= (double*)handle->next;

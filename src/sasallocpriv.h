@@ -17,13 +17,13 @@
 extern unsigned long memLow __attribute__ ((visibility ("hidden")));
 extern unsigned long memHigh __attribute__ ((visibility ("hidden")));
 
-inline unsigned long
+static inline unsigned long
 getfastMemLow ()
 {
   return memLow;
 }
 
-inline unsigned long
+static inline unsigned long
 getfastMemHigh ()
 {
   return memHigh;

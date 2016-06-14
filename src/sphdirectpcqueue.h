@@ -155,7 +155,7 @@ typedef void* SPHLFEntryDirect_t;
 *   @param subcode Subcategory code to the completed entry.
 *   @return a 1 value indicates success.
 */
-inline int
+static inline int
 SPHLFEntryDirectComplete (SPHLFEntryDirect_t directHandle,
                           sphLFEntryID_t entry_template,
                           int catcode, int subcode)
@@ -188,7 +188,7 @@ SPHLFEntryDirectComplete (SPHLFEntryDirect_t directHandle,
 *   @param directHandle Entry Handle for an allocated entry.
 *   @return address the entries free space.
 */
-inline void*
+static inline void*
 SPHLFEntryDirectGetFreePtr (SPHLFEntryDirect_t directHandle)
 {
         char    *ptr    = (char*)directHandle + sizeof (sphLFEntry_t);
@@ -209,7 +209,7 @@ SPHLFEntryDirectGetFreePtr (SPHLFEntryDirect_t directHandle)
 *   @param alignval required alignment of the next value to be added.
 *   @return address the entries free space.
 */
-inline void*
+static inline void*
 SPHLFEntryDirectGetPtrAligned (SPHLFEntryDirect_t directHandle,
 		size_t alignval)
 {
@@ -234,7 +234,7 @@ SPHLFEntryDirectGetPtrAligned (SPHLFEntryDirect_t directHandle,
 *   @param alignval required alignment of the next value to be added.
 *   @return next address within the entry with require alignment.
 */
-inline void*
+static inline void*
 SPHLFEntryDirectIncAndAlign (void *directptr, size_t incval, size_t alignval)
 {
         uintptr_t	ptr		= (uintptr_t)directptr;
@@ -252,7 +252,7 @@ SPHLFEntryDirectIncAndAlign (void *directptr, size_t incval, size_t alignval)
 *   @return true if the entry was complete (SPHLFLoggerEntryComplete
 *           has been called fo this entry). Otherwise False.
 */
-inline int
+static inline int
 SPHLFEntryDirectIsComplete (SPHLFEntryDirect_t directHandle)
 {
     SPHLFEntryHeader_t  *entryPtr = (SPHLFEntryHeader_t*)directHandle;
@@ -266,7 +266,7 @@ SPHLFEntryDirectIsComplete (SPHLFEntryDirect_t directHandle)
 *   @param directHandle Entry Handle for an allocated entry.
 *   @return true if the entry was time stamped. Otherwise False.
 */
-inline int
+static inline int
 SPHLFEntryDirectIsTimestamped (SPHLFEntryDirect_t directHandle)
 {
     SPHLFEntryHeader_t  *entryPtr = (SPHLFEntryHeader_t*)directHandle;
@@ -282,7 +282,7 @@ SPHLFEntryDirectIsTimestamped (SPHLFEntryDirect_t directHandle)
 *   @return the category from the entry, if the entry was valid.
 *   Otherwise return 0.
 */
-inline int
+static inline int
 SPHLFEntryDirectCategory (SPHLFEntryDirect_t directHandle)
 {
     SPHLFEntryHeader_t  *entryPtr = (SPHLFEntryHeader_t*)directHandle;
@@ -304,7 +304,7 @@ SPHLFEntryDirectCategory (SPHLFEntryDirect_t directHandle)
 *       @return the sub-category from the entry, if the entry was valid.
 *       Otherwise return 0.
 */
-inline int
+static inline int
 SPHLFEntryDirectSubcat (SPHLFEntryDirect_t directHandle)
 {
     SPHLFEntryHeader_t  *entryPtr = (SPHLFEntryHeader_t*)directHandle;
