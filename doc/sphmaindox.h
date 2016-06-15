@@ -267,6 +267,7 @@ int main ()
 *  - sassimplestack.h SAS Simple Stack
 *  - sassimpleheap.h SAS Simple Heap
 *  - sascompoundheap.h SAS Compound Heap; expanding heap of Simple Heaps
+*  - sphcompoundpcqheap.h SAS Compound Heap extension; expanding heap of PCQueues
 *
 *  \subsection SASIndex Maps, indexes and Contexts
 *  - sphcontext.h SPH Context
