@@ -118,14 +118,14 @@ extern __C__ void
 initSOMSASBlock(SASBlockHeader *header, sas_type_t sasType,
 					long blockSize, void* blockHeap);
 
-inline int
+static inline int
 SOMSASCheckBlockSig (SASBlockHeader* header)
 {
     return ((header->blockSig1 == block__Signature_1)
 	    &&(header->blockSig2 == block__Signature_2));
 }
 
-inline int
+static inline int
 SOMSASCheckBlockSigAndType (SASBlockHeader* header, 
                                                            sas_type_t sasType)
 {
@@ -135,7 +135,7 @@ SOMSASCheckBlockSigAndType (SASBlockHeader* header,
 	          == (sasType & SAS_TYPE_MASK)));
 }
 
-inline int
+static inline int
 SOMSASCheckBlockSigAndTypeAndSubtype (SASBlockHeader* header, 
                                                            sas_type_t sasType)
 {
@@ -145,7 +145,7 @@ SOMSASCheckBlockSigAndTypeAndSubtype (SASBlockHeader* header,
 	          == (sasType & SAS_SUBTYPE_CHECK_MASK)));
 }
 
-inline int
+static inline int
 SOMSASCheckBlockSubType (SASBlockHeader* header, 
                                                            sas_type_t sasType)
 {
@@ -153,7 +153,7 @@ SOMSASCheckBlockSubType (SASBlockHeader* header,
                  == (sasType & SAS_SUB_TYPE_MASK));
 }
 
-inline void
+static inline void
 SOMSASSetBlockSubType (SASBlockHeader* header, 
                                                            sas_type_t sasType)
 {
@@ -161,13 +161,13 @@ SOMSASSetBlockSubType (SASBlockHeader* header,
                  || (sasType & SAS_SUB_TYPE_MASK);
 }
 
-inline sas_type_t
+static inline sas_type_t
 SOMSASGetBlockSubType (SASBlockHeader* header)
 {
     return (header->blockType &  SAS_SUB_TYPE_MASK);
 }
 
-inline sas_type_t
+static inline sas_type_t
 SOMSASGetBlockType (SASBlockHeader* header)
 {
     return (header->blockType);

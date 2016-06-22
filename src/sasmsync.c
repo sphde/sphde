@@ -15,7 +15,7 @@
 #include "sasio.h"
 #include "sasmsync.h"
 
-inline void*
+static inline void*
 pageAlignStart (void *startAddr)
 {
 	unsigned long pageSize = getpagesize();
@@ -25,7 +25,7 @@ pageAlignStart (void *startAddr)
 	return (void*)(addr & pageMask);
 }
 
-inline size_t
+static inline size_t
 pageAlignLen (void *startAddr, size_t size)
 {
 	unsigned long pageSize = getpagesize();
