@@ -720,6 +720,7 @@ CPPFLAGS
 LDFLAGS
 CXXFLAGS
 CXX
+HTM
 DEBUG
 SPHDE_SO_VERSION
 MAINT
@@ -796,6 +797,7 @@ enable_option_checking
 enable_silent_rules
 enable_maintainer_mode
 enable_debug
+enable_htm
 enable_dependency_tracking
 enable_shared
 enable_static
@@ -1446,6 +1448,7 @@ Optional Features:
                           enable make rules and dependencies not useful (and
                           sometimes confusing) to the casual installer
   --enable-debug          Enable debugging information
+  --enable-htm            Enable Hardware Transactional Memory
   --enable-dependency-tracking
                           do not reject slow dependency extractors
   --disable-dependency-tracking
@@ -3146,6 +3149,21 @@ fi
 if test "x$enable_debug" = "xyes" ; then
   CFLAGS="$CFLAGS -D__SOMDebugPrint__ -Dmylockdebug -DcoherenceCheck -D__SASDebugPrint__"
   CXXFLAGS="$CXXFLAGS -D__SOMDebugPrint__ -Dmylockdebug -DcoherenceCheck -D__SASDebugPrint__"
+fi
+
+# Hardware Transactional Memory option
+# Check whether --enable-htm was given.
+if test "${enable_htm+set}" = set; then :
+  enableval=$enable_htm;
+else
+  enable_htm=no
+fi
+
+
+HTM=""
+if test "x$enable_htm" != xno; then :
+  HTM=-mhtm
+
 fi
 
 # This directive is to avoid buggy libtool that don't add the -Wl,--no-as-needed
