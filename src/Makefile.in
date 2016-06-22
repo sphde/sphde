@@ -81,13 +81,13 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 bin_PROGRAMS = sasutil$(EXEEXT)
-TESTS = sphgtod_t$(EXEEXT) sasatom_t$(EXEEXT) bitvec_t$(EXEEXT) \
-	sassim_t$(EXEEXT) sascompoundheap_t$(EXEEXT) sasseg_t$(EXEEXT) \
-	sphlockfreeheap_t$(EXEEXT) sphlflogger_t$(EXEEXT) \
-	sphthread_t$(EXEEXT) sphlflogger_tt$(EXEEXT) \
-	sphlflogger_ttt$(EXEEXT) sphlogportal_t$(EXEEXT) \
-	sphlogportal_tt$(EXEEXT) sphcontext_t$(EXEEXT) \
-	sasindex_t$(EXEEXT) sasindex_tt$(EXEEXT) \
+TESTS = sphgtod_t$(EXEEXT) sphgettime_t$(EXEEXT) sasatom_t$(EXEEXT) \
+	bitvec_t$(EXEEXT) sassim_t$(EXEEXT) sascompoundheap_t$(EXEEXT) \
+	sasseg_t$(EXEEXT) sphlockfreeheap_t$(EXEEXT) \
+	sphlflogger_t$(EXEEXT) sphthread_t$(EXEEXT) \
+	sphlflogger_tt$(EXEEXT) sphlflogger_ttt$(EXEEXT) \
+	sphlogportal_t$(EXEEXT) sphlogportal_tt$(EXEEXT) \
+	sphcontext_t$(EXEEXT) sasindex_t$(EXEEXT) sasindex_tt$(EXEEXT) \
 	sasstringbtree_t$(EXEEXT) sasstringbtree_tt$(EXEEXT) \
 	sphsinglepcqueue_t$(EXEEXT) sphsinglepcqueue_tt$(EXEEXT) \
 	sphsinglepcqueue_ttt$(EXEEXT) sphdirectpcqueue_ttt$(EXEEXT)
@@ -95,7 +95,8 @@ check_PROGRAMS = $(am__EXEEXT_1)
 subdir = src
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(top_srcdir)/depcomp $(libsphdeinclude_HEADERS) \
-	$(libsphgtodinclude_HEADERS) $(top_srcdir)/test-driver
+	$(libsphgettimeinclude_HEADERS) $(libsphgtodinclude_HEADERS) \
+	$(top_srcdir)/test-driver
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/acx_pthread.m4 \
 	$(top_srcdir)/m4/libtool.m4 $(top_srcdir)/m4/ltoptions.m4 \
@@ -137,6 +138,7 @@ am__uninstall_files_from_dir = { \
   }
 am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" \
 	"$(DESTDIR)$(libsphdeincludedir)" \
+	"$(DESTDIR)$(libsphgettimeincludedir)" \
 	"$(DESTDIR)$(libsphgtodincludedir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
 am__DEPENDENCIES_1 =
@@ -164,14 +166,22 @@ am__v_lt_1 =
 libsphde_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(libsphde_la_CXXFLAGS) \
 	$(CXXFLAGS) $(libsphde_la_LDFLAGS) $(LDFLAGS) -o $@
+libsphgettime_la_DEPENDENCIES =
+am_libsphgettime_la_OBJECTS = libsphgettime_la-sphgettime.lo
+libsphgettime_la_OBJECTS = $(am_libsphgettime_la_OBJECTS)
+libsphgettime_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
+	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
+	$(libsphgettime_la_CFLAGS) $(CFLAGS) \
+	$(libsphgettime_la_LDFLAGS) $(LDFLAGS) -o $@
 libsphgtod_la_DEPENDENCIES =
 am_libsphgtod_la_OBJECTS = libsphgtod_la-sphgtod.lo
 libsphgtod_la_OBJECTS = $(am_libsphgtod_la_OBJECTS)
 libsphgtod_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(libsphgtod_la_CFLAGS) \
 	$(CFLAGS) $(libsphgtod_la_LDFLAGS) $(LDFLAGS) -o $@
-am__EXEEXT_1 = sphgtod_t$(EXEEXT) sasatom_t$(EXEEXT) bitvec_t$(EXEEXT) \
-	sassim_t$(EXEEXT) sascompoundheap_t$(EXEEXT) sasseg_t$(EXEEXT) \
+am__EXEEXT_1 = sphgtod_t$(EXEEXT) sphgettime_t$(EXEEXT) \
+	sasatom_t$(EXEEXT) bitvec_t$(EXEEXT) sassim_t$(EXEEXT) \
+	sascompoundheap_t$(EXEEXT) sasseg_t$(EXEEXT) \
 	sphlockfreeheap_t$(EXEEXT) sphlflogger_t$(EXEEXT) \
 	sphthread_t$(EXEEXT) sphlflogger_tt$(EXEEXT) \
 	sphlflogger_ttt$(EXEEXT) sphlogportal_t$(EXEEXT) \
@@ -219,6 +229,9 @@ am_sphdirectpcqueue_ttt_OBJECTS =  \
 	tests/sphdirectpcqueue_ttt.$(OBJEXT)
 sphdirectpcqueue_ttt_OBJECTS = $(am_sphdirectpcqueue_ttt_OBJECTS)
 sphdirectpcqueue_ttt_DEPENDENCIES = libsphde.la
+am_sphgettime_t_OBJECTS = tests/sphgettime_t.$(OBJEXT)
+sphgettime_t_OBJECTS = $(am_sphgettime_t_OBJECTS)
+sphgettime_t_DEPENDENCIES = .libs/libsphgettime.a libsphde.la
 am_sphgtod_t_OBJECTS = tests/sphgtod_t.$(OBJEXT)
 sphgtod_t_OBJECTS = $(am_sphgtod_t_OBJECTS)
 sphgtod_t_DEPENDENCIES = .libs/libsphgtod.a libsphde.la
@@ -315,36 +328,41 @@ AM_V_CXXLD = $(am__v_CXXLD_@AM_V@)
 am__v_CXXLD_ = $(am__v_CXXLD_@AM_DEFAULT_V@)
 am__v_CXXLD_0 = @echo "  CXXLD   " $@;
 am__v_CXXLD_1 = 
-SOURCES = $(libsphde_la_SOURCES) $(libsphgtod_la_SOURCES) \
-	$(bitvec_t_SOURCES) $(sasatom_t_SOURCES) \
-	$(sascompoundheap_t_SOURCES) $(sasindex_t_SOURCES) \
-	$(sasindex_tt_SOURCES) $(sasseg_t_SOURCES) $(sassim_t_SOURCES) \
+SOURCES = $(libsphde_la_SOURCES) $(libsphgettime_la_SOURCES) \
+	$(libsphgtod_la_SOURCES) $(bitvec_t_SOURCES) \
+	$(sasatom_t_SOURCES) $(sascompoundheap_t_SOURCES) \
+	$(sasindex_t_SOURCES) $(sasindex_tt_SOURCES) \
+	$(sasseg_t_SOURCES) $(sassim_t_SOURCES) \
 	$(sasstringbtree_t_SOURCES) $(sasstringbtree_tt_SOURCES) \
 	$(sasutil_SOURCES) $(sphcontext_t_SOURCES) \
-	$(sphdirectpcqueue_ttt_SOURCES) $(sphgtod_t_SOURCES) \
-	$(sphlflogger_t_SOURCES) $(sphlflogger_tt_SOURCES) \
-	$(sphlflogger_ttt_SOURCES) $(sphlockfreeheap_t_SOURCES) \
-	$(sphlogportal_t_SOURCES) $(sphlogportal_tt_SOURCES) \
-	$(sphsinglepcqueue_t_SOURCES) $(sphsinglepcqueue_tt_SOURCES) \
-	$(sphsinglepcqueue_ttt_SOURCES) $(sphthread_t_SOURCES)
-DIST_SOURCES = $(libsphde_la_SOURCES) $(libsphgtod_la_SOURCES) \
-	$(bitvec_t_SOURCES) $(sasatom_t_SOURCES) \
-	$(sascompoundheap_t_SOURCES) $(sasindex_t_SOURCES) \
-	$(sasindex_tt_SOURCES) $(sasseg_t_SOURCES) $(sassim_t_SOURCES) \
+	$(sphdirectpcqueue_ttt_SOURCES) $(sphgettime_t_SOURCES) \
+	$(sphgtod_t_SOURCES) $(sphlflogger_t_SOURCES) \
+	$(sphlflogger_tt_SOURCES) $(sphlflogger_ttt_SOURCES) \
+	$(sphlockfreeheap_t_SOURCES) $(sphlogportal_t_SOURCES) \
+	$(sphlogportal_tt_SOURCES) $(sphsinglepcqueue_t_SOURCES) \
+	$(sphsinglepcqueue_tt_SOURCES) $(sphsinglepcqueue_ttt_SOURCES) \
+	$(sphthread_t_SOURCES)
+DIST_SOURCES = $(libsphde_la_SOURCES) $(libsphgettime_la_SOURCES) \
+	$(libsphgtod_la_SOURCES) $(bitvec_t_SOURCES) \
+	$(sasatom_t_SOURCES) $(sascompoundheap_t_SOURCES) \
+	$(sasindex_t_SOURCES) $(sasindex_tt_SOURCES) \
+	$(sasseg_t_SOURCES) $(sassim_t_SOURCES) \
 	$(sasstringbtree_t_SOURCES) $(sasstringbtree_tt_SOURCES) \
 	$(sasutil_SOURCES) $(sphcontext_t_SOURCES) \
-	$(sphdirectpcqueue_ttt_SOURCES) $(sphgtod_t_SOURCES) \
-	$(sphlflogger_t_SOURCES) $(sphlflogger_tt_SOURCES) \
-	$(sphlflogger_ttt_SOURCES) $(sphlockfreeheap_t_SOURCES) \
-	$(sphlogportal_t_SOURCES) $(sphlogportal_tt_SOURCES) \
-	$(sphsinglepcqueue_t_SOURCES) $(sphsinglepcqueue_tt_SOURCES) \
-	$(sphsinglepcqueue_ttt_SOURCES) $(sphthread_t_SOURCES)
+	$(sphdirectpcqueue_ttt_SOURCES) $(sphgettime_t_SOURCES) \
+	$(sphgtod_t_SOURCES) $(sphlflogger_t_SOURCES) \
+	$(sphlflogger_tt_SOURCES) $(sphlflogger_ttt_SOURCES) \
+	$(sphlockfreeheap_t_SOURCES) $(sphlogportal_t_SOURCES) \
+	$(sphlogportal_tt_SOURCES) $(sphsinglepcqueue_t_SOURCES) \
+	$(sphsinglepcqueue_tt_SOURCES) $(sphsinglepcqueue_ttt_SOURCES) \
+	$(sphthread_t_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
     *) (install-info --version) >/dev/null 2>&1;; \
   esac
-HEADERS = $(libsphdeinclude_HEADERS) $(libsphgtodinclude_HEADERS)
+HEADERS = $(libsphdeinclude_HEADERS) $(libsphgettimeinclude_HEADERS) \
+	$(libsphgtodinclude_HEADERS)
 am__tagged_files = $(HEADERS) $(SOURCES) $(TAGS_FILES) $(LISP)
 # Read a list of newline-separated strings from the standard input,
 # and print each of them once, without duplicates.  Input order is
@@ -686,12 +704,13 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AM_CFLAGS = -Wall -Wwrite-strings $(PTHREAD_CFLAGS)
 AM_CXXFLAGS = -Wall -Wwrite-strings -Woverloaded-virtual $(PTHREAD_CFLAGS)
-lib_LTLIBRARIES = libsphde.la libsphgtod.la
+lib_LTLIBRARIES = libsphde.la libsphgtod.la libsphgettime.la
 EXTRA_DIST = $(libsphde_la_INCLUDES) saslockl.cpp
 
 # libsphde definitions
 libsphdeincludedir = $(includedir)/sphde
 libsphgtodincludedir = $(includedir)/sphde
+libsphgettimeincludedir = $(includedir)/sphde
 
 # The headers in 'libsphdeinclude_HEADERS' are meant to be the ones installed
 # on 'make install'
@@ -733,6 +752,7 @@ libsphdeinclude_HEADERS = \
 	sphtimer.h
 
 libsphgtodinclude_HEADERS = sphgtod.h
+libsphgettimeinclude_HEADERS = sphgettime.h
 libsphde_la_INCLUDES = \
 	$(libsphdeinclude_HEADERS) \
 	bitv.h \
@@ -755,6 +775,7 @@ libsphde_la_INCLUDES = \
 	sasstdio.h 
 
 libsphgtod_la_SOURCES = sphgtod.c
+libsphgettime_la_SOURCES = sphgettime.c
 libsphde_la_SOURCES = \
 	sasshm.c \
 	sasmsync.c \
@@ -797,12 +818,21 @@ libsphgtod_la_CXXFLAGS = $(AM_CXXFLAGS)
 # the performance aspects of inlining the emulated gettimeofday code.
 libsphgtod_la_LDFLAGS = -all-static
 libsphgtod_la_LIBADD = -lrt
+libsphgettime_la_CFLAGS = $(AM_CFLAGS)
+libsphgettime_la_CXXFLAGS = $(AM_CXXFLAGS)
+
+# libsphgettime.a is ONLY to be a static archive in order to benefit from
+# the performance aspects of inlining the emulated clock_gettime code.
+libsphgettime_la_LDFLAGS = -all-static
+libsphgettime_la_LIBADD = -lrt
 libsphde_la_LDFLAGS = -version-info $(SPHDE_SO_VERSION)
 libsphde_la_LIBADD = $(PTHREAD_LIBS) -lrt
 sasutil_SOURCES = sasutil.c
 sasutil_LDADD = libsphde.la
 sphgtod_t_SOURCES = tests/sphgtod_t.c
 sphgtod_t_LDADD = .libs/libsphgtod.a libsphde.la
+sphgettime_t_SOURCES = tests/sphgettime_t.c
+sphgettime_t_LDADD = .libs/libsphgettime.a libsphde.la
 sasatom_t_SOURCES = tests/sasatom_t.c
 sasatom_t_LDADD = libsphde.la
 bitvec_t_SOURCES = tests/bitvec_t.c
@@ -919,6 +949,9 @@ clean-libLTLIBRARIES:
 
 libsphde.la: $(libsphde_la_OBJECTS) $(libsphde_la_DEPENDENCIES) $(EXTRA_libsphde_la_DEPENDENCIES) 
 	$(AM_V_CXXLD)$(libsphde_la_LINK) -rpath $(libdir) $(libsphde_la_OBJECTS) $(libsphde_la_LIBADD) $(LIBS)
+
+libsphgettime.la: $(libsphgettime_la_OBJECTS) $(libsphgettime_la_DEPENDENCIES) $(EXTRA_libsphgettime_la_DEPENDENCIES) 
+	$(AM_V_CCLD)$(libsphgettime_la_LINK) -rpath $(libdir) $(libsphgettime_la_OBJECTS) $(libsphgettime_la_LIBADD) $(LIBS)
 
 libsphgtod.la: $(libsphgtod_la_OBJECTS) $(libsphgtod_la_DEPENDENCIES) $(EXTRA_libsphgtod_la_DEPENDENCIES) 
 	$(AM_V_CCLD)$(libsphgtod_la_LINK) -rpath $(libdir) $(libsphgtod_la_OBJECTS) $(libsphgtod_la_LIBADD) $(LIBS)
@@ -1056,6 +1089,12 @@ tests/sphdirectpcqueue_ttt.$(OBJEXT): tests/$(am__dirstamp) \
 sphdirectpcqueue_ttt$(EXEEXT): $(sphdirectpcqueue_ttt_OBJECTS) $(sphdirectpcqueue_ttt_DEPENDENCIES) $(EXTRA_sphdirectpcqueue_ttt_DEPENDENCIES) 
 	@rm -f sphdirectpcqueue_ttt$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(sphdirectpcqueue_ttt_OBJECTS) $(sphdirectpcqueue_ttt_LDADD) $(LIBS)
+tests/sphgettime_t.$(OBJEXT): tests/$(am__dirstamp) \
+	tests/$(DEPDIR)/$(am__dirstamp)
+
+sphgettime_t$(EXEEXT): $(sphgettime_t_OBJECTS) $(sphgettime_t_DEPENDENCIES) $(EXTRA_sphgettime_t_DEPENDENCIES) 
+	@rm -f sphgettime_t$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(sphgettime_t_OBJECTS) $(sphgettime_t_LDADD) $(LIBS)
 tests/sphgtod_t.$(OBJEXT): tests/$(am__dirstamp) \
 	tests/$(DEPDIR)/$(am__dirstamp)
 
@@ -1157,6 +1196,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsphde_la-sphthread.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsphde_la-sphtimer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsphde_la-ultree.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsphgettime_la-sphgettime.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsphgtod_la-sphgtod.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sasutil.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/bitvec_t.Po@am__quote@
@@ -1170,6 +1210,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/sasstringbtree_tt.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/sphcontext_t.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/sphdirectpcqueue_ttt.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/sphgettime_t.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/sphgtod_t.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/sphlflogger_t.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/sphlflogger_tt-sphlflogger_tt.Po@am__quote@
@@ -1260,6 +1301,13 @@ libsphde_la-sphthread.lo: sphthread.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='sphthread.c' object='libsphde_la-sphthread.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsphde_la_CFLAGS) $(CFLAGS) -c -o libsphde_la-sphthread.lo `test -f 'sphthread.c' || echo '$(srcdir)/'`sphthread.c
+
+libsphgettime_la-sphgettime.lo: sphgettime.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsphgettime_la_CFLAGS) $(CFLAGS) -MT libsphgettime_la-sphgettime.lo -MD -MP -MF $(DEPDIR)/libsphgettime_la-sphgettime.Tpo -c -o libsphgettime_la-sphgettime.lo `test -f 'sphgettime.c' || echo '$(srcdir)/'`sphgettime.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libsphgettime_la-sphgettime.Tpo $(DEPDIR)/libsphgettime_la-sphgettime.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='sphgettime.c' object='libsphgettime_la-sphgettime.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsphgettime_la_CFLAGS) $(CFLAGS) -c -o libsphgettime_la-sphgettime.lo `test -f 'sphgettime.c' || echo '$(srcdir)/'`sphgettime.c
 
 libsphgtod_la-sphgtod.lo: sphgtod.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsphgtod_la_CFLAGS) $(CFLAGS) -MT libsphgtod_la-sphgtod.lo -MD -MP -MF $(DEPDIR)/libsphgtod_la-sphgtod.Tpo -c -o libsphgtod_la-sphgtod.lo `test -f 'sphgtod.c' || echo '$(srcdir)/'`sphgtod.c
@@ -1493,6 +1541,27 @@ uninstall-libsphdeincludeHEADERS:
 	@list='$(libsphdeinclude_HEADERS)'; test -n "$(libsphdeincludedir)" || list=; \
 	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
 	dir='$(DESTDIR)$(libsphdeincludedir)'; $(am__uninstall_files_from_dir)
+install-libsphgettimeincludeHEADERS: $(libsphgettimeinclude_HEADERS)
+	@$(NORMAL_INSTALL)
+	@list='$(libsphgettimeinclude_HEADERS)'; test -n "$(libsphgettimeincludedir)" || list=; \
+	if test -n "$$list"; then \
+	  echo " $(MKDIR_P) '$(DESTDIR)$(libsphgettimeincludedir)'"; \
+	  $(MKDIR_P) "$(DESTDIR)$(libsphgettimeincludedir)" || exit 1; \
+	fi; \
+	for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  echo "$$d$$p"; \
+	done | $(am__base_list) | \
+	while read files; do \
+	  echo " $(INSTALL_HEADER) $$files '$(DESTDIR)$(libsphgettimeincludedir)'"; \
+	  $(INSTALL_HEADER) $$files "$(DESTDIR)$(libsphgettimeincludedir)" || exit $$?; \
+	done
+
+uninstall-libsphgettimeincludeHEADERS:
+	@$(NORMAL_UNINSTALL)
+	@list='$(libsphgettimeinclude_HEADERS)'; test -n "$(libsphgettimeincludedir)" || list=; \
+	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
+	dir='$(DESTDIR)$(libsphgettimeincludedir)'; $(am__uninstall_files_from_dir)
 install-libsphgtodincludeHEADERS: $(libsphgtodinclude_HEADERS)
 	@$(NORMAL_INSTALL)
 	@list='$(libsphgtodinclude_HEADERS)'; test -n "$(libsphgtodincludedir)" || list=; \
@@ -1715,6 +1784,13 @@ sphgtod_t.log: sphgtod_t$(EXEEXT)
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
 	"$$tst" $(AM_TESTS_FD_REDIRECT)
+sphgettime_t.log: sphgettime_t$(EXEEXT)
+	@p='sphgettime_t$(EXEEXT)'; \
+	b='sphgettime_t'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
 sasatom_t.log: sasatom_t$(EXEEXT)
 	@p='sasatom_t$(EXEEXT)'; \
 	b='sasatom_t'; \
@@ -1915,7 +1991,7 @@ all-am: Makefile $(LTLIBRARIES) $(PROGRAMS) $(HEADERS)
 install-binPROGRAMS: install-libLTLIBRARIES
 
 installdirs:
-	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" "$(DESTDIR)$(libsphdeincludedir)" "$(DESTDIR)$(libsphgtodincludedir)"; do \
+	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" "$(DESTDIR)$(libsphdeincludedir)" "$(DESTDIR)$(libsphgettimeincludedir)" "$(DESTDIR)$(libsphgtodincludedir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
 	done
 install: install-am
@@ -1977,6 +2053,7 @@ info: info-am
 info-am:
 
 install-data-am: install-libsphdeincludeHEADERS \
+	install-libsphgettimeincludeHEADERS \
 	install-libsphgtodincludeHEADERS
 
 install-dvi: install-dvi-am
@@ -2025,6 +2102,7 @@ ps-am:
 
 uninstall-am: uninstall-binPROGRAMS uninstall-libLTLIBRARIES \
 	uninstall-libsphdeincludeHEADERS \
+	uninstall-libsphgettimeincludeHEADERS \
 	uninstall-libsphgtodincludeHEADERS
 
 .MAKE: check-am install-am install-strip
@@ -2039,6 +2117,7 @@ uninstall-am: uninstall-binPROGRAMS uninstall-libLTLIBRARIES \
 	install-exec install-exec-am install-html install-html-am \
 	install-info install-info-am install-libLTLIBRARIES \
 	install-libsphdeincludeHEADERS \
+	install-libsphgettimeincludeHEADERS \
 	install-libsphgtodincludeHEADERS install-man install-pdf \
 	install-pdf-am install-ps install-ps-am install-strip \
 	installcheck installcheck-am installdirs maintainer-clean \
@@ -2047,6 +2126,7 @@ uninstall-am: uninstall-binPROGRAMS uninstall-libLTLIBRARIES \
 	recheck tags tags-am uninstall uninstall-am \
 	uninstall-binPROGRAMS uninstall-libLTLIBRARIES \
 	uninstall-libsphdeincludeHEADERS \
+	uninstall-libsphgettimeincludeHEADERS \
 	uninstall-libsphgtodincludeHEADERS
 
 
@@ -2054,6 +2134,11 @@ uninstall-am: uninstall-binPROGRAMS uninstall-libLTLIBRARIES \
 # .libs/libsphgtod.a and if make is executed in parallel (-jN) the sphgtod_t
 # rule may be run before .libs/lisphgtod.a is built.
 .libs/libsphgtod.a: libsphgtod.la
+
+# This rule is necessary because sphgettime_t needs to statically link
+# .libs/libsphgettime.a and if make is executed in parallel (-jN) the sphgettime_t
+# rule may be run before .libs/lisphgettime.a is built.
+.libs/libsphgettime.a: libsphgettime.la
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
