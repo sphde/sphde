@@ -82,12 +82,12 @@ build_triplet = @build@
 host_triplet = @host@
 bin_PROGRAMS = sasutil$(EXEEXT)
 TESTS = sphgtod_t$(EXEEXT) sphgettime_t$(EXEEXT) sasatom_t$(EXEEXT) \
-	bitvec_t$(EXEEXT) sassim_t$(EXEEXT) sasseg_t$(EXEEXT) \
-	sphlockfreeheap_t$(EXEEXT) sphlflogger_t$(EXEEXT) \
-	sphthread_t$(EXEEXT) sphlflogger_tt$(EXEEXT) \
-	sphlflogger_ttt$(EXEEXT) sphlogportal_t$(EXEEXT) \
-	sphlogportal_tt$(EXEEXT) sphcontext_t$(EXEEXT) \
-	sasindex_t$(EXEEXT) sasindex_tt$(EXEEXT) \
+	bitvec_t$(EXEEXT) sassim_t$(EXEEXT) sascompoundheap_t$(EXEEXT) \
+	sasseg_t$(EXEEXT) sphlockfreeheap_t$(EXEEXT) \
+	sphlflogger_t$(EXEEXT) sphthread_t$(EXEEXT) \
+	sphlflogger_tt$(EXEEXT) sphlflogger_ttt$(EXEEXT) \
+	sphlogportal_t$(EXEEXT) sphlogportal_tt$(EXEEXT) \
+	sphcontext_t$(EXEEXT) sasindex_t$(EXEEXT) sasindex_tt$(EXEEXT) \
 	sasstringbtree_t$(EXEEXT) sasstringbtree_tt$(EXEEXT) \
 	sphsinglepcqueue_t$(EXEEXT) sphsinglepcqueue_tt$(EXEEXT) \
 	sphsinglepcqueue_ttt$(EXEEXT) sphdirectpcqueue_ttt$(EXEEXT) \
@@ -183,11 +183,12 @@ libsphgtod_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(CFLAGS) $(libsphgtod_la_LDFLAGS) $(LDFLAGS) -o $@
 am__EXEEXT_1 = sphgtod_t$(EXEEXT) sphgettime_t$(EXEEXT) \
 	sasatom_t$(EXEEXT) bitvec_t$(EXEEXT) sassim_t$(EXEEXT) \
-	sasseg_t$(EXEEXT) sphlockfreeheap_t$(EXEEXT) \
-	sphlflogger_t$(EXEEXT) sphthread_t$(EXEEXT) \
-	sphlflogger_tt$(EXEEXT) sphlflogger_ttt$(EXEEXT) \
-	sphlogportal_t$(EXEEXT) sphlogportal_tt$(EXEEXT) \
-	sphcontext_t$(EXEEXT) sasindex_t$(EXEEXT) sasindex_tt$(EXEEXT) \
+	sascompoundheap_t$(EXEEXT) sasseg_t$(EXEEXT) \
+	sphlockfreeheap_t$(EXEEXT) sphlflogger_t$(EXEEXT) \
+	sphthread_t$(EXEEXT) sphlflogger_tt$(EXEEXT) \
+	sphlflogger_ttt$(EXEEXT) sphlogportal_t$(EXEEXT) \
+	sphlogportal_tt$(EXEEXT) sphcontext_t$(EXEEXT) \
+	sasindex_t$(EXEEXT) sasindex_tt$(EXEEXT) \
 	sasstringbtree_t$(EXEEXT) sasstringbtree_tt$(EXEEXT) \
 	sphsinglepcqueue_t$(EXEEXT) sphsinglepcqueue_tt$(EXEEXT) \
 	sphsinglepcqueue_ttt$(EXEEXT) sphdirectpcqueue_ttt$(EXEEXT) \
@@ -200,6 +201,9 @@ bitvec_t_DEPENDENCIES = libsphde.la
 am_sasatom_t_OBJECTS = tests/sasatom_t.$(OBJEXT)
 sasatom_t_OBJECTS = $(am_sasatom_t_OBJECTS)
 sasatom_t_DEPENDENCIES = libsphde.la
+am_sascompoundheap_t_OBJECTS = tests/sascompoundheap_t.$(OBJEXT)
+sascompoundheap_t_OBJECTS = $(am_sascompoundheap_t_OBJECTS)
+sascompoundheap_t_DEPENDENCIES = libsphde.la
 am_sasindex_t_OBJECTS = tests/sasindex_t.$(OBJEXT)
 sasindex_t_OBJECTS = $(am_sasindex_t_OBJECTS)
 sasindex_t_DEPENDENCIES = libsphde.la
@@ -335,8 +339,9 @@ am__v_CXXLD_0 = @echo "  CXXLD   " $@;
 am__v_CXXLD_1 = 
 SOURCES = $(libsphde_la_SOURCES) $(libsphgettime_la_SOURCES) \
 	$(libsphgtod_la_SOURCES) $(bitvec_t_SOURCES) \
-	$(sasatom_t_SOURCES) $(sasindex_t_SOURCES) \
-	$(sasindex_tt_SOURCES) $(sasseg_t_SOURCES) $(sassim_t_SOURCES) \
+	$(sasatom_t_SOURCES) $(sascompoundheap_t_SOURCES) \
+	$(sasindex_t_SOURCES) $(sasindex_tt_SOURCES) \
+	$(sasseg_t_SOURCES) $(sassim_t_SOURCES) \
 	$(sasstringbtree_t_SOURCES) $(sasstringbtree_tt_SOURCES) \
 	$(sasutil_SOURCES) $(sphcontext_t_SOURCES) \
 	$(sphdirectpcqueue_ttt_SOURCES) $(sphgettime_t_SOURCES) \
@@ -349,8 +354,9 @@ SOURCES = $(libsphde_la_SOURCES) $(libsphgettime_la_SOURCES) \
 	$(sphthread_t_SOURCES)
 DIST_SOURCES = $(libsphde_la_SOURCES) $(libsphgettime_la_SOURCES) \
 	$(libsphgtod_la_SOURCES) $(bitvec_t_SOURCES) \
-	$(sasatom_t_SOURCES) $(sasindex_t_SOURCES) \
-	$(sasindex_tt_SOURCES) $(sasseg_t_SOURCES) $(sassim_t_SOURCES) \
+	$(sasatom_t_SOURCES) $(sascompoundheap_t_SOURCES) \
+	$(sasindex_t_SOURCES) $(sasindex_tt_SOURCES) \
+	$(sasseg_t_SOURCES) $(sassim_t_SOURCES) \
 	$(sasstringbtree_t_SOURCES) $(sasstringbtree_tt_SOURCES) \
 	$(sasutil_SOURCES) $(sphcontext_t_SOURCES) \
 	$(sphdirectpcqueue_ttt_SOURCES) $(sphgettime_t_SOURCES) \
@@ -726,6 +732,7 @@ libsphdeinclude_HEADERS = \
 	sasatom_powerpc.h \
 	sasatom_x86_64.h \
 	sascompoundheap.h \
+	sphcompoundpcqheap.h \
 	sasindexenum.h \
 	sassim.h \
 	sasalloc.h \
@@ -845,6 +852,8 @@ bitvec_t_SOURCES = tests/bitvec_t.c
 bitvec_t_LDADD = libsphde.la
 sassim_t_SOURCES = tests/sassim_t.c
 sassim_t_LDADD = libsphde.la
+sascompoundheap_t_SOURCES = tests/sascompoundheap_t.c
+sascompoundheap_t_LDADD = libsphde.la
 sasseg_t_SOURCES = tests/sasseg_t.c
 sasseg_t_LDADD = libsphde.la
 sphlockfreeheap_t_SOURCES = tests/sphlockfreeheap_t.c
@@ -1039,6 +1048,12 @@ tests/sasatom_t.$(OBJEXT): tests/$(am__dirstamp) \
 sasatom_t$(EXEEXT): $(sasatom_t_OBJECTS) $(sasatom_t_DEPENDENCIES) $(EXTRA_sasatom_t_DEPENDENCIES) 
 	@rm -f sasatom_t$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(sasatom_t_OBJECTS) $(sasatom_t_LDADD) $(LIBS)
+tests/sascompoundheap_t.$(OBJEXT): tests/$(am__dirstamp) \
+	tests/$(DEPDIR)/$(am__dirstamp)
+
+sascompoundheap_t$(EXEEXT): $(sascompoundheap_t_OBJECTS) $(sascompoundheap_t_DEPENDENCIES) $(EXTRA_sascompoundheap_t_DEPENDENCIES) 
+	@rm -f sascompoundheap_t$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(sascompoundheap_t_OBJECTS) $(sascompoundheap_t_LDADD) $(LIBS)
 tests/sasindex_t.$(OBJEXT): tests/$(am__dirstamp) \
 	tests/$(DEPDIR)/$(am__dirstamp)
 
@@ -1216,6 +1231,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sasutil.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/bitvec_t.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/sasatom_t.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/sascompoundheap_t.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/sasindex_t.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/sasindex_tt.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/sasseg_t.Po@am__quote@
@@ -1831,6 +1847,13 @@ bitvec_t.log: bitvec_t$(EXEEXT)
 sassim_t.log: sassim_t$(EXEEXT)
 	@p='sassim_t$(EXEEXT)'; \
 	b='sassim_t'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+sascompoundheap_t.log: sascompoundheap_t$(EXEEXT)
+	@p='sascompoundheap_t$(EXEEXT)'; \
+	b='sascompoundheap_t'; \
 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \

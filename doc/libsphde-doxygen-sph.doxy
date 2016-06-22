@@ -778,6 +778,7 @@ INPUT                  = $(SRCDIR)/doc/sphmaindox.h \
                          $(SRCDIR)/src/sassim.h \
                          $(SRCDIR)/src/sassimpleheap.h \
                          $(SRCDIR)/src/sascompoundheap.h \
+                         $(SRCDIR)/src/sphcompoundpcqheap.h \
                          $(SRCDIR)/src/sassimplespace.h \
                          $(SRCDIR)/src/sassimplestack.h \
                          $(SRCDIR)/src/sphlockfreeheap.h \

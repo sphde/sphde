@@ -32,6 +32,7 @@ libsphdeinclude_HEADERS = \
 	sasatom_powerpc.h \
 	sasatom_x86_64.h \
 	sascompoundheap.h \
+	sphcompoundpcqheap.h \
 	sasindexenum.h \
 	sassim.h \
 	sasalloc.h \
@@ -175,6 +176,10 @@ bitvec_t_LDADD   = libsphde.la
 TESTS            += sassim_t
 sassim_t_SOURCES  = tests/sassim_t.c
 sassim_t_LDADD    = libsphde.la
+
+TESTS            += sascompoundheap_t
+sascompoundheap_t_SOURCES  = tests/sascompoundheap_t.c
+sascompoundheap_t_LDADD    = libsphde.la
 
 TESTS            += sasseg_t
 sasseg_t_SOURCES  = tests/sasseg_t.c

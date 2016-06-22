@@ -21,6 +21,9 @@
 #include "saslock.h"
 #include "sasmsync.h"
 #include "sassimplespace.h"
+
+#include "sphsinglepcqueue.h"
+#include "sphcompoundpcqheap.h"
 #include "sascompoundheap.h"
 
 struct SASCompoundHeapHeader;
@@ -130,17 +133,21 @@ SASCompoundHeapExpandInit (void *heap_seg,
   SASCompoundHeapHeader *heapBlock = (SASCompoundHeapHeader *) heap_seg;
   char *heapStart = NULL;
   node_size_t remaining;
+  block_size_t alloc_page = default_page;
+
+  if ( alloc_page < page_size)
+	  alloc_page = page_size;
 
   if (heapBlock)
     {
-      heapStart = (char *) heapBlock + default_page;
+      heapStart = (char *) heapBlock + alloc_page;
       initSOMSASBlock ((SASBlockHeader *) heapBlock,
 		       SAS_RUNTIME_COMPOUNDHEAP, heap_size, heapStart);
     }
 
   heapBlock->pageSize = page_size;
 
-  remaining = default_page - sizeof (SASCompoundHeapHeader);
+  remaining = alloc_page - sizeof (SASCompoundHeapHeader);
   heapBlock->headerFreeSpace = (freeNode *) & heapBlock[1];
   freeNode_init (heapBlock->headerFreeSpace, remaining);
 
@@ -159,17 +166,21 @@ SASCompoundHeapInit (void *heap_seg,
   SASCompoundExpandList *list;
   char *heapStart = NULL;
   node_size_t remaining;
+  block_size_t alloc_page = default_page;
+
+  if ( alloc_page < page_size)
+	  alloc_page = page_size;
 
   if (heapBlock)
     {
-      heapStart = (char *) heapBlock + default_page;
+      heapStart = (char *) heapBlock + alloc_page;
       initSOMSASBlock ((SASBlockHeader *) heapBlock,
 		       SAS_RUNTIME_COMPOUNDHEAP, heap_size, heapStart);
     }
 
   heapBlock->pageSize = page_size;
 
-  remaining = default_page - sizeof (SASCompoundHeapHeader);
+  remaining = alloc_page - sizeof (SASCompoundHeapHeader);
   heapBlock->headerFreeSpace = (freeNode *) & heapBlock[1];
   freeNode_init (heapBlock->headerFreeSpace, remaining);
   heapBlock->blockHeader.baseBlock = (SASBlockHeader *) heapBlock;
@@ -1230,4 +1241,431 @@ SASCompoundHeapDestroy (SASCompoundHeap_t heap)
       sas_printf ("SASCompoundHeapDestroy(%p) block check failed\n", heap);
 #endif
     }
+}
+
+
+
+static SPHSinglePCQueue_t
+SPHCompoundPCQAllocInternal (SASCompoundHeapHeader * headerBlock)
+{
+  SASBlockHeader *simpleBlock;
+  block_size_t heapSize;
+  block_size_t simpleSize;
+  freeNode *mem = NULL;
+  SPHSinglePCQueue_t newHeap = NULL;
+  unsigned short stride = 128;
+
+  heapSize = headerBlock->blockHeader.blockSize;
+  simpleSize = headerBlock->pageSize;
+  if (simpleSize < heapSize)
+    {
+      mem = freeNode_allocSpace (headerBlock->blockHeader.blockFreeSpace,
+				 &headerBlock->blockHeader.blockFreeSpace,
+				 simpleSize);
+      if (mem != NULL)
+	{
+	  simpleBlock = (SASBlockHeader *) mem;
+	  newHeap = /*SASSimpleHeapInit (mem, SAS_RUNTIME_SIMPLEHEAP,
+				       simpleSize)*/
+
+      SPHSinglePCQueueInitWithStride (simpleBlock, simpleSize,
+					     stride, SPHSPCQUEUE_CIRCULAR);
+	  simpleBlock->baseBlock = (SASBlockHeader *) headerBlock;
+	}
+    }
+  return newHeap;
+}
+
+SPHSinglePCQueue_t
+SPHCompoundPCQAllocNoLock (SASCompoundHeap_t heap)
+{
+  SASCompoundHeapHeader *headerBlock = (SASCompoundHeapHeader *) heap;
+  SPHSinglePCQueue_t newHeap = NULL;
+
+  if (SOMSASCheckBlockSigAndType ((SASBlockHeader *) headerBlock,
+				  SAS_RUNTIME_COMPOUNDHEAP))
+    {
+      if (SASCompoundHeapIsExpanding (headerBlock))
+	{
+	  SASCompoundExpandList *list = headerBlock->expandList;
+	  SASCompoundHeapHeader *expandHeader;
+	  block_size_t i;
+	  expandHeader = list->heap[list->count - 1];
+
+	  if (SASCompoundHeapPercentUsed (expandHeader)
+	      >= expandHeader->loadFactor)
+	    {
+	      expandHeader = NULL;
+	      for (i = 0; i < list->count - 1; i++)
+		{
+		  SASCompoundHeapHeader *expandBlock = list->heap[i];
+		  if (SASCompoundHeapPercentUsed (expandBlock)
+		      < expandBlock->loadFactor)
+		    {
+		      expandHeader = expandBlock;
+		      break;
+		    }
+		}
+	      if (expandHeader == NULL)
+		{
+		  expandHeader = (SASCompoundHeapHeader *)
+		    SASCompoundHeapExpandCreate (heap);
+		}
+	    }
+	  if (expandHeader != NULL)
+	    newHeap = SPHCompoundPCQAllocInternal (expandHeader);
+	}
+      else
+	{
+	  newHeap = SPHCompoundPCQAllocInternal (headerBlock);
+	}
+#ifdef __SASDebugPrint__
+    }
+  else
+    {
+      sas_printf ("SPHCompoundPCQAllocNoLock(%p) type check failed\n", heap);
+#endif
+    }
+  return newHeap;
+}
+
+SPHSinglePCQueue_t
+SPHCompoundPCQAlloc (SASCompoundHeap_t heap)
+{
+  SASBlockHeader *headerBlock = (SASBlockHeader *) heap;
+  SPHSinglePCQueue_t newHeap = NULL;
+
+  if (SOMSASCheckBlockSigAndType (headerBlock, SAS_RUNTIME_COMPOUNDHEAP))
+    {
+      SASCompoundHeapHeader *heapHeader = (SASCompoundHeapHeader *) heap;
+      SASLock (heap, SasUserLock__WRITE);
+      if (SASCompoundHeapIsExpanding (heapHeader))
+	{
+	  SASCompoundExpandList *list = heapHeader->expandList;
+	  SASCompoundHeapHeader *lastHeader;
+	  SASCompoundHeapHeader *expandHeader = NULL;
+	  block_size_t i;
+	  block_size_t last_lock = 0;
+	  lastHeader = list->heap[list->count - 1];
+	  if (lastHeader != heapHeader)
+	    SASLock (lastHeader, SasUserLock__WRITE);
+
+	  if (SASCompoundHeapPercentUsed (lastHeader)
+	      >= heapHeader->loadFactor)
+	    {
+	      last_lock = list->count - 1;
+	      for (i = 0; i < list->count - 1; i++)
+		{
+		  SASCompoundHeapHeader *expandBlock = list->heap[i];
+		  if (i > 0)
+		    SASLock (expandBlock, SasUserLock__WRITE);
+		  if (SASCompoundHeapPercentUsed (expandBlock)
+		      < expandBlock->loadFactor)
+		    {
+		      expandHeader = expandBlock;
+		      last_lock = i;
+		      break;
+		    }
+		}
+	      if (expandHeader == NULL)
+		{
+		  expandHeader = (SASCompoundHeapHeader *)
+		    SASCompoundHeapExpandCreate (heap);
+		}
+	    }
+	  else
+	    {
+	      expandHeader = lastHeader;
+	    }
+	  if (expandHeader != NULL)
+	    newHeap = SPHCompoundPCQAllocInternal (expandHeader);
+
+	  if (lastHeader != expandHeader)
+	    {
+	      for (i = 1; i <= last_lock; i++)
+		{
+		  SASUnlock (list->heap[i]);
+		}
+	    }
+	  if (lastHeader != heapHeader)
+	    SASUnlock (lastHeader);
+	}
+      else
+	{
+	  newHeap = SPHCompoundPCQAllocInternal (heapHeader);
+	}
+      SASUnlock (heap);
+#ifdef __SASDebugPrint__
+    }
+  else
+    {
+      sas_printf ("SPHCompoundPCQAlloc(%p) type check failed\n", heap);
+#endif
+    }
+  return newHeap;
+}
+
+static inline void
+SPHCompoundPCQFreeInternal (SASCompoundHeapHeader * headerBlock,
+		SPHSinglePCQueue_t free_block)
+{
+  freeNode *free_node = (freeNode *) free_block;
+  block_size_t simpleSize = headerBlock->pageSize;
+
+  memset (free_block, 0, simpleSize);
+  freeNode_init (free_node, simpleSize);
+  freeNode_deallocSpace (free_node, &headerBlock->blockHeader.blockFreeSpace,
+			 simpleSize);
+}
+
+void
+SPHCompoundPCQFreeNoLock (SASCompoundHeap_t heap, SPHSinglePCQueue_t free_block)
+{
+  SASCompoundHeapHeader *headerBlock = (SASCompoundHeapHeader *) heap;
+
+  if (SOMSASCheckBlockSigAndType ((SASBlockHeader *) free_block,
+		  SAS_RUNTIME_PCQUEUE))
+    {
+      if (SOMSASCheckBlockSigAndType ((SASBlockHeader *) headerBlock,
+				      SAS_RUNTIME_COMPOUNDHEAP))
+	{
+	  if (SASCompoundHeapIsExpanding (headerBlock))
+	    {
+	      SASCompoundExpandList *list = headerBlock->expandList;
+	      block_size_t i;
+	      for (i = 0; i < list->count; i++)
+		{
+		  SASCompoundHeapHeader *expandBlock = list->heap[i];
+		  if (SASCompoundHeapContains (expandBlock, free_block))
+		    {
+			  SPHCompoundPCQFreeInternal (expandBlock, free_block);
+		      break;
+		    }
+		}
+	    }
+	  else
+	    {
+	      if (SASCompoundHeapContains (headerBlock, free_block))
+		{
+	          SPHCompoundPCQFreeInternal (headerBlock, free_block);
+#ifdef __SASDebugPrint__
+		}
+	      else
+		{
+		  sas_printf
+		    ("SPHCompoundPCQFreeNoLock(%p, %p) free block not contained\n",
+		     heap, free_block);
+#endif
+		}
+	    }
+#ifdef __SASDebugPrint__
+	}
+      else
+	{
+	  sas_printf ("SPHCompoundPCQFreeNoLock(%p, %p) type check failed\n",
+		      heap, free_block);
+#endif
+	}
+#ifdef __SASDebugPrint__
+    }
+  else
+    {
+      sas_printf ("SPHCompoundPCQFreeNoLock(%p, %p) type check failed\n",
+		  heap, free_block);
+#endif
+    }
+}
+
+void
+SPHCompoundPCQFree (SASCompoundHeap_t heap, SPHSinglePCQueue_t free_block)
+{
+  SASCompoundHeapHeader *headerBlock = (SASCompoundHeapHeader *) heap;
+
+  if (SOMSASCheckBlockSigAndType ((SASBlockHeader *) free_block,
+		  SAS_RUNTIME_PCQUEUE))
+    {
+      SASLock (heap, SasUserLock__WRITE);
+      if (SOMSASCheckBlockSigAndType ((SASBlockHeader *) headerBlock,
+				      SAS_RUNTIME_COMPOUNDHEAP))
+	{
+	  if (SASCompoundHeapIsExpanding (headerBlock))
+	    {
+	      SASCompoundExpandList *list = headerBlock->expandList;
+	      block_size_t i;
+	      for (i = 0; i < list->count; i++)
+		{
+		  SASCompoundHeapHeader *expandBlock = list->heap[i];
+		  if (i > 0)
+		    SASLock (expandBlock, SasUserLock__WRITE);
+		  if (SASCompoundHeapContains (expandBlock, free_block))
+		    {
+			  SPHCompoundPCQFreeInternal (expandBlock, free_block);
+		      if (i > 0)
+			SASUnlock (heap);
+		      break;
+		    }
+		  if (i > 0)
+		    SASUnlock (heap);
+		}
+	    }
+	  else
+	    {
+	      if (SASCompoundHeapContains (headerBlock, free_block))
+		{
+	          SPHCompoundPCQFreeInternal (headerBlock, free_block);
+#ifdef __SASDebugPrint__
+		}
+	      else
+		{
+		  sas_printf
+		    ("SASCompoundPCQFree(%p, %p) free block not contained\n",
+		     heap, free_block);
+#endif
+		}
+	    }
+#ifdef __SASDebugPrint__
+	}
+      else
+	{
+	  sas_printf ("SASCompoundPCQFree(%p, %p) type check failed\n",
+		      heap, free_block);
+#endif
+	}
+      SASUnlock (heap);
+#ifdef __SASDebugPrint__
+    }
+  else
+    {
+      sas_printf ("SASCompoundPCQFree(%p, %p) type check failed\n",
+		  heap, free_block);
+#endif
+    }
+}
+
+SPHSinglePCQueue_t
+SPHCompoundPCQNearAllocNoLock (void *nearObj)
+{
+  SASBlockHeader *nearHeader = SASFindHeader (nearObj);
+  SASCompoundHeapHeader *compoundHeader = NULL;
+  SASCompoundHeapHeader *baseHeader = NULL;
+  SPHSinglePCQueue_t newHeap = NULL;
+  if (nearHeader != NULL)
+    {
+      if (SOMSASCheckBlockSig (nearHeader))
+	{
+	  if ((nearHeader->baseBlock != nearHeader)
+	      && (nearHeader->baseBlock != NULL))
+	    compoundHeader = (SASCompoundHeapHeader *) nearHeader->baseBlock;
+	  else
+	    compoundHeader = (SASCompoundHeapHeader *) nearHeader;
+
+	  if (SOMSASCheckBlockSigAndType ((SASBlockHeader *) compoundHeader,
+					  SAS_RUNTIME_COMPOUNDHEAP))
+	    {
+	      if (SASCompoundHeapIsExpanding (compoundHeader))
+		{
+		  baseHeader = compoundHeader;
+		}
+	      else
+		{
+		  if ((compoundHeader->blockHeader.baseBlock
+		       != (SASBlockHeader *) compoundHeader)
+		      && (compoundHeader->blockHeader.baseBlock != NULL))
+		    baseHeader =
+		      (SASCompoundHeapHeader *) compoundHeader->blockHeader.
+		      baseBlock;
+		  else
+		    baseHeader = compoundHeader;
+		}
+
+	      if (SASCompoundHeapAvail (compoundHeader))
+		newHeap = SPHCompoundPCQAllocInternal (compoundHeader);
+	      else
+		newHeap =
+		  SASCompoundHeapAllocNoLock ((SASCompoundHeap_t) baseHeader);
+#ifdef __SASDebugPrint__
+	    }
+	  else
+	    {
+	      sas_printf
+		("SPHCompoundPCQNearAllocNoLock(%p) -> %p type check failed\n",
+		 nearObj, compoundHeader);
+#endif
+	    }
+	}
+    }
+  return newHeap;
+}
+
+SPHSinglePCQueue_t
+SPHCompoundPCQNearAlloc (void *nearObj)
+{
+  SASBlockHeader *nearHeader = SASFindHeader (nearObj);
+  SASCompoundHeapHeader *compoundHeader = NULL;
+  SASCompoundHeapHeader *baseHeader = NULL;
+  SPHSinglePCQueue_t newHeap = NULL;
+
+  if (nearHeader != NULL)
+    {
+      if (SOMSASCheckBlockSig (nearHeader))
+	{
+	  if ((nearHeader->baseBlock != nearHeader)
+	      && (nearHeader->baseBlock != NULL))
+	    compoundHeader = (SASCompoundHeapHeader *) nearHeader->baseBlock;
+	  else
+	    compoundHeader = (SASCompoundHeapHeader *) nearHeader;
+
+	  SASLock (compoundHeader, SasUserLock__WRITE);
+
+	  if (SOMSASCheckBlockSigAndType ((SASBlockHeader *) compoundHeader,
+					  SAS_RUNTIME_COMPOUNDHEAP))
+	    {
+	      if (SASCompoundHeapIsExpanding (compoundHeader))
+		{
+		  baseHeader = compoundHeader;
+		}
+	      else
+		{
+		  if ((compoundHeader->blockHeader.baseBlock
+		       != (SASBlockHeader *) compoundHeader)
+		      && (compoundHeader->blockHeader.baseBlock != NULL))
+		    baseHeader =
+		      (SASCompoundHeapHeader *) compoundHeader->blockHeader.
+		      baseBlock;
+		  else
+		    baseHeader = compoundHeader;
+		}
+#if 0
+	      sas_printf ("SPHCompoundPCQNearAlloc(%p) %p %p\n",
+			  nearObj, compoundHeader, baseHeader);
+#endif
+	      if (SASCompoundHeapAvail (compoundHeader))
+		{
+		  newHeap = SPHCompoundPCQAllocInternal (compoundHeader);
+		}
+	      else
+		{
+		  newHeap =
+		    SASCompoundHeapAlloc ((SASCompoundHeap_t) baseHeader);
+		}
+#ifdef __SASDebugPrint__
+	    }
+	  else
+	    {
+	      sas_printf
+		("SPHCompoundPCQNearAlloc(%p) -> %p type check failed\n",
+		 nearObj, compoundHeader);
+#endif
+	    }
+	  SASUnlock (compoundHeader);
+	}
+#ifdef __SASDebugPrint__
+    }
+  else
+    {
+      sas_printf ("SPHCompoundPCQNearAlloc(%p) block check failed\n",
+		  nearObj);
+#endif
+    }
+  return newHeap;
 }
