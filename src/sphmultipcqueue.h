@@ -15,8 +15,8 @@
 /**! \file sphmultipcqueue.h
 *  \brief Shared Persistent Heap, multi producer multi consumer queue.
 *	For shared memory multi-thread/multi-core applications.
-*	This implementation uses atomic operations to implement Lock
-*	Free Producer/Consumer queues (SPHMultiPCQueue_t).
+*	This implementation uses transactional memory operations to
+*	implement Lock Free Producer/Consumer queues (SPHMultiPCQueue_t).
 *
 *	This API supports atomic allocation of storage for queue
 *	entries for zero copy persistence and sharing. Zero copy queues
@@ -36,13 +36,13 @@ typedef struct data_struct11 {
 } data_struct11;
 
 // Allocate zero copy queue entry
-handle = SPHMultiPCQueueAllocStrideDirectTM (pcqueue);
+handle = SPHMPMCQMultiAllocStrideDirectTM (pcqueue);
 if (handle)
 {	// insert data into the allocated queue entry
 	sphLFEntryID_t tmpl;
 	data_struct11 *struct_ptr;
 
-	tmpl = SPHMultiPCQueueGetEntryTemplate(pcq);
+	tmpl = SPHMPMCQGetEntryTemplate(pcq);
 
 	struct_ptr = (data_struct11 *)SPHLFEntryDirectGetFreePtr(handle);
 	if (struct_ptr)
@@ -52,13 +52,13 @@ if (handle)
 		struct_ptr->field2 = data_int3;
 		struct_ptr->field3 = (void*)sas_data_buff2;
 	} else {
-		printf("error  SPHENTRYALLOCSTRUCT(%p, data_struct11) failed)\n",
+		printf("SPHENTRYALLOCSTRUCT(%p, data_struct11) failed)\n",
 			   handle);
 	}
 	// Mark the entry complete and available to the consumer
 	SPHLFEntryDirectComplete(handle)
 } else {
-	while (SPHMultiPCQueueFull(pcqueue))
+	while (SPHMPMCQMultiIsQueueFull(pcqueue))
 	{
 		// pacing code
 	}
@@ -67,11 +67,11 @@ if (handle)
 *
 *	The consumer can access queue entries once they are marked complete.
 *	The consumer:
-*	- checks (spins) for the next allocated entry to become complete.
-*	- uses the returned entry handle to directly access the entry contents.
+*	- checks (spins) for the next allocated entry to become complete
+*	- uses the returned entry handle to directly access the entry contents
 *	- When done processing the queue entry, it marks the entry header
-*	invalid and deallocates the entry.
-*	- This makes the next queue entry available, if any.
+*	invalid and deallocates the entry
+*	- This makes the next queue entry available, if any
 *
 *	\code
 #include <sphlfentry.h>
@@ -84,7 +84,7 @@ typedef struct data_struct11 {
 } data_struct11;
 
 // Get next queue entry
-handle = SPHMultiPCQueueGetNextComplete (pcqueue, &handle0);
+handle = SPHMPMCQMultiGetNextCompleteDirectTM (pcqueue, &handle0);
 if (handle)
 {	// insert data into the allocated queue entry
 	data_struct11 *struct_ptr;
@@ -96,13 +96,13 @@ if (handle)
 		data_int3	= struct_ptr->field2;
 		sas_data_buff2	= struct_ptr->field3;
 	} else {
-		printf("error  SPHLFEntryGetNextPtr(%p, data_struct11) failed)\n",
+		printf("SPHLFEntryGetNextPtr(%p, data_struct11) failed)\n",
 			   handle);
 	}
 	// Mark the entry free and available for reuse
-	SPHMultiPCQueueFreeNextEntry(pcqueue)
+	SPHMPMCQFreeEntryDirect(pcqueue);
 } else {
-	while (SPHMultiPCQueueEmpty(pcqueue))
+	while (SPHMPMCQIsQueueEmpty(pcqueue))
 	{
 		// pacing code
 	}
@@ -140,12 +140,11 @@ if (handle)
 #include "sphlfentry.h"
 #include "sphdirectpcqueue.h"
 
-/** \brief Handle to an instance of SPH Lock Free Multi Producer,
-*   Multi Consumer Queue.
+/** \brief Handle to an instance of SPH Multi Producer, Multi Consumer Queue.
 *
-*	The type is SAS_RUNTIME_PCQUEUE
+*	The type is SAS_RUNTIME_PCQUEUE_TM
 */
-typedef void *SPHMultiPCQueue_t;
+typedef void *SPHMPMCQ_t;
 
 /** \brief ignore this macro behind the curtain **/
 #ifdef __cplusplus
@@ -158,58 +157,57 @@ typedef void *SPHMultiPCQueue_t;
 typedef unsigned long longPtr_t;
 #endif
 /** \brief internal options flag for circular log buffers **/
-#define SPHMPCQUEUE_CIRCULAR (1)
+#define SPHMPMCQ_CIRCULAR (1)
 /** \brief internal options flag set when circular log buffers have wrapped **/
-#define SPHMPCQUEUE_CIRCULAR_WRAPPED (1<<1)
+#define SPHMPMCQ_CIRCULAR_WRAPPED (1<<1)
 /** \brief internal options flag set when circular log buffers have wrapped multiple times **/
-#define SPHMPCQUEUE_CIRCULAR_NOTFIRST (1<<2)
+#define SPHMPMCQ_CIRCULAR_NOTFIRST (1<<2)
 /** \brief internal options flag for prefetching the immediate (0 offset) cache-line **/
-#define SPHMPCQUEUE_CACHE_PREFETCH0 (1<<3)
+#define SPHMPMCQ_CACHE_PREFETCH0 (1<<3)
 /** \brief internal options flag for prefetching the next (line size offset) cache-line **/
-#define SPHMPCQUEUE_CACHE_PREFETCH1 (1<<4)
+#define SPHMPMCQ_CACHE_PREFETCH1 (1<<4)
 /** \brief internal options mask flag used the reset circular log buffers **/
-#define SPHMPCQUEUE_CIRCULAR_RESETMASK (SPHMPCQUEUE_CIRCULAR | \
-		SPHMPCQUEUE_CACHE_PREFETCH0 | \
-		SPHMPCQUEUE_CACHE_PREFETCH1)
+#define SPHMPMCQ_CIRCULAR_RESETMASK (SPHMPCQ_CIRCULAR | \
+		SPHMPCQ_CACHE_PREFETCH0 | \
+		SPHMPCQ_CACHE_PREFETCH1)
 
-/** \brief Initialize a shared storage block as a Lock Free PC Queue
+/** \brief Initialize a shared storage block as a MPMC Queue
 *
-*	Initialize the specified storage block as Lock Free PC Queue
+*	Initialize the specified storage block as MPPC Queue
 *	control blocks.
 *	The storage block must be power of two in size and have the
 *	same power of two (or better) alignment.
-*	The type should be SAS_RUNTIME_PCQUEUE.
+*	The type should be SAS_RUNTIME_PCQUEUE_TM.
 *
 *	@param buf_seg a block of allocated SAS storage matching the buf_size.
 *	@param buf_size power of two size of the heap to be initialized.
-*	@return a handle to the initialized SPHMultiPCQueue_t.
+*	@return a handle to the initialized SPHMPMCQ_t.
 */
-extern __C__ SPHMultiPCQueue_t
-SPHMultiPCQueueInit (void *buf_seg , block_size_t buf_size);
+extern __C__ SPHMPMCQ_t
+SPHMPMCQInit (void *buf_seg , block_size_t buf_size);
 
-/** \brief Initialize a shared storage block as a Lock Free
-*   Multi Producer Multi Consumer Queue
-*	with a fixed entry stride.
+/** \brief Initialize a shared storage block as a Multi Producer
+*	Multi Consumer Queue with a fixed entry stride.
 *
-*	Initialize the specified storage block as Lock Free PC Queue
+*	Initialize the specified storage block as MPMC Queue
 *	control blocks.
 *	The stride and control flags are also stored.
 *	The storage block must be power of two in size and have the
 *	same power of two (or better) alignment.
-*	The type should be SAS_RUNTIME_PCQUEUE.
+*	The type should be SAS_RUNTIME_PCQUEUE_TM.
 *
 *	@param buf_seg a block of allocated SAS storage matching the buf_size.
 *	@param buf_size power of two size of the heap to be initialized.
 *	@param entry_stride the stride offset is bytes between allocated entries.
 *	@param options option bits.
-*	@return a handle to the initialized SPHMultiPCQueue_t.
+*	@return a handle to the initialized SPHMPMCQ_t.
 */
-extern __C__ SPHMultiPCQueue_t
-SPHMultiPCQueueInitWithStride (void* buf_seg,  block_size_t buf_size,
-                           unsigned short entry_stride,
-                           unsigned int options);
+extern __C__ SPHMPMCQ_t
+SPHMPMCQInitWithStride (void* buf_seg,  block_size_t buf_size,
+			unsigned short entry_stride,
+			unsigned int options);
 
-/** \brief Allocate and initialize a shared storage block as a Lock Free
+/** \brief Allocate and initialize a shared storage block as a
 *	Multi Producer Multi Consumer Queue.
 *
 *	Allocate a block from SAS storage and initialize that block
@@ -217,10 +215,10 @@ SPHMultiPCQueueInitWithStride (void* buf_seg,  block_size_t buf_size,
 *	The storage block must be power of two in size.
 *
 *	@param buf_size power of two size of the heap to be initialized.
-*	@return a handle to the initialized SPHMultiPCQueue_t.
+*	@return a handle to the initialized SPHMPMCQ_t.
 */
-extern __C__ SPHMultiPCQueue_t
-SPHMultiPCQueueCreate (block_size_t buf_size);
+extern __C__ SPHMPMCQ_t
+SPHMPMCQCreate (block_size_t buf_size);
 
 /** \brief Allocate and initialize a shared storage block as a Lock Free
 *	Multi Producer Multi Consumer Queue.
@@ -231,10 +229,10 @@ SPHMultiPCQueueCreate (block_size_t buf_size);
 *
 *	@param buf_size power of two size of the heap to be initialized.
 *	@param stride the stride offset is bytes between allocated entries.
-*	@return a handle to the initialized SPHMultiPCQueue_t.
+*	@return a handle to the initialized SPHMPMCQ_t.
 */
-extern __C__ SPHMultiPCQueue_t
-SPHMultiPCQueueCreateWithStride (block_size_t buf_size,
+extern __C__ SPHMPMCQ_t
+SPHMPMCQCreateWithStride (block_size_t buf_size,
                            unsigned short stride);
 
 /** \brief Return the entry stride for an existing Lock Free
@@ -242,20 +240,20 @@ SPHMultiPCQueueCreateWithStride (block_size_t buf_size,
 *
 *       @param queue Handle of a producer consumer queue.
 *       @return the entry stride of strided queues, 0 if not strided,
-*       or -1 is not a valid SPHMultiPCQueue_t.
+*       or -1 is not a valid SPHMPMCQ_t.
 */
 extern __C__ int
-SPHMultiPCQueueGetStride (SPHMultiPCQueue_t queue);
+SPHMPMCQGetStride (SPHMPMCQ_t queue);
 
 /** \brief Return the total number of entries for an existing Lock Free
 *       Multi Producer Multi Consumer Queue.
 *
 *       @param queue Handle of a producer consumer queue.
 *       @return total number of entries of strided queues, 0 if not strided,
-*       or -1 is not a valid SPHMultiPCQueue_t.
+*       or -1 is not a valid SPHMPMCQ_t.
 */
 extern __C__ int
-SPHMultiPCQueueGetEntries (SPHMultiPCQueue_t queue);
+SPHMPMCQGetEntries (SPHMPMCQ_t queue);
 
 #if defined(SPH_INTERNAL)
 /** \brief Resets the specific queue to empty state asynchronously (without locking or atomic updates).
@@ -266,7 +264,7 @@ SPHMultiPCQueueGetEntries (SPHMultiPCQueue_t queue);
 *	@return 0 if successful.
 */
 extern __C__ int
-SPHMultiPCQueueResetAsync (SPHSinglePCQueue_t queue);
+SPHMPMCQResetAsync (SPHSinglePCQueue_t queue);
 #endif
 
 /** \brief Return the status of the specified queue.
@@ -276,7 +274,7 @@ SPHMultiPCQueueResetAsync (SPHSinglePCQueue_t queue);
 *	Otherwise False.
 */
 extern __C__ int
-SPHMultiPCQueueEmpty (SPHMultiPCQueue_t queue);
+SPHMPMCQIsEmpty (SPHMPMCQ_t queue);
 
 /** \brief Return the status of the specified queue.
 *
@@ -285,7 +283,7 @@ SPHMultiPCQueueEmpty (SPHMultiPCQueue_t queue);
 *	Otherwise False.
 */
 extern __C__ int
-SPHMultiPCQueueFull (SPHMultiPCQueue_t queue);
+SPHMPMCQIsFull (SPHMPMCQ_t queue);
 
 /** \brief Returns the amount of free space (in bytes) remaining in the specified queue.
 *
@@ -293,7 +291,7 @@ SPHMultiPCQueueFull (SPHMultiPCQueue_t queue);
 *	@return number of bytes of free space remaining in the queue buffer.
 */
 extern __C__ block_size_t
-SPHMultiPCQueueFreeSpace (SPHMultiPCQueue_t queue);
+SPHMPMCQFreeSpace (SPHMPMCQ_t queue);
 
 /** \brief Return the entry template for an existing Lock Free
 *   Multi Producer Multi Consumer Queue.
@@ -301,10 +299,10 @@ SPHMultiPCQueueFreeSpace (SPHMultiPCQueue_t queue);
 *
 *   @param queue Handle of a producer consumer queue.
 *   @return the entry template for this queue or
-*   0 if not a valid SPHMultiPCQueue_t.
+*   0 if not a valid SPHMPMCQ_t.
 */
 extern __C__ sphLFEntryID_t
-SPHMultiPCQueueGetEntryTemplate (SPHMultiPCQueue_t queue);
+SPHMPMCQGetEntryTemplate (SPHMPMCQ_t queue);
 
 /** \brief Allows the producer thread to allocate and initialize the
 *   header of a queue entry for access. The allocation is from the
@@ -329,7 +327,7 @@ SPHMultiPCQueueGetEntryTemplate (SPHMultiPCQueue_t queue);
 *       For example the Allocate may fail if the queue is full.
 */
 extern __C__ SPHLFEntryDirect_t
-SPHMultiPCQueueAllocStrideDirectTM (SPHMultiPCQueue_t queue);
+SPHMPMCQAllocStrideDirectTM (SPHMPMCQ_t queue);
 
 /** \brief Allows the consumer to get the next completed queue entry
 *       from the specified multi producer multi consumer queue.
@@ -347,19 +345,19 @@ SPHMultiPCQueueAllocStrideDirectTM (SPHMultiPCQueue_t queue);
 *       is empty or the next tail entry is not yet completed.
 */
 extern __C__ SPHLFEntryDirect_t
-SPHMultiPCQueueGetNextCompleteDirectTM (SPHMultiPCQueue_t queue);
+SPHMPMCQGetNextCompleteDirectTM (SPHMPMCQ_t queue);
 
 /** \brief Return the status of the entry specified by the direct entry handle.
 *
 *       @param directHandle entry Handle for an allocated entry.
-*       @return true if the entry was complete (SPHMultiPCQueueEntryComplete
+*       @return true if the entry was complete (SPHMPMCQEntryComplete
 *       has been called for this entry). Otherwise False.
 */
 extern __C__ int
-SPHMultiPCQueueEntryDirectIsComplete (SPHLFEntryDirect_t directHandle);
+SPHMPMCQEntryDirectIsComplete (SPHLFEntryDirect_t directHandle);
 
 /** \brief Allows the consumer to free the queue entry it just processed
-*   (using SPHMultiPCQueueGetNextComplete),
+*   (using SPHMPMCQGetNextComplete),
 *	from the specified multi producer multi consumer queue.
 *
 *	Mark the provided entry as free (unallocated and invalid)
@@ -379,7 +377,7 @@ SPHMultiPCQueueEntryDirectIsComplete (SPHLFEntryDirect_t directHandle);
 *	is empty or the next tail entry is not yet completed.
 */
 extern __C__ int
-SPHMultiPCQueueFreeEntryDirect (SPHMultiPCQueue_t queue,
+SPHMPMCQFreeEntryDirect (SPHMPMCQ_t queue,
 		SPHLFEntryDirect_t entry);
 
 /** \brief Allows the consumer to get the next allocated queue entry
@@ -400,7 +398,7 @@ SPHMultiPCQueueFreeEntryDirect (SPHMultiPCQueue_t queue,
 *       is empty or the next tail entry is not yet allocated.
 */
 extern __C__ SPHLFEntryDirect_t
-SPHMultiPCQueueGetNextEntry (SPHMultiPCQueue_t queue);
+SPHMPMCQGetNextEntry (SPHMPMCQ_t queue);
 
 /** \brief Set the cache-line prefetch options for entry allocate.
 *
@@ -414,7 +412,7 @@ SPHMultiPCQueueGetNextEntry (SPHMultiPCQueue_t queue);
 *	@return 0 if successful.
 */
 extern __C__ int
-SPHMultiPCQueueSetCachePrefetch (SPHMultiPCQueue_t queue, int prefetch);
+SPHMPMCQSetCachePrefetch (SPHMPMCQ_t queue, int prefetch);
 
 /** \brief Prefetch pages from the specific queue.
 *
@@ -422,7 +420,7 @@ SPHMultiPCQueueSetCachePrefetch (SPHMultiPCQueue_t queue, int prefetch);
 *	@return 0 if successful.
 */
 extern __C__ int
-SPHMultiPCQueuePrefetch (SPHMultiPCQueue_t queue);
+SPHMPMCQPrefetch (SPHMPMCQ_t queue);
 
 /** \brief Destroys the queue and frees the SAS storage for reuse.
 *
@@ -430,6 +428,6 @@ SPHMultiPCQueuePrefetch (SPHMultiPCQueue_t queue);
 *	@return 0 if successful.
 */
 extern __C__ int 
-SPHMultiPCQueueDestroy (SPHMultiPCQueue_t queue);
+SPHMPMCQDestroy (SPHMPMCQ_t queue);
 
 #endif /* __SPH_MULTI_PC_QUEUE_H */

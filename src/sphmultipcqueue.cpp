@@ -10,7 +10,7 @@
  *     IBM Corporation, Paul Clarke   - MPMC implementation
  */
 
-#define __SASDebugPrint__ 1
+//#define __SASDebugPrint__ 1
 
 #define sas_printf printf
 #include <stdlib.h>
@@ -39,7 +39,7 @@
 #define debug_printf(...)
 #endif
 
-typedef struct SPHMPCQueueHeader
+typedef struct SPHMPMCQHeader
 {
 	SASBlockHeader blockHeader;
 	longPtr_t startq;
@@ -52,7 +52,7 @@ typedef struct SPHMPCQueueHeader
 	void * dummy7[15]; // ensure qtail in own cacheline
 	longPtr_t qtail;
 	freeNode *headerFreeSpace;
-} SPHMPCQueueHeader;
+} SPHMPMCQHeader;
 
 #ifdef __LP64__
 #define HEAP_OFFSET 128
@@ -70,12 +70,12 @@ typedef struct SPHMPCQueueHeader
 #define NODEFAULT_ENTRY_STRIDE (0)
 #define NODEFAULT_LOG_OPTIONS (0)
 
-static SPHMultiPCQueue_t
-SPHMultiPCQueueInitInternal (void *buf_seg, sas_type_t sasType,
-			      block_size_t buf_size,
-			      unsigned int stride, unsigned int options)
+static SPHMPMCQ_t
+SPHMPMCQInitInternal (void *buf_seg, sas_type_t sasType,
+		      block_size_t buf_size,
+		      unsigned int stride, unsigned int options)
 {
-	SPHMPCQueueHeader *heapBlock = (SPHMPCQueueHeader *) buf_seg;
+	SPHMPMCQHeader *heapBlock = (SPHMPMCQHeader *) buf_seg;
 	char *qStart = NULL;
 	char *qEnd = NULL;
 	longPtr_t remaining;
@@ -83,7 +83,7 @@ SPHMultiPCQueueInitInternal (void *buf_seg, sas_type_t sasType,
 
 	if (heapBlock)
 		initSOMSASBlock ((SASBlockHeader *) heapBlock, sasType, buf_size, NULL);
-	debug_printf("SPHMultiPCQueueInitInternal(%p, %ld, %d) sizeof(header)=%zu round=%ld\n",buf_seg, buf_size, stride, sizeof (SPHMPCQueueHeader), round);
+	debug_printf("%s(%p, %ld, %d) sizeof(header)=%zu round=%ld\n",__FUNCTION__,buf_seg, buf_size, stride, sizeof (SPHMPMCQHeader), round);
 	if (stride != NODEFAULT_ENTRY_STRIDE) {
 		/* insure stride keep minimal alignment */
 		stride = (stride + round) & ~round;
@@ -91,19 +91,19 @@ SPHMultiPCQueueInitInternal (void *buf_seg, sas_type_t sasType,
 		buf_size = buf_size - DEFAULT_PAGE;
 		buf_size = buf_size / stride;
 		buf_size = buf_size * stride;
-		debug_printf ("SPHMultiPCQueueInitInternal() stride=%d, buf_size=%ld\n",stride, buf_size);
+		debug_printf ("%s stride=%d, buf_size=%ld\n",__FUNCTION__,stride,buf_size);
 	}
 
 	qStart = (char *) heapBlock + DEFAULT_PAGE;
 	qEnd = qStart + buf_size;
 
-	debug_printf ("SPHMultiPCQueueInitInternal() qStart=%p, qEnd=%p\n",qStart, qEnd);
-	debug_printf ("SPHMultiPCQueueInitInternal() offsetof(startq)=%lx, offsetof(endq)=%lx\n",
-			__builtin_offsetof(struct SPHMPCQueueHeader, startq),
-			__builtin_offsetof(struct SPHMPCQueueHeader, endq));
-	debug_printf ("SPHSMultiPCQueueInitInternal() offsetof(qhead)=%lx, offsetof(qtail)=%lx\n",
-			__builtin_offsetof(struct SPHMPCQueueHeader, qhead),
-			__builtin_offsetof(struct SPHMPCQueueHeader, qtail));
+	debug_printf ("%s qStart=%p, qEnd=%p\n",__FUNCTION__,qStart,qEnd);
+	debug_printf ("%s offsetof(startq)=%lx, offsetof(endq)=%lx\n",__FUNCTION__,
+		      __builtin_offsetof(struct SPHMPMCQHeader, startq),
+		      __builtin_offsetof(struct SPHMPMCQHeader, endq));
+	debug_printf ("%s offsetof(qhead)=%lx, offsetof(qtail)=%lx\n",__FUNCTION__,
+		      __builtin_offsetof(struct SPHMPMCQHeader, qhead),
+		      __builtin_offsetof(struct SPHMPMCQHeader, qtail));
 
 	heapBlock->qhead = (longPtr_t) qStart;
 	heapBlock->qtail = (longPtr_t) qStart;
@@ -113,69 +113,69 @@ SPHMultiPCQueueInitInternal (void *buf_seg, sas_type_t sasType,
 	heapBlock->options = options;
 	heapBlock->default_entry_stride = stride;
 
-	remaining = DEFAULT_PAGE - sizeof (SPHMPCQueueHeader);
+	remaining = DEFAULT_PAGE - sizeof (SPHMPMCQHeader);
 	heapBlock->headerFreeSpace = (freeNode *) & heapBlock[1];
 	freeNode_init (heapBlock->headerFreeSpace, remaining);
 	heapBlock->blockHeader.baseBlock = (SASBlockHeader *) heapBlock;
 	heapBlock->blockHeader.nextBlock = (SASBlockHeader *) heapBlock;
 
-	debug_printf("SPHMultiPCQueueInitInternal() mask=%lx options=%x stride=%d\n",
-			heapBlock->align_mask, options, heapBlock->default_entry_stride);
+	debug_printf("%s mask=%lx options=%x stride=%d\n",__FUNCTION__,
+		     heapBlock->align_mask, options, heapBlock->default_entry_stride);
 
-	return (SPHMultiPCQueue_t) heapBlock;
+	return (SPHMPMCQ_t) heapBlock;
 }
 
-SPHMultiPCQueue_t
-SPHMultiPCQueueInit (void *buf_seg, block_size_t buf_size)
+SPHMPMCQ_t
+SPHMPMCQInit (void *buf_seg, block_size_t buf_size)
 {
 	debug_printf("%s NEW\n",__FUNCTION__);
-	return SPHMultiPCQueueInitInternal (buf_seg,SAS_RUNTIME_PCQUEUE_TM,buf_size,NODEFAULT_ENTRY_STRIDE,NODEFAULT_LOG_OPTIONS);
+	return SPHMPMCQInitInternal (buf_seg,SAS_RUNTIME_PCQUEUE_TM,buf_size,NODEFAULT_ENTRY_STRIDE,NODEFAULT_LOG_OPTIONS);
 }
 
-SPHMultiPCQueue_t
-SPHMultiPCQueueInitWithStride (void *buf_seg, block_size_t buf_size,
-				unsigned short entry_stride,
-				unsigned int options)
+SPHMPMCQ_t
+SPHMPMCQInitWithStride (void *buf_seg, block_size_t buf_size,
+			unsigned short entry_stride,
+			unsigned int options)
 {
 	debug_printf("%s NEW\n",__FUNCTION__);
-	return SPHMultiPCQueueInitInternal (buf_seg,
+	return SPHMPMCQInitInternal (buf_seg,
 			SAS_RUNTIME_PCQUEUE_TM,
 			buf_size, entry_stride, options);
 }
 
-SPHMultiPCQueue_t
-SPHMultiPCQueueCreate (block_size_t buf_size)
+SPHMPMCQ_t
+SPHMPMCQCreate (block_size_t buf_size)
 {
-	  SASBlockHeader *heapBlock = NULL;
+	SASBlockHeader *heapBlock = NULL;
 
-	  debug_printf("%s\n",__FUNCTION__);
-	  heapBlock = (SASBlockHeader *) SASBlockAlloc ((long) buf_size);
-	  if (heapBlock) {
-		  return SPHMultiPCQueueInit (heapBlock, buf_size);
-	  } else
-		  return NULL;
+	debug_printf("%s\n",__FUNCTION__);
+	heapBlock = (SASBlockHeader *) SASBlockAlloc ((long) buf_size);
+	if (heapBlock)
+		return SPHMPMCQInit (heapBlock, buf_size);
+	else
+		return NULL;
 }
 
-SPHMultiPCQueue_t
-SPHMultiPCQueueCreateWithStride (block_size_t buf_size,
-				  unsigned short stride)
+SPHMPMCQ_t
+SPHMPMCQCreateWithStride (block_size_t buf_size,
+			  unsigned short stride)
 {
 	SASBlockHeader *heapBlock = NULL;
 
 	debug_printf("%-6d: %s\n",sphdeGetTID(),__FUNCTION__);
 	heapBlock = (SASBlockHeader *) SASBlockAlloc ((long) buf_size);
-	if (heapBlock) {
-		return SPHMultiPCQueueInitWithStride (heapBlock, buf_size,
+	if (heapBlock)
+		return SPHMPMCQInitWithStride (heapBlock, buf_size,
 						     stride, SPHSPCQUEUE_CIRCULAR);
-	} else
+	else
 		return NULL;
 }
 
 int
-SPHMultiPCQueueGetStride (SPHMultiPCQueue_t queue)
+SPHMPMCQGetStride (SPHMPMCQ_t queue)
 {
 	printf("%-6d: %s\n",sphdeGetTID(),__FUNCTION__);
-	SPHMPCQueueHeader *headerBlock = (SPHMPCQueueHeader *) queue;
+	SPHMPMCQHeader *headerBlock = (SPHMPMCQHeader *) queue;
 	int rc = 0;
 
 	if (SOMSASCheckBlockSigAndType ((SASBlockHeader *) headerBlock,
@@ -183,24 +183,24 @@ SPHMultiPCQueueGetStride (SPHMultiPCQueue_t queue)
 		rc = headerBlock->default_entry_stride;
 	else {
 		rc = -1;
-		debug_printf ("SPHMultiPCQueueGetStride(%p) type check failed\n", queue);
+		debug_printf ("SPHMPMCQGetStride(%p) type check failed\n", queue);
 	}
 	return rc;
 }
 
 int
-SPHMultiPCQueueGetEntries (SPHMultiPCQueue_t queue)
+SPHMPMCQGetEntries (SPHMPMCQ_t queue)
 {
-	SPHMPCQueueHeader *headerBlock = (SPHMPCQueueHeader *) queue;
+	SPHMPMCQHeader *headerBlock = (SPHMPMCQHeader *) queue;
 	debug_printf("%-6d: %s NEW\n",sphdeGetTID(),__FUNCTION__);
 	return (headerBlock->endq - headerBlock->startq) / headerBlock->default_entry_stride;
 }
 
 int
-SPHMultiPCQueueResetAsync (SPHMultiPCQueue_t queue)
+SPHMPMCQResetAsync (SPHMPMCQ_t queue)
 {
 	debug_printf("%-6d: %s\n",sphdeGetTID(),__FUNCTION__);
-	SPHMPCQueueHeader *headerBlock = (SPHMPCQueueHeader *) queue;
+	SPHMPMCQHeader *headerBlock = (SPHMPMCQHeader *) queue;
 	int rc = 0;
 
 	if (SOMSASCheckBlockSigAndType ((SASBlockHeader *) headerBlock,SAS_RUNTIME_PCQUEUE_TM)) {
@@ -209,15 +209,15 @@ SPHMultiPCQueueResetAsync (SPHMultiPCQueue_t queue)
 		headerBlock->qtail = headerBlock->startq;
 	} else {
 		rc = 1;
-		debug_printf ("SPHMultiPCQueueResetAsync(%p) type check failed\n", queue);
+		debug_printf("%s(%p) type check failed\n",__FUNCTION__,queue);
 	}
 	return rc;
 }
 
 int
-SPHMultiPCQueueEmpty (SPHMultiPCQueue_t queue)
+SPHMPMCQIsEmpty (SPHMPMCQ_t queue)
 {
-	SPHMPCQueueHeader *headerBlock = (SPHMPCQueueHeader *) queue;
+	SPHMPMCQHeader *headerBlock = (SPHMPMCQHeader *) queue;
 	int rc = 0;
 
 	debug_printf("%-6d: %s NEW\n",sphdeGetTID(),__FUNCTION__);
@@ -231,16 +231,16 @@ SPHMultiPCQueueEmpty (SPHMultiPCQueue_t queue)
 		if (!entryPtr->entryID.detail.valid)
 			rc = 1;
 	} else {
-		debug_printf ("%s(%p) type check failed\n", __FUNCTION__,queue);
+		debug_printf("%s(%p) type check failed\n", __FUNCTION__,queue);
 	}
 	return rc;
 }
 
 int
-SPHMultiPCQueueFull (SPHMultiPCQueue_t queue)
+SPHMPMCQIsFull (SPHMPMCQ_t queue)
 {
 	printf("%s NEW\n",__FUNCTION__);
-	SPHMPCQueueHeader *headerBlock = (SPHMPCQueueHeader *) queue;
+	SPHMPMCQHeader *headerBlock = (SPHMPMCQHeader *) queue;
 	int rc = 0;
 
 	if (SOMSASCheckBlockSigAndType ((SASBlockHeader *) headerBlock,SAS_RUNTIME_PCQUEUE_TM)) {
@@ -257,10 +257,10 @@ SPHMultiPCQueueFull (SPHMultiPCQueue_t queue)
 }
 
 block_size_t
-SPHMultiPCQueueFreeSpace (SPHMultiPCQueue_t queue)
+SPHMPMCQFreeSpace (SPHMPMCQ_t queue)
 {
 	debug_printf("%s NEW\n",__FUNCTION__);
-	SPHMPCQueueHeader *headerBlock = (SPHMPCQueueHeader *) queue;
+	SPHMPMCQHeader *headerBlock = (SPHMPMCQHeader *) queue;
 	block_size_t rc = 0;
 
 	if (SOMSASCheckBlockSigAndType ((SASBlockHeader *) headerBlock, SAS_RUNTIME_PCQUEUE_TM)) {
@@ -285,9 +285,9 @@ SPHMultiPCQueueFreeSpace (SPHMultiPCQueue_t queue)
 }
 
 sphLFEntryID_t
-SPHMultiPCQueueGetEntryTemplate (SPHMultiPCQueue_t queue)
+SPHMPMCQGetEntryTemplate (SPHMPMCQ_t queue)
 {
-	SPHMPCQueueHeader *headerBlock = (SPHMPCQueueHeader *) queue;
+	SPHMPMCQHeader *headerBlock = (SPHMPMCQHeader *) queue;
 	longPtr_t alloc_round = 0;
 	sphLFEntry_t entrytemp;
 
@@ -311,7 +311,7 @@ SPHMultiPCQueueGetEntryTemplate (SPHMultiPCQueue_t queue)
 }
 
 static inline SPHLFEntryHeader_t *
-SPHMultiPCQueueAdvanceHead(SPHLFEntryHeader_t **head_p, sphLFEntryID_t idAlloc, sphLFEntryID_t idFree, unsigned short len, longPtr_t qlo, longPtr_t qhi) {
+SPHMPMCQAdvanceHead(SPHLFEntryHeader_t **head_p, sphLFEntryID_t idAlloc, sphLFEntryID_t idFree, unsigned short len, longPtr_t qlo, longPtr_t qhi) {
 	SPHLFEntryHeader_t *entryPtr = *head_p;
 	if (entryPtr->entryID.idUnit == idFree) {
 		longPtr_t new_head = ((longPtr_t)entryPtr) + len;
@@ -325,9 +325,9 @@ SPHMultiPCQueueAdvanceHead(SPHLFEntryHeader_t **head_p, sphLFEntryID_t idAlloc, 
 }
 
 SPHLFEntryDirect_t
-SPHMultiPCQueueAllocStrideDirectTM (SPHMultiPCQueue_t queue)
+SPHMPMCQAllocStrideDirectTM (SPHMPMCQ_t queue)
 {
-	volatile SPHMPCQueueHeader *headerBlock = (SPHMPCQueueHeader *) queue;
+	volatile SPHMPMCQHeader *headerBlock = (SPHMPMCQHeader *) queue;
 	SPHLFEntryHeader_t *entryPtr = 0;
 
 	debug_printf("%-6d: %s NEW\n",sphdeGetTID(),__FUNCTION__);
@@ -352,14 +352,14 @@ SPHMultiPCQueueAllocStrideDirectTM (SPHMultiPCQueue_t queue)
 #ifdef __HTM__
 		if (__TM_begin (TM_buff) == _HTM_TBEGIN_STARTED) {
 			/* Transaction State Initiated. */
-			entryPtr = SPHMultiPCQueueAdvanceHead((SPHLFEntryHeader_t **)&headerBlock->qhead,entrytemp.idUnit,entryfree.idUnit,stride,qlo,qhi);
+			entryPtr = SPHMPMCQAdvanceHead((SPHLFEntryHeader_t **)&headerBlock->qhead,entrytemp.idUnit,entryfree.idUnit,stride,qlo,qhi);
 			__TM_end ();
 		} else {
 			if (__TM_is_failure_persistent (TM_buff)) {
 				/* revert to GNU TM */
 #endif
 				__transaction_atomic {
-					entryPtr = SPHMultiPCQueueAdvanceHead((SPHLFEntryHeader_t **)&headerBlock->qhead,entrytemp.idUnit,entryfree.idUnit,stride,qlo,qhi);
+					entryPtr = SPHMPMCQAdvanceHead((SPHLFEntryHeader_t **)&headerBlock->qhead,entrytemp.idUnit,entryfree.idUnit,stride,qlo,qhi);
 				}
 #ifdef __HTM__
 			}
@@ -373,7 +373,7 @@ SPHMultiPCQueueAllocStrideDirectTM (SPHMultiPCQueue_t queue)
 }
 
 static inline SPHLFEntryHeader_t *
-SPHMultiPCQueueAdvanceTail(SPHLFEntryHeader_t **tail_p, unsigned short len, longPtr_t qlo, longPtr_t qhi) {
+SPHMPMCQAdvanceTail(SPHLFEntryHeader_t **tail_p, unsigned short len, longPtr_t qlo, longPtr_t qhi) {
 	SPHLFEntryHeader_t *entryPtr = *tail_p;
 	sphLFEntry_t entrytemp;
 	entrytemp.idUnit = entryPtr->entryID.idUnit;
@@ -390,9 +390,9 @@ SPHMultiPCQueueAdvanceTail(SPHLFEntryHeader_t **tail_p, unsigned short len, long
 }
 
 SPHLFEntryDirect_t
-SPHMultiPCQueueGetNextCompleteDirectTM (SPHMultiPCQueue_t queue)
+SPHMPMCQGetNextCompleteDirectTM (SPHMPMCQ_t queue)
 {
-	volatile SPHMPCQueueHeader *headerBlock = (SPHMPCQueueHeader *) queue;
+	volatile SPHMPMCQHeader *headerBlock = (SPHMPMCQHeader *) queue;
 	SPHLFEntryHeader_t *entryPtr = 0;
 
 	debug_printf("%-6d: %s NEW\n",sphdeGetTID(),__FUNCTION__);
@@ -405,14 +405,14 @@ SPHMultiPCQueueGetNextCompleteDirectTM (SPHMultiPCQueue_t queue)
 		TM_buff_type TM_buff;
 		if (__TM_begin (TM_buff) == _HTM_TBEGIN_STARTED) {
 			/* Transaction State Initiated. */
-			entryPtr = SPHMultiPCQueueAdvanceTail((SPHLFEntryHeader_t **)&headerBlock->qtail,stride,qlo,qhi);
+			entryPtr = SPHMPMCQAdvanceTail((SPHLFEntryHeader_t **)&headerBlock->qtail,stride,qlo,qhi);
 			__TM_end ();
 		} else {
 			if (__TM_is_failure_persistent (TM_buff)) {
 				/* revert to GNU TM */
 #endif
 				__transaction_atomic {
-					entryPtr = SPHMultiPCQueueAdvanceTail((SPHLFEntryHeader_t **)&headerBlock->qtail,stride,qlo,qhi);
+					entryPtr = SPHMPMCQAdvanceTail((SPHLFEntryHeader_t **)&headerBlock->qtail,stride,qlo,qhi);
 				}
 #ifdef __HTM__
 			}
@@ -421,12 +421,21 @@ SPHMultiPCQueueGetNextCompleteDirectTM (SPHMultiPCQueue_t queue)
 	} else {
 		debug_printf("%s(%p) type check failed\n",__FUNCTION__,queue);
 	}
+#if 0
+	{
+		SPHLFEntryHeader_t **tail_p = (SPHLFEntryHeader_t **)&headerBlock->qtail;
+		SPHLFEntryHeader_t *entryPtr = *tail_p;
+		sphLFEntry_t entrytemp;
+		entrytemp.idUnit = entryPtr->entryID.idUnit;
+		printf("%-6d: tail = %lx entryPtr = %p allocated = %d valid = %d\n",sphdeGetTID(),headerBlock->qtail,entryPtr,entrytemp.detail.allocated,entrytemp.detail.valid);
+	}
+#endif
 	debug_printf("%-6d: %s = %p\n",sphdeGetTID(),__FUNCTION__,entryPtr);
 	return ((SPHLFEntryDirect_t)entryPtr);
 }
 
 int
-SPHMultiPCQueueEntryDirectIsComplete (SPHLFEntryDirect_t directHandle)
+SPHMPMCQEntryDirectIsComplete (SPHLFEntryDirect_t directHandle)
 {
 	SPHLFEntryHeader_t  *entryPtr = (SPHLFEntryHeader_t*)directHandle;
 
@@ -434,11 +443,11 @@ SPHMultiPCQueueEntryDirectIsComplete (SPHLFEntryDirect_t directHandle)
 }
 
 int
-SPHMultiPCQueueFreeEntryDirect (SPHMultiPCQueue_t queue,
+SPHMPMCQFreeEntryDirect (SPHMPMCQ_t queue,
                                      SPHLFEntryDirect_t entry)
 {
 	debug_printf("%-6d: %s(%p,%p) NEW\n",sphdeGetTID(),__FUNCTION__,queue,entry);
-	SPHMPCQueueHeader *headerBlock = (SPHMPCQueueHeader *) queue;
+	SPHMPMCQHeader *headerBlock = (SPHMPMCQHeader *) queue;
 	int rc = 0;
 
 	if (SOMSASCheckBlockSigAndType ((SASBlockHeader *) headerBlock,
@@ -451,7 +460,7 @@ SPHMultiPCQueueFreeEntryDirect (SPHMultiPCQueue_t queue,
 		entryPtr->entryID.idUnit = 0;
 		rc = 1;
 	} else {
-		debug_printf("SPHMultiPCQueueFreeNextEntry(%p) "
+		debug_printf("SPHMPMCQFreeNextEntry(%p) "
 				"type check failed\n",queue);
 	}
 	debug_printf("%-6d: %s(%p,%p) END\n",sphdeGetTID(),__FUNCTION__,queue,entry);
@@ -459,16 +468,16 @@ SPHMultiPCQueueFreeEntryDirect (SPHMultiPCQueue_t queue,
 }
 
 int
-SPHMultiPCQueueSetCachePrefetch (SPHMultiPCQueue_t queue, int prefetch)
+SPHMPMCQSetCachePrefetch (SPHMPMCQ_t queue, int prefetch)
 {
 	printf("%s unimplemented\n",__FUNCTION__);
 	return 0;
 }
 
 int
-SPHMultiPCQueuePrefetch (SPHMultiPCQueue_t queue)
+SPHMPMCQPrefetch (SPHMPMCQ_t queue)
 {
-	SPHMPCQueueHeader *headerBlock = (SPHMPCQueueHeader *) queue;
+	SPHMPMCQHeader *headerBlock = (SPHMPMCQHeader *) queue;
 	int rc = 0;
 
 	if (SOMSASCheckBlockSigAndType ((SASBlockHeader *) headerBlock,
@@ -489,7 +498,7 @@ SPHMultiPCQueuePrefetch (SPHMultiPCQueue_t queue)
 }
 
 static int
-SPHMultiPCQueueDestroyNoLock (SPHMultiPCQueue_t queue)
+SPHMPMCQDestroyNoLock (SPHMPMCQ_t queue)
 {
 	SASBlockHeader *headerBlock = (SASBlockHeader *) queue;
 	block_size_t heapSize;
@@ -508,7 +517,7 @@ SPHMultiPCQueueDestroyNoLock (SPHMultiPCQueue_t queue)
 
 
 int
-SPHMultiPCQueueDestroy (SPHMultiPCQueue_t queue)
+SPHMPMCQDestroy (SPHMPMCQ_t queue)
 {
 	SASBlockHeader *headerBlock = (SASBlockHeader *) queue;
 	int rc;
@@ -516,7 +525,7 @@ SPHMultiPCQueueDestroy (SPHMultiPCQueue_t queue)
 	debug_printf("%s\n",__FUNCTION__);
 	if (SOMSASCheckBlockSigAndTypeAndSubtype (headerBlock, SAS_RUNTIME_PCQUEUE_TM)) {
 		SASLock (queue, SasUserLock__WRITE);
-		rc = SPHMultiPCQueueDestroyNoLock (queue);
+		rc = SPHMPMCQDestroyNoLock (queue);
 		SASUnlock (queue);
 	} else {
 		debug_printf ("%s(%p) does not match type/subtype\n", __FUNCTION__,queue);

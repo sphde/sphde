@@ -56,128 +56,215 @@ static int num_threads = 1;
 static const int max_threads = 256;
 static long thread_iterations;
 static block_size_t cap, units, p10, pcq_alloc, pcq_stride;
-static SPHMultiPCQueue_t pcqueue;
+static SPHMPMCQ_t pcqueue;
 static sphPCQAlignedSem_t pwait, cwait;
 static sphLFEntryID_t pcqueue_tmpl;
-static SPHMultiPCQueue_t pcqueue2;
+static SPHMPMCQ_t pcqueue2;
 static sphPCQAlignedSem_t pwait2, cwait2;
 static sphLFEntryID_t pcqueue2_tmpl;
-static SPHMultiPCQueue_t pcqueue3;
+static SPHMPMCQ_t pcqueue3;
 static sphPCQAlignedSem_t pwait3, cwait3;
 static sphLFEntryID_t pcqueue3_tmpl;
-static SPHMultiPCQueue_t consumer_pcq_list[MAX_THREADS];
-static SPHMultiPCQueue_t producer_pcq_list[MAX_THREADS];
+static SPHMPMCQ_t consumer_pcq_list[MAX_THREADS];
+static SPHMPMCQ_t producer_pcq_list[MAX_THREADS];
 static sphLFEntryID_t pcqueue_tmpl;
 typedef void *(*test_ptr_t) (void *);
-typedef int (*test_fill_ptr_t) (SPHMultiPCQueue_t, SPHMultiPCQueue_t, int, long);
+typedef int (*test_fill_ptr_t) (SPHMPMCQ_t, SPHMPMCQ_t, int, long);
 static test_fill_ptr_t test_funclist[MAX_THREADS];
 static int arg_list[MAX_THREADS];
 
 int test0(unsigned int iters) {
-	SPHMultiPCQueue_t pcq;
+	SPHMPMCQ_t pcq;
 	SPHLFEntryDirect_t send_handle[Q_SIZE/Q_STRIDE],recv_handle[Q_SIZE/Q_STRIDE];
 	sphLFEntryID_t tmpl;
 	unsigned int entries;
 	unsigned long space;
-	unsigned int iter,i;
+	unsigned int iter,i,empty,full;
 
-	pcq = SPHMultiPCQueueCreateWithStride(Q_SIZE,Q_STRIDE);
+	pcq = SPHMPMCQCreateWithStride(Q_SIZE,Q_STRIDE);
 	if (!pcq) {
-		fprintf(stderr,"SPHMultiPCQueueCreateWithStride Error\n");
+		fprintf(stderr,"SPHMPMCQCreateWithStride Error\n");
 		return 1;
 	}
 
-	entries = SPHMultiPCQueueGetEntries(pcq);
+	empty = SPHMPMCQIsEmpty(pcq);
+	debug_printf("Q is empty = %d\n",empty);
+	if (!empty) return 1;
+
+	entries = SPHMPMCQGetEntries(pcq);
 	debug_printf("Q entries = %d\n",entries);
-	space = (unsigned long) SPHMultiPCQueueFreeSpace(pcq);
+	space = (unsigned long) SPHMPMCQFreeSpace(pcq);
 	debug_printf("Q space = %lu\n",space);
 	if (entries * Q_STRIDE != space) return 1;
 
-	tmpl = SPHMultiPCQueueGetEntryTemplate(pcq);
+	tmpl = SPHMPMCQGetEntryTemplate(pcq);
 	if (!tmpl) {
-		fprintf(stderr,"SPHMultiPCQueueGetEntryTemplate Error\n");
+		fprintf(stderr,"SPHMPMCQGetEntryTemplate Error\n");
 		return 1;
 	}
 
 	for (iter = 0; iter < iters; iter++) {
 		for (i = 0; i < entries; i++) {
-			send_handle[i] = SPHMultiPCQueueAllocStrideDirectTM(pcq);
+			full = SPHMPMCQIsFull(pcq);
+			debug_printf("Q is full = %d\n",full);
+			if (full) return 1;
+
+			send_handle[i] = SPHMPMCQAllocStrideDirectTM(pcq);
 			if (!send_handle[i]) {
-				fprintf(stderr,"SPHMultiPCQueueAllocStrideDirectTM Error\n");
+				fprintf(stderr,"SPHMPMCQAllocStrideDirectTM Error\n");
 				return 1;
 			}
-			debug_printf("%-6d: ALLOC %p\n",sphdeGetTID(),send_handle[i]);
+			debug_printf("ALLOC %p\n",send_handle[i]);
+
+			empty = SPHMPMCQIsEmpty(pcq);
+			debug_printf("Q is empty = %d\n",empty);
+			if (empty) return 1;
 		}
-		space = (unsigned long) SPHMultiPCQueueFreeSpace(pcq);
-		debug_printf("%-6d: Q space = %lu\n",sphdeGetTID(),space);
+		space = (unsigned long) SPHMPMCQFreeSpace(pcq);
+		debug_printf("Q space = %lu\n",space);
 		if (space) return 1;
 
+		full = SPHMPMCQIsFull(pcq);
+		debug_printf("Q is full = %d\n",full);
+		if (!full) return 1;
+
 		for (i = 0; i < entries; i++) {
-			debug_printf("%-6d: MARK  %p\n",sphdeGetTID(),send_handle[i]);
+			empty = SPHMPMCQIsEmpty(pcq);
+			debug_printf("Q is empty = %d\n",empty);
+			if (empty) return 1;
+
+			debug_printf("MARK  %p\n",send_handle[i]);
 			SPHLFEntryDirectComplete(send_handle[i],tmpl,0,0); // always succeeds
+
+			full = SPHMPMCQIsFull(pcq);
+			debug_printf("Q is full = %d\n",full);
+			if (!full) return 1;
 		}
 
 		for (i = 0; i < entries; i++) {
-			recv_handle[i] = SPHMultiPCQueueGetNextCompleteDirectTM(pcq);
+			empty = SPHMPMCQIsEmpty(pcq);
+			debug_printf("Q is empty = %d\n",empty);
+			if (empty) return 1;
+
+			recv_handle[i] = SPHMPMCQGetNextCompleteDirectTM(pcq);
 			if (!recv_handle[i]) {
-				fprintf(stderr,"SPHMultiPCQueueGetNextDirectCompleteTM Error\n");
+				fprintf(stderr,"SPHMPMCQGetNextDirectCompleteTM Error\n");
 				return 1;
 			}
-			debug_printf("%-6d: GET   %p\n",sphdeGetTID(),recv_handle[i]);
+			debug_printf("GET   %p\n",recv_handle[i]);
+
+			full = SPHMPMCQIsFull(pcq);
+			debug_printf("Q is full = %d\n",full);
+			if (full) return 1;
 		}
 
 		for (i = 0; i < entries; i++) {
-			debug_printf("%-6d: FREE  %p\n",sphdeGetTID(),recv_handle[i]);
-			if (!SPHMultiPCQueueFreeEntryDirect(pcq,recv_handle[i]))  {
-				fprintf(stderr,"SPHMultiPCQueueFreeEntryDirect Error\n");
+			empty = SPHMPMCQIsEmpty(pcq);
+			debug_printf("Q is empty = %d\n",empty);
+			if (empty) return 1;
+
+			debug_printf("FREE  %p\n",recv_handle[i]);
+			if (!SPHMPMCQFreeEntryDirect(pcq,recv_handle[i]))  {
+				fprintf(stderr,"SPHMPMCQFreeEntryDirect Error\n");
 				return 1;
 			}
-			debug_printf("%-6d: Q space = %lu\n",sphdeGetTID(),SPHMultiPCQueueFreeSpace(pcq));
+			debug_printf("Q space = %lu\n",SPHMPMCQFreeSpace(pcq));
+
+			full = SPHMPMCQIsFull(pcq);
+			debug_printf("Q is full = %d\n",full);
+			if (full) return 1;
 		}
-		space = (unsigned long) SPHMultiPCQueueFreeSpace(pcq);
-		debug_printf("%-6d: Q space = %lu\n",sphdeGetTID(),space);
+		space = (unsigned long) SPHMPMCQFreeSpace(pcq);
+		debug_printf("Q space = %lu\n",space);
 		if (entries * Q_STRIDE != space) return 1;
 
+		empty = SPHMPMCQIsEmpty(pcq);
+		debug_printf("Q is empty = %d\n",empty);
+		if (empty) return 1;
+
 		for (i = 0; i < entries; i++) {
-			send_handle[i] = SPHMultiPCQueueAllocStrideDirectTM(pcq);
+			full = SPHMPMCQIsFull(pcq);
+			debug_printf("Q is full = %d\n",full);
+			if (full) return 1;
+
+			send_handle[i] = SPHMPMCQAllocStrideDirectTM(pcq);
 			if (!send_handle[i]) {
-				fprintf(stderr,"SPHMultiPCQueueAllocStrideDirectTM Error\n");
+				fprintf(stderr,"SPHMPMCQAllocStrideDirectTM Error\n");
 				return 1;
 			}
-			debug_printf("%-6d: ALLOC %p\n",sphdeGetTID(),send_handle[i]);
+			debug_printf("ALLOC %p\n",send_handle[i]);
+
+			empty = SPHMPMCQIsEmpty(pcq);
+			debug_printf("Q is empty = %d\n",empty);
+			if (empty) return 1;
 		}
 
 		/* mark in reverse order */
 		for (i = entries; i > 0; i--) {
+			empty = SPHMPMCQIsEmpty(pcq);
+			debug_printf("Q is empty = %d\n",empty);
+			if (empty) return 1;
+
 			debug_printf("MARK  %p\n",send_handle[i-1]);
 			SPHLFEntryDirectComplete(send_handle[i-1],tmpl,0,0); // always succeeds
+
+			full = SPHMPMCQIsFull(pcq);
+			debug_printf("Q is full = %d\n",full);
+			if (!full) return 1;
 		}
 
 		for (i = 0; i < entries; i++) {
-			recv_handle[i] = SPHMultiPCQueueGetNextCompleteDirectTM(pcq);
+			empty = SPHMPMCQIsEmpty(pcq);
+			debug_printf("Q is empty = %d\n",empty);
+			if (empty) return 1;
+
+			recv_handle[i] = SPHMPMCQGetNextCompleteDirectTM(pcq);
 			if (!recv_handle[i]) {
-				fprintf(stderr,"SPHMultiPCQueueGetNextCompleteDirectTM Error\n");
+				fprintf(stderr,"SPHMPMCQGetNextCompleteDirectTM Error\n");
 				return 1;
 			}
-			debug_printf("%-6d: GET   %p\n",sphdeGetTID(),recv_handle[i]);
+			debug_printf("GET   %p\n",recv_handle[i]);
+
+			full = SPHMPMCQIsFull(pcq);
+			debug_printf("Q is full = %d\n",full);
+			if (full) return 1;
 		}
 
 		/* free in reverse order */
 		for (i = entries; i > 0; i--) {
-			debug_printf("%-6d: FREE  %p\n",sphdeGetTID(),recv_handle[i-1]);
-			if (!SPHMultiPCQueueFreeEntryDirect(pcq,recv_handle[i-1]))  {
-				fprintf(stderr,"SPHMultiPCQueueFreeEntryDirect Error\n");
+			empty = SPHMPMCQIsEmpty(pcq);
+			debug_printf("Q is empty = %d\n",empty);
+			if (empty) return 1;
+
+			debug_printf("FREE  %p\n",recv_handle[i-1]);
+			if (!SPHMPMCQFreeEntryDirect(pcq,recv_handle[i-1]))  {
+				fprintf(stderr,"SPHMPMCQFreeEntryDirect Error\n");
 				return 1;
 			}
-			debug_printf("%-6d: Q space = %lu\n",sphdeGetTID(),SPHMultiPCQueueFreeSpace(pcq));
+			debug_printf("Q space = %lu\n",SPHMPMCQFreeSpace(pcq));
+
+			full = SPHMPMCQIsFull(pcq);
+			debug_printf("Q is full = %d\n",full);
+			if (full) {
+				/* implementation-dependent, so ignore result */
+			}
 		}
-		space = (unsigned long) SPHMultiPCQueueFreeSpace(pcq);
-		debug_printf("%-6d: Q space = %lu\n",sphdeGetTID(),space);
+
+		space = (unsigned long) SPHMPMCQFreeSpace(pcq);
+		debug_printf("Q space = %lu\n",space);
 		if (entries * Q_STRIDE != space) return 1;
+
+		empty = SPHMPMCQIsEmpty(pcq);
+		debug_printf("Q is empty = %d\n",empty);
+		if (!empty) return 1;
+
+		full = SPHMPMCQIsFull(pcq);
+		debug_printf("Q is full = %d\n",full);
+		if (full) return 1;
 	}
 
-	if (SPHMultiPCQueueDestroy(pcq) != 0)  {
-		fprintf(stderr,"SPHMultiPCQueueDestroy Error\n");
+	if (SPHMPMCQDestroy(pcq) != 0)  {
+		fprintf(stderr,"SPHMPMCQDestroy Error\n");
 		return 1;
 	}
 	return 0;
@@ -190,17 +277,17 @@ test_pcq_init (block_size_t pcq_size)
 	pcq_alloc = pcq_size;
 	pcq_stride = 128;
 
-	pcqueue = SPHMultiPCQueueCreateWithStride (pcq_alloc, pcq_stride);
+	pcqueue = SPHMPMCQCreateWithStride (pcq_alloc, pcq_stride);
 	if (pcqueue) {
-		pcqueue_tmpl = SPHMultiPCQueueGetEntryTemplate(pcqueue);
-		rc = SPHMultiPCQueueSetCachePrefetch (pcqueue, 0);
-		debug_printf("%-6d: SPHMultiPCQueueCreateWithStride (%zu) success\n",sphdeGetTID(),pcq_alloc);
+		pcqueue_tmpl = SPHMPMCQGetEntryTemplate(pcqueue);
+		rc = SPHMPMCQSetCachePrefetch (pcqueue, 0);
+		debug_printf("%-6d: SPHMPMCQCreateWithStride (%zu) success\n",sphdeGetTID(),pcq_alloc);
 
-		cap = SPHMultiPCQueueFreeSpace (pcqueue);
+		cap = SPHMPMCQFreeSpace (pcqueue);
 
 		units = cap / 128;
 
-		debug_printf("%-6d: SPHMultiPCQueueFreeSpace() = %zu units=%zu\n", sphdeGetTID(), cap, units);
+		debug_printf("%-6d: SPHMPMCQFreeSpace() = %zu units=%zu\n", sphdeGetTID(), cap, units);
 
 		memset (pwait.unit, 0, 128);
 		memset (cwait.unit, 0, 128);
@@ -209,11 +296,11 @@ test_pcq_init (block_size_t pcq_size)
 	} else
 		rc++;
 
-	pcqueue2 = SPHMultiPCQueueCreateWithStride (pcq_alloc, pcq_stride);
+	pcqueue2 = SPHMPMCQCreateWithStride (pcq_alloc, pcq_stride);
 	if (pcqueue2) {
-		pcqueue2_tmpl = SPHMultiPCQueueGetEntryTemplate(pcqueue2);
-		rc = SPHMultiPCQueueSetCachePrefetch (pcqueue2, 0);
-		debug_printf("%-6d: SPHMultiPCQueueSetCachePrefetch (%zu) success\n", sphdeGetTID(), pcq_alloc);
+		pcqueue2_tmpl = SPHMPMCQGetEntryTemplate(pcqueue2);
+		rc = SPHMPMCQSetCachePrefetch (pcqueue2, 0);
+		debug_printf("%-6d: SPHMPMCQSetCachePrefetch (%zu) success\n", sphdeGetTID(), pcq_alloc);
 
 		memset (pwait2.unit, 0, 128);
 		memset (cwait2.unit, 0, 128);
@@ -222,11 +309,11 @@ test_pcq_init (block_size_t pcq_size)
 	} else
 		rc++;
 
-	pcqueue3 = SPHMultiPCQueueCreateWithStride (pcq_alloc, pcq_stride);
+	pcqueue3 = SPHMPMCQCreateWithStride (pcq_alloc, pcq_stride);
 	if (pcqueue3) {
-		pcqueue3_tmpl = SPHMultiPCQueueGetEntryTemplate(pcqueue3);
-		rc = SPHMultiPCQueueSetCachePrefetch (pcqueue3, 0);
-		debug_printf("%-6d: SPHMultiPCQueueSetCachePrefetch (%zu) success\n", sphdeGetTID(), pcq_alloc);
+		pcqueue3_tmpl = SPHMPMCQGetEntryTemplate(pcqueue3);
+		rc = SPHMPMCQSetCachePrefetch (pcqueue3, 0);
+		debug_printf("%-6d: SPHMPMCQSetCachePrefetch (%zu) success\n", sphdeGetTID(), pcq_alloc);
 
 		memset (pwait3.unit, 0, 128);
 		memset (cwait3.unit, 0, 128);
@@ -239,17 +326,17 @@ test_pcq_init (block_size_t pcq_size)
 }
 
 int
-lfPCQentry_test (SPHMultiPCQueue_t pqueue, SPHMultiPCQueue_t cqueue, sphLFEntryID_t qtmpl, int val1, int val2, int val3)
+lfPCQentry_test (SPHMPMCQ_t pqueue, SPHMPMCQ_t cqueue, sphLFEntryID_t qtmpl, int val1, int val2, int val3)
 {
 	SPHLFEntryDirect_t *handle;
 
-	handle = SPHMultiPCQueueAllocStrideDirectTM(pqueue);
+	handle = SPHMPMCQAllocStrideDirectTM(pqueue);
 	if (!handle) {
-		debug_printf ("%s(%p, %d) SPHMultiPCQueueFull\n",__FUNCTION__,
+		debug_printf ("%s(%p, %d) full\n",__FUNCTION__,
 				pqueue, val1);
-		while (SPHMultiPCQueueFull (pqueue))
+		while (SPHMPMCQIsFull (pqueue))
 			sched_yield ();
-		handle = SPHMultiPCQueueAllocStrideDirectTM(pqueue);
+		handle = SPHMPMCQAllocStrideDirectTM(pqueue);
 		debug_printf ("%s(%p, %d) retry handle=%p\n",__FUNCTION__,
 				pqueue,val1, handle);
 	}
@@ -267,20 +354,20 @@ lfPCQentry_test (SPHMultiPCQueue_t pqueue, SPHMultiPCQueue_t cqueue, sphLFEntryI
 }
 
 int
-lfPCQentry_verify (SPHMultiPCQueue_t pqueue, SPHMultiPCQueue_t cqueue, int val1, int val2, int val3)
+lfPCQentry_verify (SPHMPMCQ_t pqueue, SPHMPMCQ_t cqueue, int val1, int val2, int val3)
 {
 	int rc1, rc2, rc3, rc4;
 	SPHLFEntryHandle_t *handle;
 
 	debug_printf("%s(%p,%x,%x,%x)\n",__FUNCTION__,cqueue,val1,val2,val3);
 
-	handle = SPHMultiPCQueueGetNextCompleteDirectTM (cqueue);
+	handle = SPHMPMCQGetNextCompleteDirectTM (cqueue);
 	if (!handle) {
-		debug_printf("%s(%p, %d) SPHMultiPCQueueEmpty\n",__FUNCTION__,
+		debug_printf("%s(%p, %d) empty\n",__FUNCTION__,
 				cqueue, val1);
-		while (SPHMultiPCQueueEmpty (cqueue))
+		while (SPHMPMCQIsEmpty (cqueue))
 			sched_yield ();
-		handle = SPHMultiPCQueueGetNextCompleteDirectTM (cqueue);
+		handle = SPHMPMCQGetNextCompleteDirectTM (cqueue);
 		debug_printf("%s(%p, %d) retry handle=%p\n",__FUNCTION__,
 				cqueue,val1, handle);
 	}
@@ -292,17 +379,17 @@ lfPCQentry_verify (SPHMultiPCQueue_t pqueue, SPHMultiPCQueue_t cqueue, int val1,
 		rc3 = (array[2] != val3);
 
 		if (rc1 | rc2 | rc3)
-			printf("%s:: SPHLFEntryGetNextInt() = %x,%x,%x "
+			printf("%s:: verify %x,%x,%x "
 				"should be %x,%x,%x\n",__FUNCTION__,
 				array[0], array[1], array[2], val1, val2, val3);
 
 		/* invalidate buffer contents */
 		array[0] = array[1] = array[2] = 0x2020202;
 
-		if (SPHMultiPCQueueFreeEntryDirect (cqueue,handle))
+		if (SPHMPMCQFreeEntryDirect (cqueue,handle))
 			rc4 = 0;
 		else {
-			printf("%s:: SPHMultiPCQueueFreeNextEntryDirect() = fail\n",
+			printf("%s:: SPHMPMCQFreeNextEntryDirect() = fail\n",
 				__FUNCTION__);
 			rc4 = 1;
 		}
@@ -314,7 +401,7 @@ lfPCQentry_verify (SPHMultiPCQueue_t pqueue, SPHMultiPCQueue_t cqueue, int val1,
 }
 
 int
-test_thread_Producer_fill (SPHMultiPCQueue_t pqueue, SPHMultiPCQueue_t cqueue,
+test_thread_Producer_fill (SPHMPMCQ_t pqueue, SPHMPMCQ_t cqueue,
 			   int thread_ID, long iterations)
 {
 	sphLFEntryID_t qtmpl;
@@ -324,13 +411,13 @@ test_thread_Producer_fill (SPHMultiPCQueue_t pqueue, SPHMultiPCQueue_t cqueue,
 	debug_printf ("%s(%p, %d, %ld)\n",__FUNCTION__, pcqueue,
 	   thread_ID, iterations);
 
-	qtmpl = SPHMultiPCQueueGetEntryTemplate(pqueue);
+	qtmpl = SPHMPMCQGetEntryTemplate(pqueue);
 
 	for (i = 0; i < iterations; i++) {
 		rc = lfPCQentry_test (pqueue, cqueue, qtmpl, 0x111111, 0x01234567, 0xdeadbeef);
 		if (!rc) {
 		} else {
-			printf("%s SPHMultiPCQueueAllocStrideEntry (%p) failed\n",
+			printf("%s alloc (%p) failed\n",
 					__FUNCTION__,pcqueue);
 			rtn++;
 			break;
@@ -341,7 +428,7 @@ test_thread_Producer_fill (SPHMultiPCQueue_t pqueue, SPHMultiPCQueue_t cqueue,
 }
 
 int
-test_thread_consumer_verify (SPHMultiPCQueue_t pqueue, SPHMultiPCQueue_t cqueue,
+test_thread_consumer_verify (SPHMPMCQ_t pqueue, SPHMPMCQ_t cqueue,
 			     int thread_ID, long iterations)
 {
 	int rc, rtn = 0;
@@ -353,7 +440,7 @@ test_thread_consumer_verify (SPHMultiPCQueue_t pqueue, SPHMultiPCQueue_t cqueue,
 		rc = lfPCQentry_verify (pqueue, cqueue, 0x111111, 0x01234567, 0xdeadbeef);
 		if (!rc) {
 		} else {
-			printf("%s SPHMultiPCQueueGetNextComplete (%p) fail\n",
+			printf("%s verify (%p) fail\n",
 					__FUNCTION__,pcqueue);
 			rtn++;
 			break;
@@ -366,7 +453,7 @@ test_thread_consumer_verify (SPHMultiPCQueue_t pqueue, SPHMultiPCQueue_t cqueue,
 static void *
 fill_test_parallel_thread (void *arg)
 {
-	SPHMultiPCQueue_t pqueue, cqueue;
+	SPHMPMCQ_t pqueue, cqueue;
 	test_fill_ptr_t test_func;
 	long result = 0;
 	int tn = (int) (long int) arg;
@@ -448,11 +535,9 @@ main(int argc, char *argv[]) {
 	}
 	debug_printf("SAS Joined with %d processors\n", N_PROC_CONF);
 
-#if 1
 	printf("START 0 test0(%lu)\n",iters);
 	rc = test0(iters);
 	printf("END   0 test0 = %d\n",rc);
-#endif
 
 	rc = test_pcq_init (4096);
 
