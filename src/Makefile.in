@@ -348,8 +348,12 @@ SOURCES = $(libsphde_la_SOURCES) $(libsphgettime_la_SOURCES) \
 	$(sphgtod_t_SOURCES) $(sphlflogger_t_SOURCES) \
 	$(sphlflogger_tt_SOURCES) $(sphlflogger_ttt_SOURCES) \
 	$(sphlockfreeheap_t_SOURCES) $(sphlogportal_t_SOURCES) \
+<<<<<<< HEAD
 	$(sphlogportal_tt_SOURCES) $(sphmultipcqueue_t_SOURCES) \
 	$(sphmultipcqueue_ttt_SOURCES) $(sphsinglepcqueue_t_SOURCES) \
+=======
+	$(sphlogportal_tt_SOURCES) $(sphsinglepcqueue_t_SOURCES) \
+>>>>>>> 1a01901f9e99fc5b680697b081fea31139764d4a
 	$(sphsinglepcqueue_tt_SOURCES) $(sphsinglepcqueue_ttt_SOURCES) \
 	$(sphthread_t_SOURCES)
 DIST_SOURCES = $(libsphde_la_SOURCES) $(libsphgettime_la_SOURCES) \
@@ -363,8 +367,12 @@ DIST_SOURCES = $(libsphde_la_SOURCES) $(libsphgettime_la_SOURCES) \
 	$(sphgtod_t_SOURCES) $(sphlflogger_t_SOURCES) \
 	$(sphlflogger_tt_SOURCES) $(sphlflogger_ttt_SOURCES) \
 	$(sphlockfreeheap_t_SOURCES) $(sphlogportal_t_SOURCES) \
+<<<<<<< HEAD
 	$(sphlogportal_tt_SOURCES) $(sphmultipcqueue_t_SOURCES) \
 	$(sphmultipcqueue_ttt_SOURCES) $(sphsinglepcqueue_t_SOURCES) \
+=======
+	$(sphlogportal_tt_SOURCES) $(sphsinglepcqueue_t_SOURCES) \
+>>>>>>> 1a01901f9e99fc5b680697b081fea31139764d4a
 	$(sphsinglepcqueue_tt_SOURCES) $(sphsinglepcqueue_ttt_SOURCES) \
 	$(sphthread_t_SOURCES)
 am__can_run_installinfo = \
@@ -713,8 +721,13 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
+<<<<<<< HEAD
 AM_CFLAGS = $(HTM) -fgnu-tm -Wall -Wwrite-strings $(PTHREAD_CFLAGS)
 AM_CXXFLAGS = $(HTM) -fgnu-tm -Wall -Wwrite-strings -Woverloaded-virtual $(PTHREAD_CFLAGS)
+=======
+AM_CFLAGS = -Wall -Wwrite-strings $(PTHREAD_CFLAGS)
+AM_CXXFLAGS = -Wall -Wwrite-strings -Woverloaded-virtual $(PTHREAD_CFLAGS)
+>>>>>>> 1a01901f9e99fc5b680697b081fea31139764d4a
 lib_LTLIBRARIES = libsphde.la libsphgtod.la libsphgettime.la
 EXTRA_DIST = $(libsphde_la_INCLUDES) saslockl.cpp
 
