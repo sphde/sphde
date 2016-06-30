@@ -52,7 +52,7 @@
  * The runtime can always find the containing PCQueue based on the
  * address of any contained structure. The runtime will allocate from
  * the immediate containing Simple heap if free space is available there.
-
+ *
  * The runtime can also find the containing Compound Heap for any
  * PCQueue allocated from it.
  * This allows a number of extended near allocation schemes.
@@ -60,6 +60,27 @@
  * Finally the storage associated with entire collection of related data
  * structures allocated from a Compound Heap can be freed for reuse
  * (destroyed) with one call.
+ *
+ * If the user needs to manage PCQueues of multiple sizes via this
+ * (SPHCompoundPCQ) API then it is necessary to create multiple
+ * SASCompoundHeap_t's to allocate from the SASCompoundHeap_t
+ * allocating the required PCQueue size.
+ *
+ * SASCompoundHeap_t's created via SASCompoundHeapCreate() will
+ * allocate the default 4KB (4096 bytes) SPHSinglePCQueue_t.
+ * To allocate smaller or larger PCQueues using this
+ * (SASCompoundHeap_t) mechanism requires creating CompoundHeaps via
+ * SASCompoundHeapCreatePageSize(), where the "page_size" parameter
+ * will apply to all PCQueues allocated from that specific
+ * CompoundHeap.  The smallest supported PCQueue size is 512 bytes
+ * which is effectively one entry.
+ *
+ * The heap_size parameter effects the granularity of extension as
+ * the heap expands. A smaller (PCQueue) page_size can be paired with a
+ * smaller heap_size while larger page_size should be paired with
+ * larger heap_size as appropriate.  The heap_size should be a
+ * power of 2 multiple of the allocation page_size, between 256 and
+ * 4096 times the page_size.
  *
  * A Compound Heap and the contained complex data structures can be
  * arbitrarily large (up the the limits of the Region size or available
