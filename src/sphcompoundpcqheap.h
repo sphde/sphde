@@ -145,7 +145,7 @@ extern __C__ SPHSinglePCQueue_t SPHCompoundPCQNearAlloc (void *nearObj);
  * \brief Sub-Allocate a new SPH PCQueue from a SAS Compound Heaps
  * internal space.
  *
- * Similar to ::SASCompoundPCQAlloc but does not take write lock the
+ * Similar to ::SPHCompoundPCQAlloc but does not take write lock the
  * Compound Heap.  This API assumes that the application is holding a
  * write lock on the referenced Compound Heap.  This allows an
  * application to batch a group of allocations with less overhead.
@@ -159,7 +159,7 @@ SPHCompoundPCQAllocNoLock (SASCompoundHeap_t heap);
 /*!
  * \brief Allocate a new SPH PCQueue from SAS Compound Heap \a nearObj.
  *
- * Similar to ::SASCompoundPCQNearAlloc but does not take write lock the
+ * Similar to ::SPHCompoundPCQNearAlloc but does not take write lock the
  * Compound Heap. This API assumes that the application is holding a
  * write lock on the referenced Compound Heap.  This allows an
  * application to batch a group of allocations with less overhead.
@@ -173,7 +173,7 @@ extern __C__ SPHSinglePCQueue_t SPHCompoundPCQNearAllocNoLock (void *nearObj);
  * \brief Free the allocated SPH PCQueue \a free_block from SAS Compound
  * Heap \a heap.
  *
- * Similar to ::SASCompoundPCQFree but does not take write lock the
+ * Similar to ::SPHCompoundPCQFree but does not take write lock the
  * Compound Heap. This API assumes that the application is holding a
  * write lock on the referenced Compound Heap.  This allows an
  * application to batch a group of frees with less overhead.

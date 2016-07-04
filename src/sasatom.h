@@ -40,8 +40,11 @@ typedef void*         sas_lock_ptr_t;
 #include "sasatom_generic.h"
 #endif
 
+/// @cond HIDE_FROM_DOXYGEN
 #define GCC_VERSION \
         (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
+/// @endcond
+
 /*!
  * Memory barrier for store operations.
  */
