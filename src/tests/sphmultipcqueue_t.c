@@ -5,7 +5,7 @@
  *      Author: pc
  */
 
-#define DebugPrint
+//#define DebugPrint
 
 #include <stdio.h>
 #include <semaphore.h>
@@ -330,71 +330,46 @@ lfPCQentry_test (SPHMPMCQ_t pqueue, SPHMPMCQ_t cqueue, sphLFEntryID_t qtmpl, int
 {
 	SPHLFEntryDirect_t *handle;
 
-	handle = SPHMPMCQAllocStrideDirectTM(pqueue);
-	if (!handle) {
-		debug_printf ("%s(%p, %d) full\n",__FUNCTION__,
-				pqueue, val1);
-		while (SPHMPMCQIsFull (pqueue))
-			sched_yield ();
-		handle = SPHMPMCQAllocStrideDirectTM(pqueue);
-		debug_printf ("%s(%p, %d) retry handle=%p\n",__FUNCTION__,
-				pqueue,val1, handle);
-	}
-	if (handle) {
-		int *array = (int *) SPHLFEntryDirectGetFreePtr(handle);
-		debug_printf("%s %p = [ %x %x %x ]\n",__FUNCTION__,array,val1,val2,val3);
-		array[0] = val1;
-		array[1] = val2;
-		array[2] = val3;
-		SPHLFEntryDirectComplete (handle,qtmpl,0,0);
-	} else {
-		return -1;
-	}
+	while ((handle = SPHMPMCQAllocStrideDirectTM(pqueue)) == 0)
+		sched_yield();
+
+	int *array = (int *) SPHLFEntryDirectGetFreePtr(handle);
+	debug_printf("%s %p = [ %x %x %x ]\n",__FUNCTION__,array,val1,val2,val3);
+	array[0] = val1;
+	array[1] = val2;
+	array[2] = val3;
+	SPHLFEntryDirectComplete (handle,qtmpl,0,0);
+
 	return 0;
 }
 
 int
 lfPCQentry_verify (SPHMPMCQ_t pqueue, SPHMPMCQ_t cqueue, int val1, int val2, int val3)
 {
-	int rc1, rc2, rc3, rc4;
+	int rc1, rc2, rc3, rc4 = 0;
 	SPHLFEntryHandle_t *handle;
 
 	debug_printf("%s(%p,%x,%x,%x)\n",__FUNCTION__,cqueue,val1,val2,val3);
 
-	handle = SPHMPMCQGetNextCompleteDirectTM (cqueue);
-	if (!handle) {
-		debug_printf("%s(%p, %d) empty\n",__FUNCTION__,
-				cqueue, val1);
-		while (SPHMPMCQIsEmpty (cqueue))
-			sched_yield ();
-		handle = SPHMPMCQGetNextCompleteDirectTM (cqueue);
-		debug_printf("%s(%p, %d) retry handle=%p\n",__FUNCTION__,
-				cqueue,val1, handle);
-	}
-	if (handle) {
-		int *array = (int *) SPHLFEntryDirectGetFreePtr(handle);
-		debug_printf("%s %p = [ %x %x %x ]\n",__FUNCTION__,array,val1,val2,val3);
-		rc1 = (array[0] != val1);
-		rc2 = (array[1] != val2);
-		rc3 = (array[2] != val3);
+	while ((handle = SPHMPMCQGetNextCompleteDirectTM (cqueue)) == 0)
+		sched_yield();
 
-		if (rc1 | rc2 | rc3)
-			printf("%s:: verify %x,%x,%x "
-				"should be %x,%x,%x\n",__FUNCTION__,
-				array[0], array[1], array[2], val1, val2, val3);
+	int *array = (int *) SPHLFEntryDirectGetFreePtr(handle);
+	debug_printf("%s %p = [ %x %x %x ]\n",__FUNCTION__,array,val1,val2,val3);
+	rc1 = (array[0] != val1);
+	rc2 = (array[1] != val2);
+	rc3 = (array[2] != val3);
+	if (rc1 | rc2 | rc3)
+		printf("%s:: verify %x,%x,%x should be %x,%x,%x\n",__FUNCTION__,
+		       array[0], array[1], array[2], val1, val2, val3);
 
-		/* invalidate buffer contents */
-		array[0] = array[1] = array[2] = 0x2020202;
+	/* invalidate buffer contents */
+	array[0] = array[1] = array[2] = 0x2020202;
 
-		if (SPHMPMCQFreeEntryDirect (cqueue,handle))
-			rc4 = 0;
-		else {
-			printf("%s:: SPHMPMCQFreeNextEntryDirect() = fail\n",
-				__FUNCTION__);
-			rc4 = 1;
-		}
-	} else {
-		return 10;
+	if (!SPHMPMCQFreeEntryDirect(cqueue,handle)) {
+		printf("%s:: SPHMPMCQFreeNextEntryDirect() = fail\n",
+		       __FUNCTION__);
+		rc4 = 1;
 	}
 
 	return (rc1 | rc2 | rc3 | rc4);
@@ -405,20 +380,17 @@ test_thread_Producer_fill (SPHMPMCQ_t pqueue, SPHMPMCQ_t cqueue,
 			   int thread_ID, long iterations)
 {
 	sphLFEntryID_t qtmpl;
-	int rc, rtn = 0;
+	int rtn = 0;
 	long i;
 
-	debug_printf ("%s(%p, %d, %ld)\n",__FUNCTION__, pcqueue,
+	debug_printf ("%s(%p, %d, %ld)\n",__FUNCTION__, pqueue,
 	   thread_ID, iterations);
 
 	qtmpl = SPHMPMCQGetEntryTemplate(pqueue);
 
 	for (i = 0; i < iterations; i++) {
-		rc = lfPCQentry_test (pqueue, cqueue, qtmpl, 0x111111, 0x01234567, 0xdeadbeef);
-		if (!rc) {
-		} else {
-			printf("%s alloc (%p) failed\n",
-					__FUNCTION__,pcqueue);
+		if (lfPCQentry_test(pqueue,cqueue,qtmpl,0x111111,0x01234567,0xdeadbeef) != 0) {
+			printf("%s alloc (%p) failed\n",__FUNCTION__,pqueue);
 			rtn++;
 			break;
 		}
@@ -433,7 +405,7 @@ test_thread_consumer_verify (SPHMPMCQ_t pqueue, SPHMPMCQ_t cqueue,
 {
 	int rc, rtn = 0;
 	long i;
-	debug_printf ("%s(%p, %d, %ld)\n",__FUNCTION__,pcqueue,
+	debug_printf ("%s(%p, %d, %ld)\n",__FUNCTION__,pqueue,
 			thread_ID, iterations);
 
 	for (i = 0; i < iterations; i++) {
@@ -441,7 +413,96 @@ test_thread_consumer_verify (SPHMPMCQ_t pqueue, SPHMPMCQ_t cqueue,
 		if (!rc) {
 		} else {
 			printf("%s verify (%p) fail\n",
-					__FUNCTION__,pcqueue);
+					__FUNCTION__,pqueue);
+			rtn++;
+			break;
+		}
+	}
+	debug_printf ("%s END\n",__FUNCTION__);
+	return rtn;
+}
+
+int
+test_single_producer_fill(SPHMPMCQ_t pqueue, SPHMPMCQ_t cqueue,
+			  int thread_ID, long iterations)
+{
+	sphLFEntryID_t qtmpl;
+	int rtn = 0,i;
+
+	debug_printf("%s(%p, %d, %ld)\n",__FUNCTION__,pqueue,thread_ID,iterations);
+
+	qtmpl = SPHMPMCQGetEntryTemplate(pqueue);
+
+	for (i = 0; i < iterations; i++) {
+		SPHLFEntryDirect_t *handle;
+
+		handle = SPHSPMCQAllocStrideDirect(pqueue);
+		if (!handle) {
+			debug_printf("%s(%p) full\n",__FUNCTION__,pqueue);
+			while (SPHMPMCQIsFull(pqueue))
+				sched_yield ();
+			handle = SPHSPMCQAllocStrideDirect(pqueue);
+			debug_printf("%s(%p) retry handle=%p\n",__FUNCTION__,pqueue,handle);
+		}
+		if (handle) {
+			int *array = (int *) SPHLFEntryDirectGetFreePtr(handle);
+			debug_printf("%s %p = [ %x %x %x ]\n",__FUNCTION__,array,0x111111,0x1234567,0xdeadbeef);
+			array[0] = 0x111111;
+			array[1] = 0x1234567;
+			array[2] = 0xdeadbeef;
+			SPHLFEntryDirectComplete(handle,qtmpl,0,0);
+		} else {
+			printf("%s alloc (%p) failed\n",__FUNCTION__,pqueue);
+			rtn++;
+			break;
+		}
+	}
+	debug_printf ("%s END\n",__FUNCTION__);
+	return rtn;
+}
+
+int
+test_single_consumer_verify(SPHMPMCQ_t pqueue, SPHMPMCQ_t cqueue,
+			    int thread_ID, long iterations)
+{
+	int rc, rtn = 0;
+	int val1 = 0x111111, val2 = 0x1234567, val3 = 0xdeadbeef;
+	long i;
+	debug_printf("%s(%p, %d, %ld)\n",__FUNCTION__,cqueue,thread_ID,iterations);
+
+	for (i = 0; i < iterations; i++) {
+		SPHLFEntryHandle_t *handle;
+		debug_printf("%s(%p,%x,%x,%x)\n",__FUNCTION__,cqueue,val1,val2,val3);
+
+		handle = SPHMPSCQGetNextCompleteDirect(cqueue);
+		if (!handle) {
+			debug_printf("%s(%p) empty\n",__FUNCTION__,cqueue);
+			while (SPHMPMCQIsEmpty(cqueue))
+				sched_yield();
+			handle = SPHMPSCQGetNextCompleteDirect(cqueue);
+			debug_printf("%s(%p) retry handle=%p\n",__FUNCTION__,cqueue,handle);
+		}
+		if (handle) {
+			int *array = (int *) SPHLFEntryDirectGetFreePtr(handle);
+			debug_printf("%s %p = [ %x %x %x ]\n",__FUNCTION__,array,val1,val2,val3);
+			rc = (array[0] != val1) + (array[1] != val2) + (array[2] != val3);
+			if (rc)
+				printf("%s:: verify %x,%x,%x "
+				       "should be %x,%x,%x\n",__FUNCTION__,
+				       array[0], array[1], array[2], val1, val2, val3);
+
+			/* invalidate buffer contents */
+			array[0] = array[1] = array[2] = 0x2020202;
+
+			if ((rc += !SPHMPMCQFreeEntryDirect(cqueue,handle))) {
+				printf("%s: SPHMPMCQFreeNextEntryDirect() fail\n",__FUNCTION__);
+			}
+		} else {
+			rc = 1;
+		}
+
+		if (rc) {
+			printf("%s verify (%p) fail\n",__FUNCTION__,cqueue);
 			rtn++;
 			break;
 		}
@@ -482,7 +543,7 @@ launch_test_threads (int t_cnt, test_ptr_t test_f, int iterations)
 	long thread_result;
 	int result = 0;
 
-	printf ("creating threads from pid/tid = %d/%d\n", getpid(), sphdeGetTID());
+	debug_printf ("creating threads from pid/tid = %d/%d\n", getpid(), sphdeGetTID());
 
 	thread_iterations = iterations / t_cnt;
 
@@ -508,13 +569,21 @@ launch_test_threads (int t_cnt, test_ptr_t test_f, int iterations)
 	return result;
 }
 
+void compute_stats(unsigned long count, sphtimer_t delta, double *per, double *rate)
+{
+	double freq = sphfastcpufreq();
+	double deltat = delta / freq;
+	*per = deltat * 1000000000.0 / count;
+	*rate = count / deltat;
+}
+
 int
 main(int argc, char *argv[]) {
 	unsigned long iters = DEFAULT_ITERS;
-	double clock, nano, rate;
-	sphtimer_t tempt, startt, endt, freqt;
+	double nano, rate;
+	sphtimer_t startt, endt;
 	int rc = 0;
-	unsigned int i;
+	int test_id,i;
 	int num_producers, num_consumers, remainder;
 
 	if (argc > 1) {
@@ -541,43 +610,9 @@ main(int argc, char *argv[]) {
 
 	rc = test_pcq_init (4096);
 
-#if 0
-	num_threads = 2;
-	producer_pcq_list[0] = pcqueue;
-	consumer_pcq_list[1] = pcqueue;
-	test_funclist[0] = test_thread_Producer_fill;
-	test_funclist[1] = test_thread_consumer_verify;
-
-	for (i = 0; i < num_threads; i++) {
-		printf("%d: arg %d func %p p %p c %p\n",i,arg_list[i],test_funclist[i],producer_pcq_list[i],consumer_pcq_list[i]);
-	}
-
-	p10 = units * 10000000;
 	p10 = units * 1000000;
-	printf("START 1 test_thread_Producer | consumer (%p,%zu)\n",
-			  pcqueue, units);
-
-	startt = sphgettimer ();
-	rc += launch_test_threads (num_threads, fill_test_parallel_thread, p10);
-	endt = sphgettimer ();
-	tempt = endt - startt;
-	clock = tempt;
-	freqt = sphfastcpufreq ();
-	nano = (clock * 1000000000.0) / (double) freqt;
-	nano = nano / p10;
-	rate = p10 / (clock / (double) freqt);
-
-	debug_printf("\nstartt=%lld, endt=%lld, deltat=%lld, freqt=%lld\n",
-			 startt, endt, tempt, freqt);
-
-	printf("test_thread_Producer | consumer %zu ave= %6.2fns rate=%10.1f/s\n",
-		     p10, nano, rate);
-	printf("END   1   test_thread_Producer | consumer (%p,%zu) = %d\n",
-			pcqueue, units, rc);
-#endif
 #if 1
-	p10 = units * 1000000;
-	p10 = units * 2;
+	test_id = 1;
 
 	num_threads = 2;
 	num_producers = 1;
@@ -603,29 +638,341 @@ main(int argc, char *argv[]) {
 	arg_list[i-1] += remainder;
 
 	for (i = 0; i < num_threads; i++) {
-		printf("%d: arg %d func %p p %p c %p\n",i,arg_list[i],test_funclist[i],producer_pcq_list[i],consumer_pcq_list[i]);
+		debug_printf("%d: arg %d func %p p %p c %p\n",i,arg_list[i],test_funclist[i],producer_pcq_list[i],consumer_pcq_list[i]);
 	}
 
-	printf("START 2 test_thread_Producer | consumer (%p,%zu)\n",
-			  pcqueue, units);
+	printf("START %u test thread %d producers | %d consumers (%p,%zu)\n",
+	       test_id,num_producers,num_consumers,pcqueue,units);
 
 	startt = sphgettimer ();
 	rc += launch_test_threads (num_threads, fill_test_parallel_thread, p10);
 	endt = sphgettimer ();
-	tempt = endt - startt;
-	clock = tempt;
-	freqt = sphfastcpufreq ();
-	nano = (clock * 1000000000.0) / (double) freqt;
-	nano = nano / p10;
-	rate = p10 / (clock / (double) freqt);
 
-	debug_printf("\nstartt=%lld, endt=%lld, deltat=%lld, freqt=%lld\n",
-			 startt, endt, tempt, freqt);
+	compute_stats(p10,endt-startt,&nano,&rate);
 
-	printf("test_thread_Producer | consumer %zu ave= %6.2fns rate=%10.1f/s\n",
+	printf("test thread %d producers | %d consumers %zu ave= %6.2fns rate=%10.1f/s\n",
+	       num_producers,num_consumers,p10,nano,rate);
+	printf("END   %u   test thread %d producers | %d consumers (%p,%zu) = %d\n",
+	       test_id,num_producers,num_consumers,pcqueue,units,rc);
+#endif
+#if 1
+	test_id = 2;
+
+	num_threads = 2;
+	num_consumers = 1; // SINGLE CONSUMER!
+	num_producers = num_threads - num_consumers;
+	remainder = p10;
+	for (i = 0; i < num_producers; i++) {
+		producer_pcq_list[i] = pcqueue;
+		consumer_pcq_list[i] = 0;
+		test_funclist[i] = test_thread_Producer_fill;
+		arg_list[i] = p10 / num_producers;
+		remainder -= p10 / num_producers;
+	}
+	arg_list[i-1] += remainder;
+
+	producer_pcq_list[i] = 0;
+	consumer_pcq_list[i] = pcqueue;
+	test_funclist[i] = test_single_consumer_verify;
+	arg_list[i] = p10;
+
+	for (i = 0; i < num_threads; i++) {
+		debug_printf("%d: arg %d func %p p %p c %p\n",i,arg_list[i],test_funclist[i],producer_pcq_list[i],consumer_pcq_list[i]);
+	}
+
+	printf("START %u test %d producers | single consumer (%p,%zu)\n",
+	       test_id,num_producers,pcqueue,units);
+
+	startt = sphgettimer ();
+	rc += launch_test_threads (num_threads, fill_test_parallel_thread, p10);
+	endt = sphgettimer ();
+
+	compute_stats(p10,endt-startt,&nano,&rate);
+
+	printf("test thread %d producers | single consumer %zu ave= %6.2fns rate=%10.1f/s\n",
+	       num_producers,p10,nano,rate);
+	printf("END   %u   test %d producers | single consumer (%p,%zu) = %d\n",
+	       test_id,num_producers,pcqueue, units, rc);
+#endif
+#if 1
+	test_id = 3;
+
+	num_threads = 2;
+	num_producers = 1; // SINGLE PRODUCER!
+	num_consumers = num_threads - num_producers;
+
+	producer_pcq_list[0] = pcqueue;
+	consumer_pcq_list[0] = 0;
+	test_funclist[0] = test_single_producer_fill;
+	arg_list[0] = p10;
+	i = 1;
+
+	remainder = p10;
+	for (; i < num_threads; i++) {
+		producer_pcq_list[i] = 0;
+		consumer_pcq_list[i] = pcqueue;
+		test_funclist[i] = test_thread_consumer_verify;
+		arg_list[i] = p10 / num_consumers;
+		remainder -= p10 / num_consumers;
+	}
+	arg_list[i-1] += remainder;
+
+	for (i = 0; i < num_threads; i++) {
+		debug_printf("%d: arg %d func %p p %p c %p\n",i,arg_list[i],test_funclist[i],producer_pcq_list[i],consumer_pcq_list[i]);
+	}
+
+	printf("START %u test single producer | %d consumers (%p,%zu)\n",
+		test_id,num_consumers,pcqueue,units);
+
+	startt = sphgettimer ();
+	rc += launch_test_threads (num_threads, fill_test_parallel_thread, p10);
+	endt = sphgettimer ();
+
+	compute_stats(p10,endt-startt,&nano,&rate);
+
+	printf("test thread single producer | %d consumers %zu ave= %6.2fns rate=%10.1f/s\n",
+		num_consumers,p10,nano,rate);
+	printf("END   %u   test single producer | %d consumers (%p,%zu) = %d\n",
+		test_id,num_consumers,pcqueue,units,rc);
+#endif
+#if 1
+	test_id = 4;
+
+	num_producers = 1; // SINGLE PRODUCER!
+	num_consumers = 1; // SINGLE CONSUMER!
+	num_threads = num_producers + num_consumers;
+
+	producer_pcq_list[0] = pcqueue;
+	consumer_pcq_list[0] = 0;
+	test_funclist[0] = test_single_producer_fill;
+	arg_list[0] = p10;
+
+	producer_pcq_list[1] = 0;
+	consumer_pcq_list[1] = pcqueue;
+	test_funclist[1] = test_single_consumer_verify;
+	arg_list[1] = p10;
+
+	for (i = 0; i < num_threads; i++) {
+		debug_printf("%d: arg %d func %p p %p c %p\n",i,arg_list[i],test_funclist[i],producer_pcq_list[i],consumer_pcq_list[i]);
+	}
+
+	printf("START %u test single producers | single consumer (%p,%zu)\n",
+		test_id,pcqueue,units);
+
+	startt = sphgettimer ();
+	rc += launch_test_threads (num_threads, fill_test_parallel_thread, p10);
+	endt = sphgettimer ();
+
+	compute_stats(p10,endt-startt,&nano,&rate);
+
+	printf("test single producer | single consumer %zu ave= %6.2fns rate=%10.1f/s\n",
 		     p10, nano, rate);
-	printf("END   1   test_thread_Producer | consumer (%p,%zu) = %d\n",
-			pcqueue, units, rc);
+	printf("END   %u   test single producer | single consumer (%p,%zu) = %d\n",
+		test_id,pcqueue,units,rc);
+#endif
+#if 1
+	test_id = 5;
+
+	num_threads = 8;
+	num_producers = 4;
+	num_consumers = num_threads - num_producers;
+	remainder = p10;
+	for (i = 0; i < num_producers; i++) {
+		producer_pcq_list[i] = pcqueue;
+		consumer_pcq_list[i] = 0;
+		test_funclist[i] = test_thread_Producer_fill;
+		arg_list[i] = p10 / num_producers;
+		remainder -= p10 / num_producers;
+	}
+	arg_list[i-1] += remainder;
+
+	remainder = p10;
+	for (; i < num_threads; i++) {
+		producer_pcq_list[i] = 0;
+		consumer_pcq_list[i] = pcqueue;
+		test_funclist[i] = test_thread_consumer_verify;
+		arg_list[i] = p10 / num_consumers;
+		remainder -= p10 / num_consumers;
+	}
+	arg_list[i-1] += remainder;
+
+	for (i = 0; i < num_threads; i++) {
+		debug_printf("%d: arg %d func %p p %p c %p\n",i,arg_list[i],test_funclist[i],producer_pcq_list[i],consumer_pcq_list[i]);
+	}
+
+	printf("START %u test thread %d producers | %d consumers (%p,%zu)\n",
+	       test_id,num_producers,num_consumers,pcqueue,units);
+
+	startt = sphgettimer ();
+	rc += launch_test_threads (num_threads, fill_test_parallel_thread, p10);
+	endt = sphgettimer ();
+
+	compute_stats(p10,endt-startt,&nano,&rate);
+
+	printf("test thread %d producers | %d consumers %zu ave= %6.2fns rate=%10.1f/s\n",
+	       num_producers,num_consumers,p10,nano,rate);
+	printf("END   %u   test thread %d producers | %d consumers (%p,%zu) = %d\n",
+	       test_id,num_producers,num_consumers,pcqueue,units,rc);
+#endif
+#if 1
+	test_id = 6;
+
+	num_threads = 5;
+	num_consumers = 1; // SINGLE CONSUMER!
+	num_producers = num_threads - num_consumers;
+	remainder = p10;
+	for (i = 0; i < num_producers; i++) {
+		producer_pcq_list[i] = pcqueue;
+		consumer_pcq_list[i] = 0;
+		test_funclist[i] = test_thread_Producer_fill;
+		arg_list[i] = p10 / num_producers;
+		remainder -= p10 / num_producers;
+	}
+	arg_list[i-1] += remainder;
+
+	producer_pcq_list[i] = 0;
+	consumer_pcq_list[i] = pcqueue;
+	test_funclist[i] = test_thread_consumer_verify;
+	arg_list[i] = p10;
+
+	for (i = 0; i < num_threads; i++) {
+		debug_printf("%d: arg %d func %p p %p c %p\n",i,arg_list[i],test_funclist[i],producer_pcq_list[i],consumer_pcq_list[i]);
+	}
+
+	printf("START %u test %d producers | %d consumers (%p,%zu)\n",
+	       test_id,num_producers,num_consumers,pcqueue,units);
+
+	startt = sphgettimer ();
+	rc += launch_test_threads (num_threads, fill_test_parallel_thread, p10);
+	endt = sphgettimer ();
+
+	compute_stats(p10,endt-startt,&nano,&rate);
+
+	printf("test thread %d producers | %d consumer %zu ave= %6.2fns rate=%10.1f/s\n",
+	       num_producers,num_consumers,p10,nano,rate);
+	printf("END   %u   test %d producers | single consumer (%p,%zu) = %d\n",
+	       test_id,num_producers,pcqueue, units, rc);
+#endif
+#if 1
+	test_id = 7;
+
+	num_threads = 5;
+	num_consumers = 1; // SINGLE CONSUMER!
+	num_producers = num_threads - num_consumers;
+	remainder = p10;
+	for (i = 0; i < num_producers; i++) {
+		producer_pcq_list[i] = pcqueue;
+		consumer_pcq_list[i] = 0;
+		test_funclist[i] = test_thread_Producer_fill;
+		arg_list[i] = p10 / num_producers;
+		remainder -= p10 / num_producers;
+	}
+	arg_list[i-1] += remainder;
+
+	producer_pcq_list[i] = 0;
+	consumer_pcq_list[i] = pcqueue;
+	test_funclist[i] = test_single_consumer_verify;
+	arg_list[i] = p10;
+
+	for (i = 0; i < num_threads; i++) {
+		debug_printf("%d: arg %d func %p p %p c %p\n",i,arg_list[i],test_funclist[i],producer_pcq_list[i],consumer_pcq_list[i]);
+	}
+
+	printf("START %u test %d producers | single consumer (%p,%zu)\n",
+	       test_id,num_producers,pcqueue,units);
+
+	startt = sphgettimer ();
+	rc += launch_test_threads (num_threads, fill_test_parallel_thread, p10);
+	endt = sphgettimer ();
+
+	compute_stats(p10,endt-startt,&nano,&rate);
+
+	printf("test thread %d producers | single consumer %zu ave= %6.2fns rate=%10.1f/s\n",
+	       num_producers,p10,nano,rate);
+	printf("END   %u   test %d producers | single consumer (%p,%zu) = %d\n",
+	       test_id,num_producers,pcqueue, units, rc);
+#endif
+#if 1
+	test_id = 8;
+
+	num_threads = 5;
+	num_producers = 1; // SINGLE PRODUCER!
+	num_consumers = num_threads - num_producers;
+
+	producer_pcq_list[0] = pcqueue;
+	consumer_pcq_list[0] = 0;
+	test_funclist[0] = test_thread_Producer_fill;
+	arg_list[0] = p10;
+	i = 1;
+
+	remainder = p10;
+	for (; i < num_threads; i++) {
+		producer_pcq_list[i] = 0;
+		consumer_pcq_list[i] = pcqueue;
+		test_funclist[i] = test_thread_consumer_verify;
+		arg_list[i] = p10 / num_consumers;
+		remainder -= p10 / num_consumers;
+	}
+	arg_list[i-1] += remainder;
+
+	for (i = 0; i < num_threads; i++) {
+		debug_printf("%d: arg %d func %p p %p c %p\n",i,arg_list[i],test_funclist[i],producer_pcq_list[i],consumer_pcq_list[i]);
+	}
+
+	printf("START %u test %d producers | %d consumers (%p,%zu)\n",
+	       test_id,num_producers,num_consumers,pcqueue,units);
+
+	startt = sphgettimer ();
+	rc += launch_test_threads (num_threads, fill_test_parallel_thread, p10);
+	endt = sphgettimer ();
+
+	compute_stats(p10,endt-startt,&nano,&rate);
+
+	printf("test thread %d producers | %d consumers %zu ave= %6.2fns rate=%10.1f/s\n",
+	       num_producers,num_consumers,p10,nano,rate);
+	printf("END   %u   test %d producer | %d consumers (%p,%zu) = %d\n",
+	       test_id,num_producers,num_consumers,pcqueue,units,rc);
+#endif
+#if 1
+	test_id = 9;
+
+	num_threads = 5;
+	num_producers = 1; // SINGLE PRODUCER!
+	num_consumers = num_threads - num_producers;
+
+	producer_pcq_list[0] = pcqueue;
+	consumer_pcq_list[0] = 0;
+	test_funclist[0] = test_single_producer_fill;
+	arg_list[0] = p10;
+	i = 1;
+
+	remainder = p10;
+	for (; i < num_threads; i++) {
+		producer_pcq_list[i] = 0;
+		consumer_pcq_list[i] = pcqueue;
+		test_funclist[i] = test_thread_consumer_verify;
+		arg_list[i] = p10 / num_consumers;
+		remainder -= p10 / num_consumers;
+	}
+	arg_list[i-1] += remainder;
+
+	for (i = 0; i < num_threads; i++) {
+		debug_printf("%d: arg %d func %p p %p c %p\n",i,arg_list[i],test_funclist[i],producer_pcq_list[i],consumer_pcq_list[i]);
+	}
+
+	printf("START %u test single producer | %d consumers (%p,%zu)\n",
+		test_id,num_consumers,pcqueue,units);
+
+	startt = sphgettimer ();
+	rc += launch_test_threads (num_threads, fill_test_parallel_thread, p10);
+	endt = sphgettimer ();
+
+	compute_stats(p10,endt-startt,&nano,&rate);
+
+	printf("test thread single producer | %d consumers %zu ave= %6.2fns rate=%10.1f/s\n",
+		num_consumers,p10,nano,rate);
+	printf("END   %u   test single producer | %d consumers (%p,%zu) = %d\n",
+		test_id,num_consumers,pcqueue,units,rc);
 #endif
 	SASRemove();
 	return rc;

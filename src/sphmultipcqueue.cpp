@@ -220,7 +220,7 @@ SPHMPMCQIsEmpty (SPHMPMCQ_t queue)
 	SPHMPMCQHeader *headerBlock = (SPHMPMCQHeader *) queue;
 	int rc = 0;
 
-	debug_printf("%-6d: %s NEW\n",sphdeGetTID(),__FUNCTION__);
+	debug_printf("%-6d: %s(%p)\n",sphdeGetTID(),__FUNCTION__,queue);
 
 	if (SOMSASCheckBlockSigAndType ((SASBlockHeader *) headerBlock,
 					  SAS_RUNTIME_PCQUEUE_TM))
@@ -233,13 +233,14 @@ SPHMPMCQIsEmpty (SPHMPMCQ_t queue)
 	} else {
 		debug_printf("%s(%p) type check failed\n", __FUNCTION__,queue);
 	}
+	debug_printf("%-6d: %s(%p)=%d\n",sphdeGetTID(),__FUNCTION__,queue,rc);
 	return rc;
 }
 
 int
 SPHMPMCQIsFull (SPHMPMCQ_t queue)
 {
-	printf("%s NEW\n",__FUNCTION__);
+	debug_printf("%s NEW\n",__FUNCTION__);
 	SPHMPMCQHeader *headerBlock = (SPHMPMCQHeader *) queue;
 	int rc = 0;
 
@@ -372,6 +373,36 @@ SPHMPMCQAllocStrideDirectTM (SPHMPMCQ_t queue)
 	return entryPtr;
 }
 
+SPHLFEntryDirect_t
+SPHSPMCQAllocStrideDirect(SPHMPMCQ_t queue)
+{
+	volatile SPHMPMCQHeader *headerBlock = (SPHMPMCQHeader *) queue;
+	SPHLFEntryHeader_t *entryPtr = 0;
+	debug_printf("%-6d: %s(%p)\n",sphdeGetTID(),__FUNCTION__,queue);
+
+	if (SOMSASCheckBlockSigAndType ((SASBlockHeader *) headerBlock,SAS_RUNTIME_PCQUEUE_TM)) {
+		sphLFEntry_t entrytemp;
+		const sphLFEntry_t entryfree = {0};
+		const unsigned short stride = headerBlock->default_entry_stride;
+		const longPtr_t qlo = headerBlock->startq;
+		const longPtr_t qhi = headerBlock->endq;
+
+		entrytemp.detail.valid = 0;
+		entrytemp.detail.timestamped = 0;
+		entrytemp.detail.allocated = 1;
+		entrytemp.detail.__reserved = 0;
+		entrytemp.detail.category = 0;
+		entrytemp.detail.subcat = 0;
+		entrytemp.detail.len = (stride / DEFAULT_ALLOC_UNIT);
+
+		entryPtr = SPHMPMCQAdvanceHead((SPHLFEntryHeader_t **)&headerBlock->qhead,entrytemp.idUnit,entryfree.idUnit,stride,qlo,qhi);
+	} else {
+		debug_printf("%-6d: %s(%p) type check failed\n",sphdeGetTID(),__FUNCTION__,queue);
+	}
+	debug_printf("%-6d: %s = %p\n",sphdeGetTID(),__FUNCTION__,entryPtr);
+	return entryPtr;
+}
+
 static inline SPHLFEntryHeader_t *
 SPHMPMCQAdvanceTail(SPHLFEntryHeader_t **tail_p, unsigned short len, longPtr_t qlo, longPtr_t qhi) {
 	SPHLFEntryHeader_t *entryPtr = *tail_p;
@@ -430,6 +461,39 @@ SPHMPMCQGetNextCompleteDirectTM (SPHMPMCQ_t queue)
 		printf("%-6d: tail = %lx entryPtr = %p allocated = %d valid = %d\n",sphdeGetTID(),headerBlock->qtail,entryPtr,entrytemp.detail.allocated,entrytemp.detail.valid);
 	}
 #endif
+	debug_printf("%-6d: %s = %p\n",sphdeGetTID(),__FUNCTION__,entryPtr);
+	return ((SPHLFEntryDirect_t)entryPtr);
+}
+
+SPHLFEntryDirect_t
+SPHMPSCQGetNextCompleteDirect(SPHMPMCQ_t queue)
+{
+	volatile SPHMPMCQHeader *headerBlock = (SPHMPMCQHeader *) queue;
+	SPHLFEntryHeader_t *entryPtr = 0;
+
+	debug_printf("%-6d: %s NEW\n",sphdeGetTID(),__FUNCTION__);
+
+	if (SOMSASCheckBlockSigAndType ((SASBlockHeader *) headerBlock,SAS_RUNTIME_PCQUEUE_TM)) {
+		const unsigned short stride = headerBlock->default_entry_stride;
+		const longPtr_t qlo = headerBlock->startq;
+		const longPtr_t qhi = headerBlock->endq;
+
+		entryPtr = (SPHLFEntryHeader_t *)headerBlock->qtail;
+		sphLFEntry_t entrytemp;
+		entrytemp.idUnit = entryPtr->entryID.idUnit;
+		if (entrytemp.detail.allocated && entrytemp.detail.valid) {
+			longPtr_t new_tail = ((longPtr_t)entryPtr) + stride;
+			if (new_tail >= qhi)
+				new_tail = qlo;
+			entrytemp.detail.allocated = 0;
+			sas_read_barrier();
+			entryPtr->entryID.idUnit = entrytemp.idUnit;
+			headerBlock->qtail = new_tail;
+		} else
+			entryPtr = 0;
+	} else {
+		debug_printf("%s(%p) type check failed\n",__FUNCTION__,queue);
+	}
 	debug_printf("%-6d: %s = %p\n",sphdeGetTID(),__FUNCTION__,entryPtr);
 	return ((SPHLFEntryDirect_t)entryPtr);
 }
