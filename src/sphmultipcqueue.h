@@ -329,6 +329,34 @@ SPHMPMCQGetEntryTemplate (SPHMPMCQ_t queue);
 extern __C__ SPHLFEntryDirect_t
 SPHMPMCQAllocStrideDirectTM (SPHMPMCQ_t queue);
 
+/** \brief Allows the producer thread to allocate and initialize the
+*   header of a queue entry for access. The allocation is from the
+*   specified Multi Producer Multi Consumer Queue.
+*	This function uses no synchronization, so only safe with
+*	external synchronization, or for use by a single producer,
+*	thus the "SPMC" moniker.
+*
+*       The allocation size is the stride set when the PC queue was
+*       initialized/created.
+*       The Entry status and length
+*       are stored in the header of the new entry.
+*       Returns an dire ctentry handle which allows the application to insert
+*       application specific data into the entry via the sphlfentry.h API.
+*       If the specified queue is full the allocation may fail.
+*
+*       \note The queue entry is not ready for access by the Consumer
+*       thread, until additional application data is inserted and the
+*       entry is completed (via SPHLFEntryDirectComplete).
+*       Category and Subcategory may be supplied as the entry is completed.
+*
+*       @param queue Handle of a producer consumer queue.
+*       @return Direct handle of the initialized queue entry,
+*       or 0 (NULL) if the allocation failed.
+*       For example the Allocate may fail if the queue is full.
+*/
+extern __C__ SPHLFEntryDirect_t
+SPHSPMCQAllocStrideDirect(SPHMPMCQ_t queue);
+
 /** \brief Allows the consumer to get the next completed queue entry
 *       from the specified multi producer multi consumer queue.
 *
@@ -346,6 +374,27 @@ SPHMPMCQAllocStrideDirectTM (SPHMPMCQ_t queue);
 */
 extern __C__ SPHLFEntryDirect_t
 SPHMPMCQGetNextCompleteDirectTM (SPHMPMCQ_t queue);
+
+/** \brief Allows the consumer to get the next completed queue entry
+*       from the specified multi producer multi consumer queue.
+*	This function uses no synchronization, so only safe with
+*	external synchronization, or for use by a single consumer,
+*	thus the "MPSC" moniker.
+*
+*       Returns an direct entry handle which allows the application
+*       to access the application specific data inserted by the
+*       produced thread.
+*       If the specified queue is empty or the next queue is not yet
+*       completed the get may fail.
+*
+*       @param queue Handle of a producer consumer queue.
+*       @return Direct Handle of the initialized logger entry,
+*       or 0 (NULL) if the get failed.
+*       For example the Get may fail if the queue
+*       is empty or the next tail entry is not yet completed.
+*/
+extern __C__ SPHLFEntryDirect_t
+SPHMPSCQGetNextCompleteDirect (SPHMPMCQ_t queue);
 
 /** \brief Return the status of the entry specified by the direct entry handle.
 *
