@@ -2,7 +2,6 @@
 
 AM_CFLAGS   = $(HTM) -fgnu-tm -Wall -Wwrite-strings $(PTHREAD_CFLAGS)
 AM_CXXFLAGS = $(HTM) -fgnu-tm -Wall -Wwrite-strings -Woverloaded-virtual $(PTHREAD_CFLAGS)
-LIBS = -litm
 
 lib_LTLIBRARIES = libsphde.la libsphgtod.la libsphgettime.la
 bin_PROGRAMS    = sasutil

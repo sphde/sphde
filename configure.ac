@@ -107,6 +107,8 @@ AC_CHECK_LIB([c], [printf], [],
 LDFLAGS="$SAVE_LDFLAGS"
 fi
 
+AC_SEARCH_LIBS([_ITM_libraryVersion],[itm])
+
 # Doxygen support
 DX_HTML_FEATURE(ON)
 DX_MAN_FEATURE(ON)
