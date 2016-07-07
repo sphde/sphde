@@ -50,9 +50,9 @@ __arch_fetch_and_add_ptr(void **pointer, long int delta)
   void *temp = 0;
 
   __asm__ (
-    "0: "LPARX" %0,0,%1;"
+    "0: " LPARX " %0,0,%1;"
     "    add    11,%0,%2;"
-    "   "STPCX" 11,0,%1;"
+    "   " STPCX " 11,0,%1;"
     "    bne    0b;"
     : "+b" (temp)
     : "p" (pointer), "r" (delta)
@@ -67,9 +67,9 @@ __arch_fetch_and_add(void *pointer, long int delta)
   long int temp = delta;
   __asm__ (
     "    ori    12,%0,0;"
-    "0:	"LPARX" %0,0,%1;"
+    "0:	" LPARX " %0,0,%1;"
     "    add    11,%0,12;"
-    "	"STPCX" 11,0,%1;"
+    "	" STPCX " 11,0,%1;"
     "	bne     0b;"
    : "+b" (temp)
    : "p" (pointer)
@@ -85,10 +85,10 @@ __arch_compare_and_swap (volatile long int *p, long int oldval,
   int ret;
 
   __asm__ __volatile__ (
-    "0:   "LPARX" %0,0,%1 ;"
+    "0:   " LPARX " %0,0,%1 ;"
     "      xor. %0,%3,%0;"
     "      bne 1f;"
-    "     "STPCX" %2,0,%1;"
+    "     " STPCX " %2,0,%1;"
     "      bne- 0b;"
     "1:    isync"
    : "=&r"(ret)
@@ -106,8 +106,8 @@ __arch_atomic_swap (long int *p, long int replace)
 
   __asm__ (
     "	 ori    12,%0,0;"
-    "0:	"LPARX"	%0,0,%1;"
-    "	"STPCX"	12,0,%1;"
+    "0:	" LPARX "	%0,0,%1;"
+    "	" STPCX "	12,0,%1;"
     "	bne     0b;"
     : "+b" (temp)
     : "p" (p)
@@ -123,9 +123,9 @@ __arch_atomic_inc(long int *p)
   long int temp = 0;
 
   __asm__ __volatile__ (
-    "0:	"LPARX" %0,0,%1;"
+    "0:	" LPARX " %0,0,%1;"
     "	 addi   %0,%0,1;"
-    "	"STPCX" %0,0,%1;"
+    "	" STPCX " %0,0,%1;"
     "	 bne     0b;"
    : "+b" (temp)
    : "p" (p), "m" (*p)
@@ -139,9 +139,9 @@ __arch_atomic_dec(long int *p)
   long int temp = 0;
 
   __asm__ __volatile__ (
-    "0: "LPARX" %0,0,%1;"
+    "0: " LPARX " %0,0,%1;"
     "    addi   %0,%0,-1;"
-    "   "STPCX" %0,0,%1;"
+    "   " STPCX " %0,0,%1;"
     "    bne    0b;"
    : "+b" (temp)
    : "b" (p), "m" (*p)
