@@ -671,8 +671,8 @@ SPHSinglePCQueueGetNextCompleteDirectSpin (SPHSinglePCQueue_t queue)
   else
     {
       sas_printf
-        ("SPHSinglePCQueueGetNextCompleteDirectSpin(%p, %ld) type check failed\n",
-         queue, alloc_round);
+        ("SPHSinglePCQueueGetNextCompleteDirectSpin(%p) type check failed\n",
+         queue);
 #endif
     }
   return ((SPHLFEntryDirect_t)queue_entry);
@@ -733,8 +733,8 @@ SPHSinglePCQueueGetNextCompleteDirectSpinPause (SPHSinglePCQueue_t queue)
   else
     {
       sas_printf
-        ("SPHSinglePCQueueGetNextCompleteDirectSpinPause(%p, %ld) type check failed\n",
-         queue, alloc_round);
+        ("SPHSinglePCQueueGetNextCompleteDirectSpinPause(%p) type check failed\n",
+         queue);
 #endif
     }
   return ((SPHLFEntryDirect_t)queue_entry);
@@ -770,8 +770,8 @@ SPHSinglePCQueueGetNextCompleteDirect (SPHSinglePCQueue_t queue)
   else
     {
       sas_printf
-        ("SPHSinglePCQueueGetNextCompleteDirect(%p, %ld) type check failed\n",
-         queue, alloc_round);
+        ("SPHSinglePCQueueGetNextCompleteDirect(%p) type check failed\n",
+         queue);
 #endif
     }
   return ((SPHLFEntryDirect_t)queue_entry);
@@ -808,8 +808,8 @@ SPHSinglePCQueueGetNextEntryDirect (SPHSinglePCQueue_t queue)
   else
     {
       sas_printf
-        ("SPHSinglePCQueueGetNextEntryDirect(%p, %ld) type check failed\n",
-         queue, alloc_round);
+        ("SPHSinglePCQueueGetNextEntryDirect(%p) type check failed\n",
+         queue);
 #endif
     }
   return ((SPHLFEntryDirect_t)queue_entry);
@@ -1078,7 +1078,7 @@ SPHSinglePCQueueGetNextComplete (SPHSinglePCQueue_t queue,
 {
   SPHPCQueueHeader *headerBlock = (SPHPCQueueHeader *) queue;
   SPHLFEntryHandle_t *handlespace = handleorg;
-  longPtr_t alloc_round;
+  longPtr_t alloc_round = 0;
   longPtr_t queue_entry;
 
   if (SOMSASCheckBlockSigAndType ((SASBlockHeader *) headerBlock,

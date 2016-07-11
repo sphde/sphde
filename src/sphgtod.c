@@ -78,11 +78,11 @@ sphget_tb2gtod_factor (void)
 #ifdef __SASDebugPrint__
   printf ("sphget_tb2gtod_factor tb_freq=%llu, %llx\n",
 		  tb_freq, tb_freq);
-  printf ("sphget_tb2gtod_factor tb1=%llu, %llx\n",
+  printf ("sphget_tb2gtod_factor tb1=%lu, %lx\n",
 		  tb1, tb1);
-  printf ("sphget_tb2gtod_factor tb2=%llu, %llx\n",
+  printf ("sphget_tb2gtod_factor tb2=%lu, %lx\n",
 		  tb2, tb2);
-  printf ("sphget_tb2gtod_factor gtod_tb=%llu, %llx\n",
+  printf ("sphget_tb2gtod_factor gtod_tb=%lu, %lx\n",
 		  gtod_tb, gtod_tb);
   printf ("sphget_tb2gtod_factor tb2gtod=%llu, %llx\n",
 		  tb2gtod, tb2gtod);

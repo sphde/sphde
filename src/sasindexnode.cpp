@@ -1352,7 +1352,7 @@ SASIndexNodeSplit (SASIndexNode_t node_t,
       median = (short) (min + 1);
     }
 #ifdef __SASDebugPrint__
-  sas_printf ("Split@%p x=%p k=%hd median=%hd lock_on=%d\n", node, xref->key, k, median, lock_on);
+  sas_printf ("Split@%p x=%p k=%hd median=%ld lock_on=%d\n", node, xref->key, k, median, lock_on);
 #endif
 
   if (lock_on == LOCK_ON)
