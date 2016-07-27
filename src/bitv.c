@@ -90,7 +90,7 @@ bitv_alloc (bitv_cb_t * cb, bitv_word * bvec, size_t size)
 	      bitv_word new_msk;
 	      new_msk = cur_msk & ~req_msk;
 	      ;
-	      if (__sync_bool_compare_and_swap (bvec, cur_msk, new_msk))
+	      if (sas_compare_and_swap ((long int*)bvec, cur_msk, new_msk))
 		{		/* cur_msk was still valid and update successful */
 #ifdef PRINT_DEBUG
 		  printf ("i=%ld, req_msk=%lx\n", i, req_msk);
@@ -167,7 +167,7 @@ bitv_alloc_marked (bitv_cb_t * cb, bitv_word * bvec, bitv_word * endvec,
 		{		/* cur_msk was still valid and update successful */
 		  bitv_word end_mrk, chk_mrk __attribute__((unused));
 		  end_mrk = bitv_mask_to_end_mrk (req_msk);
-		  chk_mrk = fetch_and_or_long (endvec, end_mrk);
+		  chk_mrk = sas_fetch_and_or_long (endvec, end_mrk);
 #ifdef PRINT_DEBUG
 		  printf ("i=%ld, req_msk=%lx, end_mrk=%lx\n",
 			  i, req_msk, end_mrk);
@@ -354,7 +354,7 @@ bitv_aligned_alloc_marked (bitv_cb_t * cb, bitv_word * bvec,
 		{		/* cur_msk was still valid and update successful */
 		  bitv_word end_mrk, chk_mrk __attribute__((unused));
 		  end_mrk = bitv_mask_to_end_mrk (req_msk);
-		  chk_mrk = fetch_and_or_long (endvec, end_mrk);
+		  chk_mrk = sas_fetch_and_or_long (endvec, end_mrk);
 #ifdef PRINT_DEBUG
 		  printf ("i=%ld, req_msk=%lx, end_mrk=%lx\n",
 			  i, req_msk, end_mrk);
@@ -411,7 +411,7 @@ bitv_dealloc_internal (bitv_word * bvec, bitv_word offset, size_t alloc_units)
     return -1;
 
   req_msk >>= offset;
-  prv_msk = fetch_and_or_long (bvec, req_msk);
+  prv_msk = sas_fetch_and_or_long (bvec, req_msk);
   /* Insure that we are deallocating units that were previously
      allocated. If so the logical and of the original unit mask
      and the requested mask should be 0s. */

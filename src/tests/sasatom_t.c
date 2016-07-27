@@ -29,7 +29,7 @@ test_inc_dec_long ()
   long value2 = __LONG_MAX__;
   int rc = 0;
   
-  atomic_inc (&value);
+  sas_atomic_inc (&value);
   
   if (value != 1)
   {
@@ -43,7 +43,7 @@ test_inc_dec_long ()
     rc++;
   }
   
-  atomic_inc (&value);
+  sas_atomic_inc (&value);
   
   if (value != 2)
   {
@@ -51,7 +51,7 @@ test_inc_dec_long ()
     rc++;
   }
   
-  atomic_inc (&value);
+  sas_atomic_inc (&value);
   
   if (value != 3)
   {
@@ -59,7 +59,7 @@ test_inc_dec_long ()
     rc++;
   }
   
-  atomic_dec (&value);
+  sas_atomic_dec (&value);
   
   if (value != 2)
   {
@@ -73,7 +73,7 @@ test_inc_dec_long ()
     rc++;
   }
   
-  atomic_dec (&value);
+  sas_atomic_dec (&value);
   
   if (value != 1)
   {
@@ -81,7 +81,7 @@ test_inc_dec_long ()
     rc++;
   }
   
-  atomic_inc (&value);
+  sas_atomic_inc (&value);
   
   if (value != 2)
   {
@@ -214,7 +214,7 @@ test_add_long ()
   long prev;
   int rc = 0;
   
-  prev = fetch_and_add (&value, 1);
+  prev = sas_fetch_and_add (&value, 1);
   
   if (prev != 0)
   {
@@ -233,7 +233,7 @@ test_add_long ()
     rc++;
   }
   
-  prev = fetch_and_add (&value, 2);
+  prev = sas_fetch_and_add (&value, 2);
   
   if (prev != 1)
   {
@@ -246,7 +246,7 @@ test_add_long ()
     rc++;
   }
   
-  prev = fetch_and_add (&value, 3);
+  prev = sas_fetch_and_add (&value, 3);
   
   if (prev != 3)
   {
@@ -259,7 +259,7 @@ test_add_long ()
     rc++;
   }
   
-  prev = fetch_and_add (&value, -3);
+  prev = sas_fetch_and_add (&value, -3);
   
   if (prev != 6)
   {
@@ -290,7 +290,7 @@ test_add_ptr ()
     return rc;
   }
 
-  ptr2 = (char*)fetch_and_add_ptr ((void**)&ptr, 1);
+  ptr2 = (char*)sas_fetch_and_add_ptr ((void**)&ptr, 1);
   
   if (*ptr2 != '0')
   {
@@ -303,7 +303,7 @@ test_add_ptr ()
     rc++;
   }
 
-  ptr2 = (char*)fetch_and_add_ptr ((void**)&ptr, 2);
+  ptr2 = (char*)sas_fetch_and_add_ptr ((void**)&ptr, 2);
   
   if (*ptr2 != '1')
   {
@@ -316,7 +316,7 @@ test_add_ptr ()
     rc++;
   }
 
-  ptr2 = (char*)fetch_and_add_ptr ((void**)&ptr, 3);
+  ptr2 = (char*)sas_fetch_and_add_ptr ((void**)&ptr, 3);
   
   if (*ptr2 != '3')
   {
@@ -329,7 +329,7 @@ test_add_ptr ()
     rc++;
   }
 
-  ptr2 = (char*)fetch_and_add_ptr ((void**)&ptr, -3);
+  ptr2 = (char*)sas_fetch_and_add_ptr ((void**)&ptr, -3);
   
   if (*ptr2 != '6')
   {

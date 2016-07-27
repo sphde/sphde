@@ -210,7 +210,7 @@ SPHLFLoggerAllocTimeStamped (SPHLFLogger_t log,
       alloc_round = (alloc_size + sizeof (SPHLFLogHeader_t) + round) & ~round;
 #ifdef __powerpc__
       log_entry =
-	(longPtr_t) fetch_and_add_ptr ((void **) &headerBlock->next_free,
+	(longPtr_t) sas_fetch_and_add_ptr ((void **) &headerBlock->next_free,
 				       alloc_round);
 #else
       log_entry = __sync_fetch_and_add (&headerBlock->next_free, alloc_round);
@@ -269,7 +269,7 @@ SPHLFLoggerAllocTimeStamped (SPHLFLogger_t log,
 						      start_log_buf);
 		    }
 		  while (!done);
-		  fetch_and_or (&headerBlock->options,
+		  sas_fetch_and_or (&headerBlock->options,
 					      SPHLFLOGGER_CIRCULAR_WRAPED);
 #ifdef __SASDebugPrint__
 		  sas_printf
@@ -336,7 +336,7 @@ SPHLFLoggerAllocStrideTimeStamped (SPHLFLogger_t log,
       alloc_round = headerBlock->default_entry_stride;
 #ifdef __powerpc__
       log_entry =
-	(longPtr_t) fetch_and_add_ptr ((void **) &headerBlock->next_free,
+	(longPtr_t) sas_fetch_and_add_ptr ((void **) &headerBlock->next_free,
 				       alloc_round);
 #else
       log_entry = __sync_fetch_and_add (&headerBlock->next_free, alloc_round);
@@ -400,7 +400,7 @@ SPHLFLoggerAllocStrideTimeStamped (SPHLFLogger_t log,
 						      start_log_buf);
 		    }
 		  while (!done);
-		  fetch_and_or (&headerBlock->options,
+		  sas_fetch_and_or (&headerBlock->options,
 					      SPHLFLOGGER_CIRCULAR_WRAPED);
 #ifdef __SASDebugPrint__
 		  sas_printf
@@ -1014,8 +1014,8 @@ SPHLFLoggerSetCachePrefetch (SPHLFLogger_t log, int prefetch)
 	  if (prefetch == 1)
 	    prefetch_opt = SPHLFLOGGER_CACHE_PREFETCH0;
 	}
-      temp = fetch_and_and (&headerBlock->options, temp);
-      temp = fetch_and_or (&headerBlock->options, prefetch_opt);
+      temp = sas_fetch_and_and (&headerBlock->options, temp);
+      temp = sas_fetch_and_or (&headerBlock->options, prefetch_opt);
     }
   else
     {

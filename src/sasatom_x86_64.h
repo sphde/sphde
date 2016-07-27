@@ -27,6 +27,29 @@ __arch_pause (void)
   );
 }
 
+#if GCC_VERSION >= 40700
+/* GCC is at least version 4.7.  */
+
+static inline void *
+__arch_fetch_and_add_ptr (void **pointer, long int delta)
+{
+  void *temp;
+  temp = __atomic_fetch_add((long int *)pointer, delta, __ATOMIC_RELAXED);
+  return temp;
+}
+
+static inline long
+__arch_fetch_and_add (long *pointer, long int delta)
+{
+  long temp;
+
+  temp = __atomic_fetch_add((long int *)pointer, delta, __ATOMIC_RELAXED);
+
+  return temp;
+}
+#else
+/* GCC is version 4.6 or less.  */
+
 static inline void *
 __arch_fetch_and_add_ptr (void **pointer, long int delta)
 {
@@ -42,7 +65,7 @@ __arch_fetch_and_add_ptr (void **pointer, long int delta)
 }
 
 static inline long
-__arch_fetch_and_add (void *pointer, long int delta)
+__arch_fetch_and_add (long *pointer, long int delta)
 {
   long temp = delta;
 
@@ -56,6 +79,7 @@ __arch_fetch_and_add (void *pointer, long int delta)
 
   return temp;
 }
+#endif /* GCC is version 4.6 or less.  */
 
 static inline int
 __arch_compare_and_swap (volatile long int *p, long int oldval, long int newval)
@@ -75,7 +99,7 @@ __arch_atomic_swap (long int *p, long int replace)
 
   __asm__ (
     " lock;"
-    " xadd %0,(%1);"
+    " xchg %0,(%1);"
    : "+r" (temp)
    : "p" (p)
    : "memory"

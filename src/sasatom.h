@@ -25,6 +25,11 @@
  * it is not garanted to work correctly.
  */
 
+/// @cond HIDE_FROM_DOXYGEN
+#define GCC_VERSION \
+        (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
+/// @endcond
+
 /*! Spinlock type used on sas_spin_xxx functions */
 typedef unsigned int  sas_spin_lock_t;
 /*! Pointer to sas_spin_lock_t type */
@@ -39,11 +44,6 @@ typedef void*         sas_lock_ptr_t;
 #else
 #include "sasatom_generic.h"
 #endif
-
-/// @cond HIDE_FROM_DOXYGEN
-#define GCC_VERSION \
-        (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
-/// @endcond
 
 /*!
  * Memory barrier for store operations.
@@ -74,7 +74,7 @@ typedef void*         sas_lock_ptr_t;
  * Returns \a *pointer before update.
  */
 static inline void *
-fetch_and_add_ptr(void **pointer, long int delta)
+sas_fetch_and_add_ptr(void **pointer, long int delta)
 {
   return __arch_fetch_and_add_ptr(pointer, delta);
 }
@@ -88,7 +88,7 @@ fetch_and_add_ptr(void **pointer, long int delta)
  * Returns \a *pointer before update.
  */
 static inline long int
-fetch_and_add(void *pointer, long int delta)
+sas_fetch_and_add(long *pointer, long int delta)
 {
   return __arch_fetch_and_add(pointer, delta);
 }
@@ -102,7 +102,7 @@ fetch_and_add(void *pointer, long int delta)
  * Returns \a *pointer before update.
  */
 static inline long int
-fetch_and_and(unsigned int *pointer, int delta)
+sas_fetch_and_and(unsigned int *pointer, int delta)
 {
 #if GCC_VERSION >= 40700
   return __atomic_fetch_and(pointer, delta, __ATOMIC_ACQ_REL);
@@ -138,7 +138,7 @@ fetch_and_and_long(unsigned long *pointer, long int delta)
  * Returns \a *pointer before update.
  */
 static inline long int
-fetch_and_or(unsigned int *pointer, int delta)
+sas_fetch_and_or(unsigned int *pointer, int delta)
 {
 #if GCC_VERSION >= 40700
   return __atomic_fetch_or(pointer, delta, __ATOMIC_ACQ_REL);
@@ -156,7 +156,7 @@ fetch_and_or(unsigned int *pointer, int delta)
  * Returns \a *pointer before update.
  */
 static inline long int
-fetch_and_or_long(unsigned long *pointer, long int delta)
+sas_fetch_and_or_long(unsigned long *pointer, long int delta)
 {
 #if GCC_VERSION >= 40700
   return __atomic_fetch_or(pointer, delta, __ATOMIC_ACQ_REL);
@@ -173,7 +173,7 @@ fetch_and_or_long(unsigned long *pointer, long int delta)
  * Returns \a oldval.
  */
 static inline int
-compare_and_swap (volatile long int *p, long int oldval, long int newval)
+sas_compare_and_swap (volatile long int *p, long int oldval, long int newval)
 {
   return __arch_compare_and_swap(p, oldval, newval);
 }
@@ -185,7 +185,7 @@ compare_and_swap (volatile long int *p, long int oldval, long int newval)
  * { tmp = *p; *p = tmp; return tmp }
  */
 static inline long int
-atomic_swap (long int *p, long int replace)
+sas_atomic_swap (long int *p, long int replace)
 {
   return __arch_atomic_swap(p, replace);
 }
@@ -194,7 +194,7 @@ atomic_swap (long int *p, long int replace)
  * Atomic increment, performing { (*p)++ }
  */
 static inline void
-atomic_inc(long int *p)
+sas_atomic_inc(long int *p)
 {
   __arch_atomic_inc(p);
 }
@@ -203,7 +203,7 @@ atomic_inc(long int *p)
  * Atomic decrement, performing { (*p)-- }
  */
 static inline void
-atomic_dec(long int *p)
+sas_atomic_dec(long int *p)
 {
   __arch_atomic_dec(p);
 }
@@ -276,7 +276,7 @@ sas_lock_ptr (volatile sas_lock_ptr_t *lock)
   do {
     unlocked = (long)(*lock) & -2L;
     locked = unlocked | 1;
-    rc = compare_and_swap ((long int *)lock, unlocked, locked);
+    rc = sas_compare_and_swap ((long int *)lock, unlocked, locked);
   } while (!rc);
   sas_write_barrier();
   
@@ -294,7 +294,7 @@ sas_set_unlocked_ptr (volatile sas_lock_ptr_t *lock, sas_lock_ptr_t newptr)
   do {
     long unlocked= (long)(*lock) & -2L;
     long newlocked= (long)newptr | 1;
-    rc = compare_and_swap ((long int *)lock, unlocked, newlocked);
+    rc = sas_compare_and_swap ((long int *)lock, unlocked, newlocked);
   } while (!rc);
   sas_write_barrier();
 }
@@ -310,7 +310,7 @@ sas_set_locked_ptr (volatile sas_lock_ptr_t *lock, sas_lock_ptr_t newptr)
   do {
     long locked= (long)(*lock) | 1;
     long newlocked= (long)newptr | 1;
-    rc = compare_and_swap ((long int *)lock, locked, newlocked);
+    rc = sas_compare_and_swap ((long int *)lock, locked, newlocked);
   } while (!rc);
 }
 
@@ -325,7 +325,7 @@ sas_trylock_ptr (volatile sas_lock_ptr_t *lock)
   {
     long unlocked= (long)(*lock) & -2L;
     long locked= unlocked | 1;
-    rc = compare_and_swap ((long int *)lock, unlocked, locked);
+    rc = sas_compare_and_swap ((long int *)lock, unlocked, locked);
   }
   sas_write_barrier();
   
@@ -344,7 +344,7 @@ sas_unlock_ptr (volatile sas_lock_ptr_t *lock)
   do {
     long unlocked= (long)(*lock) & -2L;
     long locked= unlocked | 1;
-    rc = compare_and_swap ((long int *)lock, locked, unlocked);
+    rc = sas_compare_and_swap ((long int *)lock, locked, unlocked);
   } while (!rc);
 }
 
@@ -401,22 +401,21 @@ sas_lock_ptr_with_yield (volatile sas_lock_ptr_t *lock)
 
   return;
 }
-
+#if 1
 /*!
  * Atomically increments \a value by 1.
  */
 static inline long
-sas_atomic_inc_long (volatile  long *value)
+sas_atomic_inc_long (volatile long *value)
 {
-  long result, update;
-  int rc;
-  
-  do {
-    result = *value;
-    update = result + 1;
-    rc = compare_and_swap ((long int *)value, result, update);
-  } while (!rc);
-  sas_write_barrier();
+  long result;
+  long delta = 1;
+
+#if GCC_VERSION >= 40700
+  result = __atomic_fetch_add(value, delta, __ATOMIC_ACQUIRE);
+#else
+  result = __sync_fetch_and_add(value, delta);
+#endif
   
   return result;
 }
@@ -425,20 +424,19 @@ sas_atomic_inc_long (volatile  long *value)
  * Atomically decrements \a value by 1.
  */
 static inline long
-sas_atomic_dec_long (volatile  long *value)
+sas_atomic_dec_long (volatile long *value)
 {
-  long result, update;
-  int rc;
-  
-  do {
-    result = *value;
-    update = result - 1;
-    rc = compare_and_swap ((long int *)value, result, update);
-  } while (!rc);
-  sas_write_barrier();
+  long result;
+  long delta = -1;
+
+#if GCC_VERSION >= 40700
+  result = __atomic_fetch_add(value, delta, __ATOMIC_ACQUIRE);
+#else
+  result = __sync_fetch_and_add(value, delta);
+#endif
   
   return result;
 }
-
+#endif
 #endif /*_SASATOMIC_H */
 

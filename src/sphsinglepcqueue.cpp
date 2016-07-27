@@ -1198,8 +1198,8 @@ SPHSinglePCQueueSetCachePrefetch (SPHSinglePCQueue_t queue, int prefetch)
 	    prefetch_opt = SPHSPCQUEUE_CACHE_PREFETCH0;
 	}
 
-      temp = fetch_and_and (&headerBlock->options, temp);
-      temp = fetch_and_or (&headerBlock->options, prefetch_opt);
+      temp = sas_fetch_and_and (&headerBlock->options, temp);
+      temp = sas_fetch_and_or (&headerBlock->options, prefetch_opt);
     }
   else
     {

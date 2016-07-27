@@ -33,7 +33,7 @@ static inline void
 spin_lock(spin_lock_t *data_lock)
 {
 	unsigned int count = 0;
-	while(! compare_and_swap(data_lock, 0L, 1L) ) 
+	while(! sas_compare_and_swap(data_lock, 0L, 1L) ) 
 	{
 		if ( (++count % 8) == 0 )
 		{
@@ -45,7 +45,8 @@ spin_lock(spin_lock_t *data_lock)
 static inline void
 spin_unlock(spin_lock_t *data_lock)
 {
-	compare_and_swap(data_lock, 1L, 0L);
+	sas_read_barrier();
+	*data_lock = 0;
 }
 
 

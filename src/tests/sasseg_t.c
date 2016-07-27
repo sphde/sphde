@@ -116,7 +116,7 @@ TESTSigSegvHandler (int signal, siginfo_t * info, void *context)
 	{
 		/* Decrement the child_status as this is OK, The SAS runtime
 		 * correctly handled this bogus address ref.  */
-		fetch_and_add (&shared_block->child_status, -1);
+		sas_fetch_and_add (&shared_block->child_status, -1);
 	}
 	fprintf (stdout, "Child1 TESTSigSegvHandler\n");
 
@@ -177,7 +177,7 @@ test_child_1 (void)
 	 * or child Join fails. Since we got to this point the child is
 	 * running and successfully Joined, post-decrement to clear the
 	 * error.  */
-	fetch_and_add (&shared_block->child_status,
+	sas_fetch_and_add (&shared_block->child_status,
 			-(JOIN_EXIT_FAILURE));
 
 	new_block = SASBlockAlloc (SegmentSize);
@@ -198,7 +198,7 @@ test_child_1 (void)
 	 * successfully up-calls to the applications sigaction handler.
 	 * For this test the applications sigaction handler will
 	 * post-decrement the child status to clear the error.  */
-	fetch_and_add (&shared_block->child_status, 1);
+	sas_fetch_and_add (&shared_block->child_status, 1);
 #if 1
 	*shared_block->badBlock = 1;
 #else
@@ -241,7 +241,7 @@ test_child_2 (void)
 	 * or child Join fails. Since we got to this point the child is
 	 * running and successfully Joined, post-decrement to clear the
 	 * error.  */
-	fetch_and_add (&shared_block->child_status,
+	sas_fetch_and_add (&shared_block->child_status,
 			-(JOIN_EXIT_FAILURE));
 
 	new_block = SASBlockAlloc (SegmentSize);
@@ -288,9 +288,9 @@ test_parent (void)
 	 * or child Join fails. Once the child is running and
 	 * successfully Joined, it will post-decrement to clear the
 	 * error.  */
-	fetch_and_add (&shared_block->child_status,
+	sas_fetch_and_add (&shared_block->child_status,
 			(JOIN_EXIT_FAILURE));
-	fetch_and_add (&shared_block->child_status,
+	sas_fetch_and_add (&shared_block->child_status,
 			(JOIN_EXIT_FAILURE));
 
 	setSASFinder (shared_block);
