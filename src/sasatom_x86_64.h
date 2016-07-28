@@ -34,7 +34,7 @@ static inline void *
 __arch_fetch_and_add_ptr (void **pointer, long int delta)
 {
   void *temp;
-  temp = __atomic_fetch_add((long int *)pointer, delta, __ATOMIC_RELAXED);
+  temp = __atomic_fetch_add(pointer, delta, __ATOMIC_RELAXED);
   return temp;
 }
 
@@ -43,7 +43,7 @@ __arch_fetch_and_add (long *pointer, long int delta)
 {
   long temp;
 
-  temp = __atomic_fetch_add((long int *)pointer, delta, __ATOMIC_RELAXED);
+  temp = __atomic_fetch_add(pointer, delta, __ATOMIC_RELAXED);
 
   return temp;
 }
