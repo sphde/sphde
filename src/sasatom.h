@@ -120,7 +120,7 @@ sas_fetch_and_and(unsigned int *pointer, int delta)
  * Returns \a *pointer before update.
  */
 static inline long int
-fetch_and_and_long(unsigned long *pointer, long int delta)
+sas_fetch_and_and_long(unsigned long *pointer, long int delta)
 {
 #if GCC_VERSION >= 40700
   return __atomic_fetch_and(pointer, delta, __ATOMIC_ACQ_REL);

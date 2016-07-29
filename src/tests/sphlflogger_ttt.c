@@ -32,6 +32,12 @@
 #include "sphthread.h"
 #include "sphtimer.h"
 
+#ifdef LONGCHECK
+# define ITERATIONS 100000000
+#else
+# define ITERATIONS 10000000
+#endif
+
 static int N_PROC_CONF = 1;
 static int num_threads = 1;
 static long thread_iterations;
@@ -1066,7 +1072,7 @@ int main ()
 		rc2 = test_wraplog_init(SegmentSize);
 		if (rc2 == 0)
 		{
-			p10 = 100000000;
+			p10 = ITERATIONS;
 			test_func = test_thread_wraplog_fill;
 			printf("start test_thread_wraplog_fill (%p,%zu)\n",
 				logger, units);
@@ -1096,7 +1102,7 @@ int main ()
 			rc3 = test_wraplog_reset();
 			if (rc3 == 0)
 			{
-				p10 = 100000000;
+				p10 = ITERATIONS;
 				test_func = test_thread_wraplog_fill_strong;
 				printf("start test_thread_wraplog_fill_strong (%p,%zu)\n",
 					logger, units);
@@ -1127,7 +1133,7 @@ int main ()
 			rc3 = test_wraplog_reset();
 			if (rc3 == 0)
 			{
-				p10 = 100000000;
+				p10 = ITERATIONS;
 				test_func = test_thread_wraplog_fill_weak;
 				printf("start test_thread_wraplog_fill_weak (%p,%zu)\n",
 					logger, units);
@@ -1160,7 +1166,7 @@ int main ()
 			rc2 = test_wraplog_parallel_init(SegmentSize);
 			if (rc2 == 0)
 			{
-				p10 = 100000000;
+				p10 = ITERATIONS;
 				test_func = test_thread_wraplog_fill;
 				printf("start test_thread_wraplog_parallel_fill (%p,%zu)\n",
 					logger, units);
@@ -1190,7 +1196,7 @@ int main ()
 				rc3 = test_wraplog_parallel_reset();
 				if (rc3 == 0)
 				{
-					p10 = 100000000;
+					p10 = ITERATIONS;
 					test_func = test_thread_wraplog_fill_strong;
 					printf("start test_thread_wraplog_fill_parallel_strong (%p,%zu)\n",
 						logger, units);
@@ -1221,7 +1227,7 @@ int main ()
 				rc3 = test_wraplog_parallel_reset();
 				if (rc3 == 0)
 				{
-					p10 = 100000000;
+					p10 = ITERATIONS;
 					test_func = test_thread_wraplog_fill_nolock;
 					printf("start test_thread_wraplog_fill_parallel_nolock (%p,%zu)\n",
 						logger, units);

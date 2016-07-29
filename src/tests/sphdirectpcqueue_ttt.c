@@ -36,6 +36,11 @@
 #include "sphthread.h"
 #include "sphtimer.h"
 
+#ifdef LONGCHECK
+# define ITERATIONS 10000000
+#else
+# define ITERATIONS 1000000
+#endif
 
 typedef struct {
 	volatile unsigned int 	threshold;
@@ -837,7 +842,7 @@ main ()
               consumer_pcq_list[1] = pcqueue;
               test_funclist[0] = test_thread_Producer_fasterfill;
               test_funclist[1] = test_thread_consumer_fasterverify;
-              p10 = units * 10000000;
+              p10 = units * ITERATIONS;
 
               printf ("start 2a test_thread_Producer | consumer fast (%p,%zu)\n",
                       pcqueue, units);
@@ -877,7 +882,7 @@ main ()
               consumer_pcq_list[1] = pcqueue2;
               test_funclist[0] = test_thread_Producer_pinger;
               test_funclist[1] = test_thread_consumer_ponger;
-              p10 = units * 10000000;
+              p10 = units * ITERATIONS;
 
               printf ("start 3a test_thread_Producer | consumer ping/pong (%p,%zu)\n",
                       pcqueue, units);
@@ -917,7 +922,7 @@ main ()
               consumer_pcq_list[1] = pcqueue2;
               test_funclist[0] = test_thread_Producer_pingpause;
               test_funclist[1] = test_thread_consumer_pongpause;
-              p10 = units * 10000000;
+              p10 = units * ITERATIONS;
 
               printf ("start 3b test_thread_Producer | consumer ping/pong (%p,%zu)\n",
                       pcqueue, units);

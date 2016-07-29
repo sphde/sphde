@@ -130,8 +130,11 @@ sasbtree_print (SASStringBTree_t btree)
 
 #define JOIN_EXIT_FAILURE 128
 
-#define LARGE_KEY_COUNT 1000000
-//#define LARGE_KEY_COUNT 100
+#ifdef LONGCHECK
+# define LARGE_KEY_COUNT 1000000
+#else
+# define LARGE_KEY_COUNT 100000
+#endif
 
 static int
 sassim_index_random ()

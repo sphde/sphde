@@ -46,6 +46,11 @@
 #define STRINGIZE2(x)  #x
 #define LINE_STRING  STRINGIZE(__LINE__)
 
+#ifdef LONGCHECK
+# define LOOPMAX 23040
+#else
+# define LOOPMAX 2304
+#endif
 static const char sassim_prog_name[] = "sascompoundheap_t";
 
 static inline void
@@ -675,7 +680,7 @@ sassim_compound_heap_test3 ()
       return 1;
   }
   /* at 75% load factor, allocate enough entries to allocate 2048 blocks */
-  for (i=0; i < 23040; i++)
+  for (i=0; i < LOOPMAX; i++)
   {
 	  temp1 = SASCompoundHeapAlloc (compoundHeap);
 	  if (!temp1)
@@ -754,7 +759,7 @@ sassim_compound_heap_test3B ()
       return 1;
   }
   /* at 75% load factor, allocate enough entries to allocate 2048 blocks */
-  for (i=0; i < 23040; i++)
+  for (i=0; i < LOOPMAX; i++)
   {
 	  temp1 = SASCompoundHeapAlloc (compoundHeap);
 	  if (!temp1)
@@ -856,7 +861,7 @@ sassim_compound_heap_test3C ()
       return 1;
   }
   /* at 75% load factor, allocate enough entries to allocate 2048 blocks */
-  for (i=0; i < 23040; i++)
+  for (i=0; i < LOOPMAX; i++)
   {
 	  temp1 = SASCompoundHeapAlloc (compoundHeap);
 	  if (!temp1)
@@ -958,7 +963,7 @@ sassim_compound_heap_test4 ()
       return 1;
   }
   /* at 75% load factor, allocate enough entries to allocate 2048 blocks */
-  for (i=1; i < 49140 /*100000*/; i++)
+  for (i=1; i < LOOPMAX /*100000*/; i++)
   {
 	  temp1 = SASCompoundHeapAlloc (compoundHeap);
 	  if (!temp1)
@@ -1037,7 +1042,7 @@ sassim_compound_heap_test4B ()
       return 1;
   }
   /* at 75% load factor, allocate enough entries to allocate 2048 blocks */
-  for (i=1; i < 23040 /*100000*/; i++)
+  for (i=1; i < LOOPMAX /*100000*/; i++)
   {
 	  temp1 = SASCompoundHeapAlloc (compoundHeap);
 	  if (!temp1)
@@ -1116,7 +1121,7 @@ sassim_compound_heap_test5 ()
       return 1;
   }
   /* at 75% load factor, allocate enough entries to allocate 2048 blocks */
-  for (i=0; i < 23040; i++)
+  for (i=0; i < LOOPMAX; i++)
   {
 	  temp2 = SPHCompoundPCQAlloc (compoundHeap);
 	  if (!temp2)

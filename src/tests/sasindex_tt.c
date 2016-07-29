@@ -166,7 +166,11 @@ sasindex_print_uint (SASIndex_t index)
 #define JOIN_EXIT_FAILURE 128
 //#define __SASDebugPrint__ 1
 
-#define LARGE_KEY_COUNT 1000000
+#ifdef LONGCHECK
+# define LARGE_KEY_COUNT 1000000
+#else
+# define LARGE_KEY_COUNT 100000
+#endif
 
 static int
 sassim_index_random ()

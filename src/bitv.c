@@ -486,7 +486,7 @@ bitv_free_marked (bitv_cb_t * cb, bitv_word * bvec, bitv_word * endvec,
       alloc_units = units + 1;
       endmrk = bit_zero >> (offset + units);
 
-      chkmsk = fetch_and_and_long (endvec, ~endmrk);
+      chkmsk = sas_fetch_and_and_long (endvec, ~endmrk);
 
 #ifdef PRINT_DEBUG
       printf (" units=%ld, endmrk=%lx, chkmsk=%lx\n", units, endmrk, chkmsk);

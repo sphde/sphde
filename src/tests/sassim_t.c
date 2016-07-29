@@ -572,7 +572,7 @@ main ()
 
   failures += sassim_space_test1 ();
 
-  SASCleanUp ();
+  SASRemove ();
 
   return failures;
 }

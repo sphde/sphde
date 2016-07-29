@@ -1413,6 +1413,7 @@ SASRemove ()
   SASRemoveAllocatedSegs ();
   if (SASRemoveSegByAddr (anchor, SegmentSize))
     sas_printf ("SASRemove: SASRemoveSegByAddr failed\n");
+  SASLockReset ();
   SASLockRemove ();
   destroySASSem (&anchor->anchors);
   free (mem_IDs);

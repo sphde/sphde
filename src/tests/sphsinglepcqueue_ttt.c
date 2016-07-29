@@ -35,6 +35,11 @@
 #include "sphthread.h"
 #include "sphtimer.h"
 
+#ifdef LONGCHECK
+# define ITERATIONS 10000000
+#else
+# define ITERATIONS 1000000
+#endif
 
 typedef struct {
 	volatile unsigned int 	threshold;
@@ -1358,7 +1363,7 @@ main ()
       if (rc == 0)
 	{
 #if 1
-	  p10 = units * 10000000;
+	  p10 = units * ITERATIONS;
 	  printf ("start 1 test_thread_Producer | consumer (%p,%zu)\n",
 		  pcqueue, units);
 
@@ -1391,7 +1396,7 @@ main ()
 	      consumer_pcq_list[1] = pcqueue;
 	      test_funclist[0] = test_thread_Producer_fastfill;
 	      test_funclist[1] = test_thread_consumer_fastverify;
-	      p10 = units * 10000000;
+	      p10 = units * ITERATIONS;
 
 	      printf ("start 2 test_thread_Producer | consumer fast (%p,%zu)\n",
 		      pcqueue, units);
@@ -1439,7 +1444,7 @@ main ()
 	      sem_data_init(&pwait, 0, 0);
 	      sem_data_init(&cwait, 0, cap);
 
-	      p10 = units * 1000000;
+	      p10 = units * ITERATIONS;
 
 	      printf ("start 3 test_thread_Producer | consumer wait (%p,%zu)\n",
 		      pcqueue, units);
@@ -1492,7 +1497,7 @@ main ()
 	      sem_data_init(&pwait, 0, cap / 2);
 	      sem_data_init(&cwait, 0, cap / 2);
 
-	      p10 = units * 1000000;
+	      p10 = units * ITERATIONS;
 
 	      printf ("start 4 test_thread_Producer | consumer wait (%p,%zu)\n",
 		      pcqueue, units);
@@ -1554,7 +1559,7 @@ main ()
 	      sem_data_init(&pwait2, 0, 0);
 	      sem_data_init(&cwait2, 0, cap);
 
-	      p10 = units * 1000000;
+	      p10 = units * ITERATIONS;
 
 	      printf ("start 5 test_thread_Producer | transfer | consumer wait (%p,%zu)\n",
 		      pcqueue, units);
@@ -1622,7 +1627,7 @@ main ()
 	      sem_data_init(&pwait2, 0, cap / 2);
 	      sem_data_init(&cwait2, 0, cap / 2);
 
-	      p10 = units * 1000000;
+	      p10 = units * ITERATIONS;
 
 	      printf ("start 6 test_thread_Producer | transfer | consumer wait (%p,%zu)\n",
 		      pcqueue, units);
@@ -1697,7 +1702,7 @@ main ()
 	      sem_data_init(&pwait3, 0, cap / 2);
 	      sem_data_init(&cwait3, 0, cap / 2);
 
-	      p10 = units * 1000000;
+	      p10 = units * ITERATIONS;
 
 	      printf ("start 7 test_thread_Producer | transfer | consumer wait (%p,%zu)\n",
 		      pcqueue, units);
@@ -1777,7 +1782,7 @@ main ()
 	      sem_data_init(&cwait2, 2, cap / 2);
 	      sem_data_init(&pwait3, 2, cap / 2);
 	      sem_data_init(&cwait3, 2, cap / 2);
-	      p10 = units * 1000000;
+	      p10 = units * ITERATIONS;
 
 	      printf ("start 8 test_thread_Producer | transfer | consumer wait (%p,%zu)\n",
 		      pcqueue, units);
@@ -1858,7 +1863,7 @@ main ()
 	      sem_data_init(&cwait2, 5, cap / 2);
 	      sem_data_init(&pwait3, 5, cap / 2);
 	      sem_data_init(&cwait3, 5, cap / 2);
-	  p10 = units * 1000000;
+	  p10 = units * ITERATIONS;
 
 	      printf ("start 9 test_thread_Producer | transfer | consumer wait (%p,%zu)\n",
 		  pcqueue, units);
@@ -1940,7 +1945,7 @@ main ()
 	      sem_data_init(&pwait3, 2, cap / 2);
 	      sem_data_init(&cwait3, 2, cap / 2);
 
-	      p10 = units * 1000000;
+	      p10 = units * ITERATIONS;
 
 	      printf ("start 10 test_thread_Producer | transfer | consumer wait (%p,%zu)\n",
 		      pcqueue, units);
