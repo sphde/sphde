@@ -1,7 +1,7 @@
 ## Process this file with autoconf to produce configure.
 
-AM_CFLAGS   = -Wall -Wwrite-strings $(PTHREAD_CFLAGS)
-AM_CXXFLAGS = -Wall -Wwrite-strings -Woverloaded-virtual $(PTHREAD_CFLAGS)
+AM_CFLAGS   = -Wall -Wwrite-strings $(PTHREAD_CFLAGS) -fgnu-tm
+AM_CXXFLAGS = -Wall -Wwrite-strings -Woverloaded-virtual $(PTHREAD_CFLAGS) -fgnu-tm
 
 lib_LTLIBRARIES = libsphde.la libsphgtod.la
 bin_PROGRAMS    = sasutil
@@ -44,6 +44,7 @@ libsphdeinclude_HEADERS = \
 	sasstringbtree.h \
 	sasstringbtreeenum.h \
 	sasstringbtreenode.h \
+	sphmultipcqueue.h \
 	sphsinglepcqueue.h \
 	sphdirectpcqueue.h \
 	sphlfentry.h \
@@ -108,6 +109,7 @@ libsphde_la_SOURCES = \
 	sphlockfreeheap.cpp \
 	sphlflogger.cpp \
 	sphlogportal.cpp \
+	sphmultipcqueue.cpp \
 	sphsinglepcqueue.cpp \
 	sasallocpriv.h \
 	sphcontextpriv.h
@@ -124,7 +126,7 @@ libsphgtod_la_LDFLAGS = -all-static
 libsphgtod_la_LIBADD = -lrt
 
 libsphde_la_LDFLAGS  = -version-info $(SPHDE_SO_VERSION)
-libsphde_la_LIBADD   = $(PTHREAD_LIBS) -lrt
+libsphde_la_LIBADD   = $(PTHREAD_LIBS) -litm -lrt
 
 EXTRA_DIST          += $(libsphde_la_INCLUDES) saslockl.cpp
 
@@ -170,12 +172,12 @@ sphthread_t_LDADD   = libsphde.la
 TESTS                  += sphlflogger_tt
 sphlflogger_tt_SOURCES  = tests/sphlflogger_tt.c
 sphlflogger_tt_CFLAGS   = -DSPH_TIMERTEST_VERIFY=1
-sphlflogger_tt_LDADD    = libsphde.la
+sphlflogger_tt_LDADD    = libsphde.la -litm
 
 TESTS                   += sphlflogger_ttt
 sphlflogger_ttt_SOURCES  = tests/sphlflogger_ttt.c
 sphlflogger_ttt_CFLAGS   = -DSPH_TIMERTEST_VERIFY=1
-sphlflogger_ttt_LDADD    = libsphde.la
+sphlflogger_ttt_LDADD    = libsphde.la -litm
 
 TESTS                 += sphlogportal_t
 sphlogportal_t_SOURCES = tests/sphlogportal_t.c
@@ -220,5 +222,13 @@ sphsinglepcqueue_ttt_LDADD   = libsphde.la
 TESTS                 += sphdirectpcqueue_ttt
 sphdirectpcqueue_ttt_SOURCES = tests/sphdirectpcqueue_ttt.c
 sphdirectpcqueue_ttt_LDADD   = libsphde.la
+
+TESTS                 += sphmultipcqueue_t
+sphmultipcqueue_t_SOURCES = tests/sphmultipcqueue_t.c
+sphmultipcqueue_t_LDADD   = libsphde.la
+
+TESTS                 += sphmultipcqueue_ttt
+sphmultipcqueue_ttt_SOURCES = tests/sphmultipcqueue_ttt.c
+sphmultipcqueue_ttt_LDADD   = libsphde.la
 
 check_PROGRAMS = $(TESTS)
