@@ -702,8 +702,10 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-AM_CFLAGS = -Wall -Wwrite-strings $(PTHREAD_CFLAGS)
-AM_CXXFLAGS = -Wall -Wwrite-strings -Woverloaded-virtual $(PTHREAD_CFLAGS)
+AM_CFLAGS = -Wall -Werror -Wwrite-strings $(PTHREAD_CFLAGS)
+AM_CXXFLAGS = -Wall -Werror -Wwrite-strings -Woverloaded-virtual \
+	      $(PTHREAD_CFLAGS)
+
 lib_LTLIBRARIES = libsphde.la libsphgtod.la libsphgettime.la
 EXTRA_DIST = $(libsphde_la_INCLUDES) saslockl.cpp
 
@@ -850,10 +852,10 @@ sphlflogger_t_LDADD = libsphde.la
 sphthread_t_SOURCES = tests/sphthread_t.c
 sphthread_t_LDADD = libsphde.la
 sphlflogger_tt_SOURCES = tests/sphlflogger_tt.c
-sphlflogger_tt_CFLAGS = -DSPH_TIMERTEST_VERIFY=1
+sphlflogger_tt_CFLAGS = -DSPH_TIMERTEST_VERIFY=1 $(AM_CFLAGS)
 sphlflogger_tt_LDADD = libsphde.la
 sphlflogger_ttt_SOURCES = tests/sphlflogger_ttt.c
-sphlflogger_ttt_CFLAGS = -DSPH_TIMERTEST_VERIFY=1
+sphlflogger_ttt_CFLAGS = -DSPH_TIMERTEST_VERIFY=1 $(AM_CFLAGS)
 sphlflogger_ttt_LDADD = libsphde.la
 sphlogportal_t_SOURCES = tests/sphlogportal_t.c
 sphlogportal_t_LDADD = libsphde.la

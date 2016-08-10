@@ -1,7 +1,8 @@
 ## Process this file with autoconf to produce configure.
 
-AM_CFLAGS   = -Wall -Wwrite-strings $(PTHREAD_CFLAGS)
-AM_CXXFLAGS = -Wall -Wwrite-strings -Woverloaded-virtual $(PTHREAD_CFLAGS)
+AM_CFLAGS   = -Wall -Werror -Wwrite-strings $(PTHREAD_CFLAGS)
+AM_CXXFLAGS = -Wall -Werror -Wwrite-strings -Woverloaded-virtual \
+	      $(PTHREAD_CFLAGS)
 
 lib_LTLIBRARIES = libsphde.la libsphgtod.la libsphgettime.la
 bin_PROGRAMS    = sasutil
@@ -196,12 +197,12 @@ sphthread_t_LDADD   = libsphde.la
 
 TESTS                  += sphlflogger_tt
 sphlflogger_tt_SOURCES  = tests/sphlflogger_tt.c
-sphlflogger_tt_CFLAGS   = -DSPH_TIMERTEST_VERIFY=1
+sphlflogger_tt_CFLAGS   = -DSPH_TIMERTEST_VERIFY=1 $(AM_CFLAGS)
 sphlflogger_tt_LDADD    = libsphde.la
 
 TESTS                   += sphlflogger_ttt
 sphlflogger_ttt_SOURCES  = tests/sphlflogger_ttt.c
-sphlflogger_ttt_CFLAGS   = -DSPH_TIMERTEST_VERIFY=1
+sphlflogger_ttt_CFLAGS   = -DSPH_TIMERTEST_VERIFY=1 $(AM_CFLAGS)
 sphlflogger_ttt_LDADD    = libsphde.la
 
 TESTS                 += sphlogportal_t

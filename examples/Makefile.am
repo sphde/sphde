@@ -1,6 +1,6 @@
 # This file is part of libsphde.
 
-AM_CFLAGS = -Wall -I$(top_srcdir)/src
+AM_CFLAGS = -Wall -Werror -I$(top_srcdir)/src
 
 noinst_PROGRAMS = \
   example_sph_1 \
