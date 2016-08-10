@@ -60,8 +60,10 @@ fill_test_parallel_thread (void *arg)
 	SPHLFLogger_t logger;
     long result = 0;
     int tn = (int) (long int) arg;
+#ifdef DEBUG_PRINT
     pid_t tid = sphFastGetTID();
     char number[128];
+#endif
 
     logger = log_lst[tn];
 
@@ -87,8 +89,10 @@ fill_test_thread (void *arg)
 {
     int tn = (int) (long int) arg;
     long result = 0;
+#ifdef DEBUG_PRINT
     pid_t tid = sphFastGetTID();
     char number[128];
+#endif
 
     SASThreadSetUp ();
 #ifdef DEBUG_PRINT
@@ -113,13 +117,16 @@ launch_test_threads (int t_cnt, test_ptr_t test_f,
 {
   long int n;
   pthread_t th[max_threads];
-  int tid;
-  int pid;
   long thread_result;
   int result = 0;
+#ifdef DEBUG_PRINT
+  int tid;
+  int pid;
 
   pid = getpid();
   tid = sphdeGetTID();
+#endif
+
   thread_iterations = iterations / t_cnt;
 #ifdef DEBUG_PRINT
   printf("creating thread from pid/tid = %d/%d\n", 
@@ -436,7 +443,7 @@ test_thread_log_verify(SPHLFLogger_t logger)
 	SPHLFLoggerHandle_t *handlex, handle5;
 	sphpid16_t entry_pid, entry_tid;
 	SPHLFLogIterator_t *iter, iter0;
-	sphtimer_t entry_timestamp, prev_timestamp;
+	sphtimer_t entry_timestamp;
 	int rtn = 0;	
 	long i;
 
@@ -466,7 +473,6 @@ test_thread_log_verify(SPHLFLogger_t logger)
 		return (rtn + 10);
 	}
 
-	prev_timestamp = 0LL;
 	do
 	{
 		handlex = SPHLFLoggerIteratorNext (iter, &handle5);
@@ -508,7 +514,6 @@ test_thread_log_verify(SPHLFLogger_t logger)
 						   temp0_i, temp1_i, temp2_i);
 				rtn++;
 			}
-			prev_timestamp = entry_timestamp;
 		}
 	} while (handlex);
 	
@@ -640,7 +645,7 @@ test_thread_wraplog_verify(SPHLFLogger_t logger)
 	sphpid16_t entry_pid, entry_tid;
 	SPHLFLogIterator_t *iter, iter0;
 	int	*tarray;
-	sphtimer_t entry_timestamp, prev_timestamp;
+	sphtimer_t entry_timestamp;
 	int rtn = 0;	
 	long i;
 
@@ -669,8 +674,7 @@ test_thread_wraplog_verify(SPHLFLogger_t logger)
 				logger, &iter0, iter);
 		return (rtn + 10);
 	}
-	
-	prev_timestamp = 0LL;
+
 	do
 	{
 		handlex = SPHLFLoggerIteratorNext (iter, &handle5);
@@ -713,7 +717,6 @@ test_thread_wraplog_verify(SPHLFLogger_t logger)
 						temp0_i, temp1_i, temp2_i);
 				rtn++;
 			}
-			prev_timestamp = entry_timestamp;
 		}
 	} while (handlex);
 	
@@ -870,7 +873,7 @@ int
 test_thread_wraplog_parallel_verify(void)
 {
 
-	int rc, rtn = 0;
+	int rtn = 0;
 	int i;
 
 	for (i = 0; i < num_threads; i++)

@@ -396,7 +396,7 @@ sasutil_reset_cmd(int argc, char *argv[])
 }
 
 
-static void 
+static void
 sasutil_dump_block(void *blockAddr, unsigned long len)
 {
   unsigned int  *dumpAddr = (unsigned int*)blockAddr;
@@ -413,10 +413,10 @@ sasutil_dump_block(void *blockAddr, unsigned long len)
       temp = *charAddr++;
       if ( (temp < 32) || (temp > 126) )
 	temp = '.';
-	chars[j] = temp;
-      };
+      chars[j] = temp;
+    };
 
-      printf ("%p  %08x %08x %08x %08x <%s>\n", tempAddr, *dumpAddr, 
+      printf ("%p  %08x %08x %08x %08x <%s>\n", tempAddr, *dumpAddr,
 	      *(dumpAddr+1), *(dumpAddr+2), *(dumpAddr+3), chars);
       dumpAddr += 4;
   }

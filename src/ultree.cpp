@@ -416,11 +416,8 @@ uLongTreeNode::listNodes (int indent)
     int	count = 0;
     int	i;
 
-    if (this)
-	{
-	for (i = 0; i < indent; i++) { sas_printf(" "); };
-	count = listNodes (indent, count );
-	}
+    for (i = 0; i < indent; i++) { sas_printf(" "); };
+    count = listNodes (indent, count );
 };
 
 int
