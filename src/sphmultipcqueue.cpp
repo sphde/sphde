@@ -56,7 +56,7 @@ typedef struct SPHMPMCQHeader
 
 #ifdef __LP64__
 #define HEAP_OFFSET 128
-#if 0
+#if 1
 #define DEFAULT_PAGE 256
 #else
 #define DEFAULT_PAGE 384

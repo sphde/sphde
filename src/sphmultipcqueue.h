@@ -84,7 +84,7 @@ typedef struct data_struct11 {
 } data_struct11;
 
 // Get next queue entry
-handle = SPHMPMCQMultiGetNextCompleteDirectTM (pcqueue, &handle0);
+handle = SPHMPMCQGetNextCompleteDirectTM (pcqueue);
 if (handle)
 {	// insert data into the allocated queue entry
 	data_struct11 *struct_ptr;
@@ -264,7 +264,7 @@ SPHMPMCQGetEntries (SPHMPMCQ_t queue);
 *	@return 0 if successful.
 */
 extern __C__ int
-SPHMPMCQResetAsync (SPHSinglePCQueue_t queue);
+SPHMPMCQResetAsync (SPHMPMCQ_t queue);
 #endif
 
 /** \brief Return the status of the specified queue.

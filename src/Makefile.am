@@ -172,12 +172,12 @@ sphthread_t_LDADD   = libsphde.la
 TESTS                  += sphlflogger_tt
 sphlflogger_tt_SOURCES  = tests/sphlflogger_tt.c
 sphlflogger_tt_CFLAGS   = -DSPH_TIMERTEST_VERIFY=1
-sphlflogger_tt_LDADD    = libsphde.la -litm
+sphlflogger_tt_LDADD    = libsphde.la
 
 TESTS                   += sphlflogger_ttt
 sphlflogger_ttt_SOURCES  = tests/sphlflogger_ttt.c
 sphlflogger_ttt_CFLAGS   = -DSPH_TIMERTEST_VERIFY=1
-sphlflogger_ttt_LDADD    = libsphde.la -litm
+sphlflogger_ttt_LDADD    = libsphde.la
 
 TESTS                 += sphlogportal_t
 sphlogportal_t_SOURCES = tests/sphlogportal_t.c
