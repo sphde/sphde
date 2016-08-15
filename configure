@@ -796,7 +796,6 @@ enable_option_checking
 enable_silent_rules
 enable_maintainer_mode
 enable_debug
-enable_htm
 enable_dependency_tracking
 enable_shared
 enable_static
@@ -805,6 +804,7 @@ enable_fast_install
 with_gnu_ld
 with_sysroot
 enable_libtool_lock
+enable_htm
 enable_doxygen_doc
 enable_doxygen_man
 enable_doxygen_html
@@ -1447,7 +1447,6 @@ Optional Features:
                           enable make rules and dependencies not useful (and
                           sometimes confusing) to the casual installer
   --enable-debug          Enable debugging information
-  --enable-htm            Enable hardware transactional memory (HTM)
   --enable-dependency-tracking
                           do not reject slow dependency extractors
   --disable-dependency-tracking
@@ -1457,6 +1456,7 @@ Optional Features:
   --enable-fast-install[=PKGS]
                           optimize for fast installation [default=yes]
   --disable-libtool-lock  avoid locking (might break parallel builds)
+  --enable-htm            Enable hardware transactional memory (HTM)
   --disable-doxygen-doc   don't generate any doxygen documentation
   --disable-doxygen-man   don't generate doxygen manual pages
   --disable-doxygen-html  don't generate doxygen plain HTML documentation
@@ -3148,20 +3148,6 @@ fi
 if test "x$enable_debug" = "xyes" ; then
   CFLAGS="$CFLAGS -D__SOMDebugPrint__ -Dmylockdebug -DcoherenceCheck -D__SASDebugPrint__"
   CXXFLAGS="$CXXFLAGS -D__SOMDebugPrint__ -Dmylockdebug -DcoherenceCheck -D__SASDebugPrint__"
-fi
-
-# Hardware Transactional Memory (HTM) option
-# Check whether --enable-htm was given.
-if test "${enable_htm+set}" = set; then :
-  enableval=$enable_htm;
-else
-  enable_htm=no
-fi
-
-
-if test "x$enable_htm" = "xyes" ; then
-  CFLAGS="$CFLAGS -mhtm"
-  CXXFLAGS="$CXXFLAGS -mhtm"
 fi
 
 # This directive is to avoid buggy libtool that don't add the -Wl,--no-as-needed
@@ -16882,6 +16868,20 @@ else
 fi
 
 LDFLAGS="$SAVE_LDFLAGS"
+fi
+
+# Hardware Transactional Memory (HTM) option
+# Check whether --enable-htm was given.
+if test "${enable_htm+set}" = set; then :
+  enableval=$enable_htm;
+else
+  enable_htm=no
+fi
+
+
+if test "x$enable_htm" = "xyes" ; then
+  CFLAGS="$CFLAGS -mhtm"
+  CXXFLAGS="$CXXFLAGS -mhtm"
 fi
 
 # Doxygen support

@@ -33,18 +33,6 @@ if test "x$enable_debug" = "xyes" ; then
   CXXFLAGS="$CXXFLAGS -D__SOMDebugPrint__ -Dmylockdebug -DcoherenceCheck -D__SASDebugPrint__"
 fi
 
-# Hardware Transactional Memory (HTM) option
-AC_ARG_ENABLE([htm],
-  [AS_HELP_STRING([--enable-htm],
-    [Enable hardware transactional memory (HTM)])],
-  [],
-  [enable_htm=no])
-
-if test "x$enable_htm" = "xyes" ; then
-  CFLAGS="$CFLAGS -mhtm"
-  CXXFLAGS="$CXXFLAGS -mhtm"
-fi
-
 # This directive is to avoid buggy libtool that don't add the -Wl,--no-as-needed
 # directive in the correct position of LDFLAGS
 LDFLAGS="$LDFLAGS -Wl,--no-as-needed -lrt"
@@ -117,6 +105,18 @@ LDFLAGS="-static $LDFLAGS"
 AC_CHECK_LIB([c], [printf], [],
              AC_MSG_ERROR([*** No static libc found. Try to install glibc-static or libc6-dev.]))
 LDFLAGS="$SAVE_LDFLAGS"
+fi
+
+# Hardware Transactional Memory (HTM) option
+AC_ARG_ENABLE([htm],
+  [AS_HELP_STRING([--enable-htm],
+    [Enable hardware transactional memory (HTM)])],
+  [],
+  [enable_htm=no])
+
+if test "x$enable_htm" = "xyes" ; then
+  CFLAGS="$CFLAGS -mhtm"
+  CXXFLAGS="$CXXFLAGS -mhtm"
 fi
 
 # Doxygen support
