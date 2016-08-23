@@ -69,6 +69,13 @@ x86_64*)
   ;;
   esac
 ;;
+*64*)
+;;
+*)
+AC_MSG_WARN([
+*** __BIGREGION__ is not defined.
+*** Adjust the address limits in sasconf.h as required.])
+;;
 esac
 
 # Checks for header files.

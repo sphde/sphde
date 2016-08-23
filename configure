@@ -15561,6 +15561,16 @@ x86_64*)
   ;;
   esac
 ;;
+*64*)
+;;
+*)
+{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING:
+*** __BIGREGION__ is not defined.
+*** Adjust the address limits in sasconf.h as required." >&5
+$as_echo "$as_me: WARNING:
+*** __BIGREGION__ is not defined.
+*** Adjust the address limits in sasconf.h as required." >&2;}
+;;
 esac
 
 # Checks for header files.

@@ -14,7 +14,11 @@
 
 #include <sys/param.h>
 
-#define __BIGREGION__ 1
+#if defined(__powerpc64__) || defined(__x86_64__)
+# define __BIGREGION__ 1
+#else
+# undef __BIGREGION__
+#endif
 
 /* maximum length (including trailing null) of the path
    and file name for the segment stores.  */
@@ -51,9 +55,9 @@
 #   define	SegmentSize		0x01000000UL	/*  16MB */
 #   define	__SAS_SHMAP_MAX		0x1000000UL
 #  else
-#   define	__SAS_BASE_ADDRESS	0x60000000
-#   define	RegionSize		0x10000000	/* 256MB */
-#   define	SegmentSize		0x01000000	/*  16MB */
+#   define	__SAS_BASE_ADDRESS	0x60000000UL
+#   define	RegionSize		0x10000000UL	/* 256MB */
+#   define	SegmentSize		0x01000000UL	/*  16MB */
 #  endif
 # endif
 #endif
