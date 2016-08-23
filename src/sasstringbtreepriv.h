@@ -13,6 +13,7 @@
 #define __SAS_STRINGBTREE_PRIVH
 
 #include <freenode.h>
+#include "sasio.h"
 #include <sasstringbtree.h>
 
 #define DEFAULT_LOAD_FACTOR 75

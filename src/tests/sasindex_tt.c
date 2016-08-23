@@ -58,57 +58,6 @@ sassim_print_msg (const char *func, int line, const char *fmt, ...)
 
 #ifdef __SASDebugPrint__
 static void
-sassim_dump_block (const char *func, int line, void *blockAddr,
-		   unsigned long len)
-{
-  unsigned int *dumpAddr = (unsigned int *) blockAddr;
-  unsigned char *charAddr = (unsigned char *) blockAddr;
-  void *tempAddr;
-  unsigned char chars[20];
-  unsigned char temp;
-  unsigned int i, j;
-  chars[16] = 0;
-  for (i = 0; i < len; i = i + 16)
-    {
-      tempAddr = dumpAddr;
-      for (j = 0; j < 16; j++)
-	{
-	  temp = *charAddr++;
-	  if ((temp < 32) || (temp > 126))
-	    temp = '.';
-	  chars[j] = temp;
-	};
-      sassim_print_msg (func, line, "%p  %08x %08x %08x %08x <%s>",
-			tempAddr, *dumpAddr, *(dumpAddr + 1),
-			*(dumpAddr + 2), *(dumpAddr + 3), chars);
-      dumpAddr += 4;
-    }
-}
-#define SASSIM_DUMP_BLOCK(fmt, ...) sassim_dump_block(__FUNCTION__, __LINE__, fmt, ##__VA_ARGS__)
-#endif
-
-#ifdef __SASDebugPrint__
-static void
-sasindex_print_node (SASIndexNode_t node)
-{
-  int i, n;
-  n = SASIndexNodeGetCount (node);
-  for (i = 0; i <= n; ++i)
-    {
-      SASIndexNode_t br;
-      SASIndexKey_t *key = SASIndexNodeGetKeyIndexed (node, i);
-      if (!key)
-	continue;
-      printf ("(%c : %s)", (char)key->data[0],
-             (char*) SASIndexNodeGetValIndexed (node, i));
-      if ((br = SASIndexNodeGetBranchIndexed (node, i)))
-	sasindex_print_node (br);
-      if (i != n)
-	printf (", ");
-    }
-}
-
-static void
 sasindex_print_node_uint (SASIndexNode_t node)
 {
   int i, n;
@@ -134,19 +83,6 @@ sasindex_print_node_uint (SASIndexNode_t node)
 	     printf (", ");
     }
   printf ("}");
-}
-
-static void
-sasindex_print (SASIndex_t index)
-{
-  SASIndexNode_t root = SASIndexGetRootNode (index);
-  if (root)
-    {
-      printf ("{");
-      sasindex_print_node (root);
-      printf ("}");
-    }
-  printf ("\n");
 }
 
 static void

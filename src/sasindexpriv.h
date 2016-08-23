@@ -15,6 +15,7 @@
 #include <sastype.h>
 #include <freenode.h>
 #include "sasindex.h"
+#include "sasio.h"
 #include "sasindexkey.h"
 #include "sasindexnode.h"
 
