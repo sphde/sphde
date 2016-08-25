@@ -1203,6 +1203,8 @@ sassim_compound_heap_test6 ()
   block_size_t temp_b0;
   int i;
 
+  if (blockSize > SegmentSize)
+    blockSize = SegmentSize;
   compoundHeap = SASCompoundHeapCreate (blockSize);
   if (!compoundHeap)
     {

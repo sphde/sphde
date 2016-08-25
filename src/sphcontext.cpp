@@ -52,7 +52,11 @@ typedef struct SPHContextHeader {
 
 
 #ifdef __WORDSIZE_64
-#define DEFAULT_BLOCK (4096*4096)
+# ifdef __s390x__
+# define DEFAULT_BLOCK (1024*1024)
+# else
+# define DEFAULT_BLOCK (4096*4096)
+# endif
 #else
 #define DEFAULT_BLOCK (1024*1024)
 #endif

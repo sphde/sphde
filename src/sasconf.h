@@ -70,6 +70,14 @@
 #  define	__SAS_SHMAP_MAX		0x000001000000L	/* 16MB */
 #endif
 
+#ifdef __s390x__
+# define     __WORDSIZE_64
+# define     __SAS_BASE_ADDRESS      0x20000000000L   /* 2TB */
+# define     RegionSize              0x10000000000L   /* 1TB */
+# define     SegmentSize             0x00000400000L   /* 4MB */
+# define     __SAS_SHMAP_MAX         0x00000400000L   /* 4MB */
+#endif
+
 /* 
  * If the platform is not recognized above, select some resonable default.
  */
