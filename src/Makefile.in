@@ -98,6 +98,7 @@ DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(libsphgtodinclude_HEADERS) $(top_srcdir)/test-driver
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/acx_pthread.m4 \
+	$(top_srcdir)/m4/ax_check_compile_flag.m4 \
 	$(top_srcdir)/m4/libtool.m4 $(top_srcdir)/m4/ltoptions.m4 \
 	$(top_srcdir)/m4/ltsugar.m4 $(top_srcdir)/m4/ltversion.m4 \
 	$(top_srcdir)/m4/lt~obsolete.m4 $(top_srcdir)/acinclude.m4 \
@@ -688,8 +689,9 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-AM_CFLAGS = -Wall -Wwrite-strings $(PTHREAD_CFLAGS) -fgnu-tm
-AM_CXXFLAGS = -Wall -Wwrite-strings -Woverloaded-virtual $(PTHREAD_CFLAGS) -fgnu-tm
+
+AM_CFLAGS = -Wall -Wwrite-strings $(PTHREAD_CFLAGS)
+AM_CXXFLAGS = -Wall -Wwrite-strings -Woverloaded-virtual $(PTHREAD_CFLAGS)
 lib_LTLIBRARIES = libsphde.la libsphgtod.la
 EXTRA_DIST = $(libsphde_la_INCLUDES) saslockl.cpp
 
@@ -803,7 +805,7 @@ libsphgtod_la_CXXFLAGS = $(AM_CXXFLAGS)
 libsphgtod_la_LDFLAGS = -all-static
 libsphgtod_la_LIBADD = -lrt
 libsphde_la_LDFLAGS = -version-info $(SPHDE_SO_VERSION)
-libsphde_la_LIBADD = $(PTHREAD_LIBS) -litm -lrt
+libsphde_la_LIBADD = $(PTHREAD_LIBS) -lrt
 sasutil_SOURCES = sasutil.c
 sasutil_LDADD = libsphde.la
 sphgtod_t_SOURCES = tests/sphgtod_t.c

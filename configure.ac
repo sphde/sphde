@@ -107,17 +107,17 @@ AC_CHECK_LIB([c], [printf], [],
 LDFLAGS="$SAVE_LDFLAGS"
 fi
 
-# Hardware Transactional Memory (HTM) option
-AC_ARG_ENABLE([htm],
-  [AS_HELP_STRING([--enable-htm],
-    [Enable hardware transactional memory (HTM)])],
-  [],
-  [enable_htm=no])
+AX_CHECK_COMPILE_FLAG([-fgnu-tm],[
+	CFLAGS="$CFLAGS -fgnu-tm -DHAS_GNU_TM"
+	CXXFLAGS="$CXXFLAGS -fgnu-tm -DHAS_GNU_TM"
+	AC_CHECK_LIB([itm], [_ITM_libraryVersion], [],
+		AC_MSG_ERROR([*** libitm not found. Try to install libitm.]))
+])
+AX_CHECK_COMPILE_FLAG([-mhtm],[
+	CFLAGS="$CFLAGS -mhtm"
+	CXXFLAGS="$CXXFLAGS -mhtm"
+])
 
-if test "x$enable_htm" = "xyes" ; then
-  CFLAGS="$CFLAGS -mhtm"
-  CXXFLAGS="$CXXFLAGS -mhtm"
-fi
 
 # Doxygen support
 DX_HTML_FEATURE(ON)

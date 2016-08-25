@@ -325,6 +325,7 @@ SPHMPMCQAdvanceHead(SPHLFEntryHeader_t **head_p, sphLFEntryID_t idAlloc, sphLFEn
 	return 0;
 }
 
+#if defined(HAS_GNU_TM) || defined(__HTM__)
 SPHLFEntryDirect_t
 SPHMPMCQAllocStrideDirectTM (SPHMPMCQ_t queue)
 {
@@ -359,9 +360,11 @@ SPHMPMCQAllocStrideDirectTM (SPHMPMCQ_t queue)
 			if (__TM_is_failure_persistent (TM_buff)) {
 				/* revert to GNU TM */
 #endif
+#ifdef HAS_GNU_TM
 				__transaction_atomic {
 					entryPtr = SPHMPMCQAdvanceHead((SPHLFEntryHeader_t **)&headerBlock->qhead,entrytemp.idUnit,entryfree.idUnit,stride,qlo,qhi);
 				}
+#endif
 #ifdef __HTM__
 			}
 		}
@@ -372,6 +375,7 @@ SPHMPMCQAllocStrideDirectTM (SPHMPMCQ_t queue)
 	debug_printf("%-6d: %s = %p\n",sphdeGetTID(),__FUNCTION__,entryPtr);
 	return entryPtr;
 }
+#endif
 
 SPHLFEntryDirect_t
 SPHSPMCQAllocStrideDirect(SPHMPMCQ_t queue)
@@ -420,6 +424,7 @@ SPHMPMCQAdvanceTail(SPHLFEntryHeader_t **tail_p, unsigned short len, longPtr_t q
 	return 0;
 }
 
+#if defined(HAS_GNU_TM) || defined(__HTM__)
 SPHLFEntryDirect_t
 SPHMPMCQGetNextCompleteDirectTM (SPHMPMCQ_t queue)
 {
@@ -442,9 +447,11 @@ SPHMPMCQGetNextCompleteDirectTM (SPHMPMCQ_t queue)
 			if (__TM_is_failure_persistent (TM_buff)) {
 				/* revert to GNU TM */
 #endif
+#ifdef HAS_GNU_TM
 				__transaction_atomic {
 					entryPtr = SPHMPMCQAdvanceTail((SPHLFEntryHeader_t **)&headerBlock->qtail,stride,qlo,qhi);
 				}
+#endif
 #ifdef __HTM__
 			}
 		}
@@ -464,6 +471,7 @@ SPHMPMCQGetNextCompleteDirectTM (SPHMPMCQ_t queue)
 	debug_printf("%-6d: %s = %p\n",sphdeGetTID(),__FUNCTION__,entryPtr);
 	return ((SPHLFEntryDirect_t)entryPtr);
 }
+#endif
 
 SPHLFEntryDirect_t
 SPHMPSCQGetNextCompleteDirect(SPHMPMCQ_t queue)

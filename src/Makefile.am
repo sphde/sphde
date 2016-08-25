@@ -1,7 +1,7 @@
 ## Process this file with autoconf to produce configure.
 
-AM_CFLAGS   = -Wall -Wwrite-strings $(PTHREAD_CFLAGS) -fgnu-tm
-AM_CXXFLAGS = -Wall -Wwrite-strings -Woverloaded-virtual $(PTHREAD_CFLAGS) -fgnu-tm
+AM_CFLAGS   = -Wall -Wwrite-strings $(PTHREAD_CFLAGS)
+AM_CXXFLAGS = -Wall -Wwrite-strings -Woverloaded-virtual $(PTHREAD_CFLAGS)
 
 lib_LTLIBRARIES = libsphde.la libsphgtod.la
 bin_PROGRAMS    = sasutil
@@ -126,7 +126,7 @@ libsphgtod_la_LDFLAGS = -all-static
 libsphgtod_la_LIBADD = -lrt
 
 libsphde_la_LDFLAGS  = -version-info $(SPHDE_SO_VERSION)
-libsphde_la_LIBADD   = $(PTHREAD_LIBS) -litm -lrt
+libsphde_la_LIBADD   = $(PTHREAD_LIBS) -lrt
 
 EXTRA_DIST          += $(libsphde_la_INCLUDES) saslockl.cpp
 
