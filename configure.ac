@@ -5,7 +5,7 @@
 AC_PREREQ(2.63)
 
 #Autoconf versioning is A:C:B
-AC_INIT([libsphde], [1.2.1], munroesj@us.ibm.com raji@linux.vnet.ibm.com tulioqm@br.ibm.com)
+AC_INIT([libsphde], [1.3.0], munroesj@us.ibm.com raji@linux.vnet.ibm.com tulioqm@br.ibm.com)
 
 AC_CONFIG_SRCDIR([src/sassim.cpp])
 AC_CONFIG_HEADERS([config.h])
@@ -15,7 +15,7 @@ AM_MAINTAINER_MODE([disable])
 
 # Update this value for every release: (A:B:C will map to foo.so.(A-C).C.B)
 # http://www.gnu.org/software/libtool/manual/html_node/Updating-version-info.html
-SPHDE_SO_VERSION=1:2:1
+SPHDE_SO_VERSION=1:3:0
 AC_SUBST(SPHDE_SO_VERSION)
 
 # Debug option
