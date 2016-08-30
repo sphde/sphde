@@ -22,7 +22,7 @@
 #else
 # define NS_P_S 1000000000ULL
 # define NS_P_uS 1000ULL
-# define ALLOWABLE_DRIFT 9500ULL
+# define ALLOWABLE_DRIFT 13000ULL
 #endif
 #define COUNT 10000000
 
