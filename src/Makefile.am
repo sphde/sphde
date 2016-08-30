@@ -227,8 +227,4 @@ TESTS                 += sphmultipcqueue_t
 sphmultipcqueue_t_SOURCES = tests/sphmultipcqueue_t.c
 sphmultipcqueue_t_LDADD   = libsphde.la
 
-TESTS                 += sphmultipcqueue_ttt
-sphmultipcqueue_ttt_SOURCES = tests/sphmultipcqueue_ttt.c
-sphmultipcqueue_ttt_LDADD   = libsphde.la
-
 check_PROGRAMS = $(TESTS)

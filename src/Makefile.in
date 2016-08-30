@@ -90,7 +90,7 @@ TESTS = sphgtod_t$(EXEEXT) sasatom_t$(EXEEXT) bitvec_t$(EXEEXT) \
 	sasstringbtree_t$(EXEEXT) sasstringbtree_tt$(EXEEXT) \
 	sphsinglepcqueue_t$(EXEEXT) sphsinglepcqueue_tt$(EXEEXT) \
 	sphsinglepcqueue_ttt$(EXEEXT) sphdirectpcqueue_ttt$(EXEEXT) \
-	sphmultipcqueue_t$(EXEEXT) sphmultipcqueue_ttt$(EXEEXT)
+	sphmultipcqueue_t$(EXEEXT)
 check_PROGRAMS = $(am__EXEEXT_1)
 subdir = src
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
@@ -181,7 +181,7 @@ am__EXEEXT_1 = sphgtod_t$(EXEEXT) sasatom_t$(EXEEXT) bitvec_t$(EXEEXT) \
 	sasstringbtree_t$(EXEEXT) sasstringbtree_tt$(EXEEXT) \
 	sphsinglepcqueue_t$(EXEEXT) sphsinglepcqueue_tt$(EXEEXT) \
 	sphsinglepcqueue_ttt$(EXEEXT) sphdirectpcqueue_ttt$(EXEEXT) \
-	sphmultipcqueue_t$(EXEEXT) sphmultipcqueue_ttt$(EXEEXT)
+	sphmultipcqueue_t$(EXEEXT)
 PROGRAMS = $(bin_PROGRAMS)
 am__dirstamp = $(am__leading_dot)dirstamp
 am_bitvec_t_OBJECTS = tests/bitvec_t.$(OBJEXT)
@@ -252,9 +252,6 @@ sphlogportal_tt_DEPENDENCIES = libsphde.la
 am_sphmultipcqueue_t_OBJECTS = tests/sphmultipcqueue_t.$(OBJEXT)
 sphmultipcqueue_t_OBJECTS = $(am_sphmultipcqueue_t_OBJECTS)
 sphmultipcqueue_t_DEPENDENCIES = libsphde.la
-am_sphmultipcqueue_ttt_OBJECTS = tests/sphmultipcqueue_ttt.$(OBJEXT)
-sphmultipcqueue_ttt_OBJECTS = $(am_sphmultipcqueue_ttt_OBJECTS)
-sphmultipcqueue_ttt_DEPENDENCIES = libsphde.la
 am_sphsinglepcqueue_t_OBJECTS = tests/sphsinglepcqueue_t.$(OBJEXT)
 sphsinglepcqueue_t_OBJECTS = $(am_sphsinglepcqueue_t_OBJECTS)
 sphsinglepcqueue_t_DEPENDENCIES = libsphde.la
@@ -329,9 +326,9 @@ SOURCES = $(libsphde_la_SOURCES) $(libsphgtod_la_SOURCES) \
 	$(sphlflogger_t_SOURCES) $(sphlflogger_tt_SOURCES) \
 	$(sphlflogger_ttt_SOURCES) $(sphlockfreeheap_t_SOURCES) \
 	$(sphlogportal_t_SOURCES) $(sphlogportal_tt_SOURCES) \
-	$(sphmultipcqueue_t_SOURCES) $(sphmultipcqueue_ttt_SOURCES) \
-	$(sphsinglepcqueue_t_SOURCES) $(sphsinglepcqueue_tt_SOURCES) \
-	$(sphsinglepcqueue_ttt_SOURCES) $(sphthread_t_SOURCES)
+	$(sphmultipcqueue_t_SOURCES) $(sphsinglepcqueue_t_SOURCES) \
+	$(sphsinglepcqueue_tt_SOURCES) $(sphsinglepcqueue_ttt_SOURCES) \
+	$(sphthread_t_SOURCES)
 DIST_SOURCES = $(libsphde_la_SOURCES) $(libsphgtod_la_SOURCES) \
 	$(bitvec_t_SOURCES) $(sasatom_t_SOURCES) $(sasindex_t_SOURCES) \
 	$(sasindex_tt_SOURCES) $(sasseg_t_SOURCES) $(sassim_t_SOURCES) \
@@ -341,9 +338,9 @@ DIST_SOURCES = $(libsphde_la_SOURCES) $(libsphgtod_la_SOURCES) \
 	$(sphlflogger_t_SOURCES) $(sphlflogger_tt_SOURCES) \
 	$(sphlflogger_ttt_SOURCES) $(sphlockfreeheap_t_SOURCES) \
 	$(sphlogportal_t_SOURCES) $(sphlogportal_tt_SOURCES) \
-	$(sphmultipcqueue_t_SOURCES) $(sphmultipcqueue_ttt_SOURCES) \
-	$(sphsinglepcqueue_t_SOURCES) $(sphsinglepcqueue_tt_SOURCES) \
-	$(sphsinglepcqueue_ttt_SOURCES) $(sphthread_t_SOURCES)
+	$(sphmultipcqueue_t_SOURCES) $(sphsinglepcqueue_t_SOURCES) \
+	$(sphsinglepcqueue_tt_SOURCES) $(sphsinglepcqueue_ttt_SOURCES) \
+	$(sphthread_t_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -854,8 +851,6 @@ sphdirectpcqueue_ttt_SOURCES = tests/sphdirectpcqueue_ttt.c
 sphdirectpcqueue_ttt_LDADD = libsphde.la
 sphmultipcqueue_t_SOURCES = tests/sphmultipcqueue_t.c
 sphmultipcqueue_t_LDADD = libsphde.la
-sphmultipcqueue_ttt_SOURCES = tests/sphmultipcqueue_ttt.c
-sphmultipcqueue_ttt_LDADD = libsphde.la
 all: all-am
 
 .SUFFIXES:
@@ -1105,12 +1100,6 @@ tests/sphmultipcqueue_t.$(OBJEXT): tests/$(am__dirstamp) \
 sphmultipcqueue_t$(EXEEXT): $(sphmultipcqueue_t_OBJECTS) $(sphmultipcqueue_t_DEPENDENCIES) $(EXTRA_sphmultipcqueue_t_DEPENDENCIES) 
 	@rm -f sphmultipcqueue_t$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(sphmultipcqueue_t_OBJECTS) $(sphmultipcqueue_t_LDADD) $(LIBS)
-tests/sphmultipcqueue_ttt.$(OBJEXT): tests/$(am__dirstamp) \
-	tests/$(DEPDIR)/$(am__dirstamp)
-
-sphmultipcqueue_ttt$(EXEEXT): $(sphmultipcqueue_ttt_OBJECTS) $(sphmultipcqueue_ttt_DEPENDENCIES) $(EXTRA_sphmultipcqueue_ttt_DEPENDENCIES) 
-	@rm -f sphmultipcqueue_ttt$(EXEEXT)
-	$(AM_V_CCLD)$(LINK) $(sphmultipcqueue_ttt_OBJECTS) $(sphmultipcqueue_ttt_LDADD) $(LIBS)
 tests/sphsinglepcqueue_t.$(OBJEXT): tests/$(am__dirstamp) \
 	tests/$(DEPDIR)/$(am__dirstamp)
 
@@ -1192,7 +1181,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/sphlockfreeheap_t.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/sphlogportal_t.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/sphmultipcqueue_t.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/sphmultipcqueue_ttt.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/sphsinglepcqueue_t.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/sphsinglepcqueue_tt.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/sphsinglepcqueue_ttt.Po@am__quote@
@@ -1882,13 +1870,6 @@ sphdirectpcqueue_ttt.log: sphdirectpcqueue_ttt$(EXEEXT)
 sphmultipcqueue_t.log: sphmultipcqueue_t$(EXEEXT)
 	@p='sphmultipcqueue_t$(EXEEXT)'; \
 	b='sphmultipcqueue_t'; \
-	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
-	--log-file $$b.log --trs-file $$b.trs \
-	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
-	"$$tst" $(AM_TESTS_FD_REDIRECT)
-sphmultipcqueue_ttt.log: sphmultipcqueue_ttt$(EXEEXT)
-	@p='sphmultipcqueue_ttt$(EXEEXT)'; \
-	b='sphmultipcqueue_ttt'; \
 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
