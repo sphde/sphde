@@ -52,6 +52,7 @@ libsphdeinclude_HEADERS = \
 	sasstringbtree.h \
 	sasstringbtreeenum.h \
 	sasstringbtreenode.h \
+	sphmultipcqueue.h \
 	sphsinglepcqueue.h \
 	sphdirectpcqueue.h \
 	sphlfentry.h \
@@ -120,6 +121,7 @@ libsphde_la_SOURCES = \
 	sphlockfreeheap.cpp \
 	sphlflogger.cpp \
 	sphlogportal.cpp \
+	sphmultipcqueue.cpp \
 	sphsinglepcqueue.cpp \
 	sasallocpriv.h \
 	sphcontextpriv.h
@@ -248,5 +250,9 @@ sphsinglepcqueue_ttt_LDADD   = libsphde.la
 TESTS                 += sphdirectpcqueue_ttt
 sphdirectpcqueue_ttt_SOURCES = tests/sphdirectpcqueue_ttt.c
 sphdirectpcqueue_ttt_LDADD   = libsphde.la
+
+TESTS                 += sphmultipcqueue_t
+sphmultipcqueue_t_SOURCES = tests/sphmultipcqueue_t.c
+sphmultipcqueue_t_LDADD   = libsphde.la
 
 check_PROGRAMS = $(TESTS)
