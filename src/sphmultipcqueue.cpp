@@ -329,7 +329,7 @@ SPHMPMCQAdvanceHead(SPHLFEntryHeader_t **head_p, sphLFEntryID_t idAlloc, sphLFEn
 SPHLFEntryDirect_t
 SPHMPMCQAllocStrideDirectTM (SPHMPMCQ_t queue)
 {
-	volatile SPHMPMCQHeader *headerBlock = (SPHMPMCQHeader *) queue;
+	SPHMPMCQHeader *headerBlock = (SPHMPMCQHeader *) queue;
 	SPHLFEntryHeader_t *entryPtr = 0;
 
 	debug_printf("%-6d: %s NEW\n",sphdeGetTID(),__FUNCTION__);
@@ -380,7 +380,7 @@ SPHMPMCQAllocStrideDirectTM (SPHMPMCQ_t queue)
 SPHLFEntryDirect_t
 SPHSPMCQAllocStrideDirect(SPHMPMCQ_t queue)
 {
-	volatile SPHMPMCQHeader *headerBlock = (SPHMPMCQHeader *) queue;
+	SPHMPMCQHeader *headerBlock = (SPHMPMCQHeader *) queue;
 	SPHLFEntryHeader_t *entryPtr = 0;
 	debug_printf("%-6d: %s(%p)\n",sphdeGetTID(),__FUNCTION__,queue);
 
@@ -428,7 +428,7 @@ SPHMPMCQAdvanceTail(SPHLFEntryHeader_t **tail_p, unsigned short len, longPtr_t q
 SPHLFEntryDirect_t
 SPHMPMCQGetNextCompleteDirectTM (SPHMPMCQ_t queue)
 {
-	volatile SPHMPMCQHeader *headerBlock = (SPHMPMCQHeader *) queue;
+	SPHMPMCQHeader *headerBlock = (SPHMPMCQHeader *) queue;
 	SPHLFEntryHeader_t *entryPtr = 0;
 
 	debug_printf("%-6d: %s NEW\n",sphdeGetTID(),__FUNCTION__);
@@ -476,7 +476,7 @@ SPHMPMCQGetNextCompleteDirectTM (SPHMPMCQ_t queue)
 SPHLFEntryDirect_t
 SPHMPSCQGetNextCompleteDirect(SPHMPMCQ_t queue)
 {
-	volatile SPHMPMCQHeader *headerBlock = (SPHMPMCQHeader *) queue;
+	SPHMPMCQHeader *headerBlock = (SPHMPMCQHeader *) queue;
 	SPHLFEntryHeader_t *entryPtr = 0;
 
 	debug_printf("%-6d: %s NEW\n",sphdeGetTID(),__FUNCTION__);
