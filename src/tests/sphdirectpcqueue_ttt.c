@@ -671,6 +671,7 @@ fill_test_parallel_thread (void *arg)
     rc = sched_setaffinity(sphFastGetTID(),size,cset);
     printf("%6d: sched_setaffinity(thread %d to CPU %d)=%d\n",
       sphFastGetTID(),tn,cpu_list[tn],rc);
+    CPU_FREE(cset);
   }
 
   SASThreadSetUp ();
