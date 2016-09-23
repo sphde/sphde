@@ -15,6 +15,7 @@
  *     IBM Corporation, Steven Munroe - initial API and implementation
  */
 
+#define _GNU_SOURCE
 #include <stdlib.h>
 #include <stdio.h>
 #include <errno.h>
@@ -65,6 +66,9 @@ static long thread_iterations;
 
 static const int max_threads = 256;
 #define MAX_THREADS 256
+static int cpu_list[MAX_THREADS] = {0};
+static int cpu_list_len = 0;
+static int cpu_max = 0;
 
 static SPHSinglePCQueue_t pcqueue;
 static SPHSinglePCQueue_t pcqueue2;
@@ -658,6 +662,17 @@ fill_test_parallel_thread (void *arg)
   cqueue = consumer_pcq_list[tn];
   test_func = test_funclist[tn];
 
+  if (cpu_list_len > tn) {
+    int rc;
+    cpu_set_t *cset = CPU_ALLOC(cpu_max+1);
+    int size = CPU_ALLOC_SIZE(cpu_max+1);
+    CPU_ZERO_S(size,cset);
+    CPU_SET_S(cpu_list[tn],size,cset);
+    rc = sched_setaffinity(sphFastGetTID(),size,cset);
+    printf("%6d: sched_setaffinity(thread %d to CPU %d)=%d\n",
+      sphFastGetTID(),tn,cpu_list[tn],rc);
+  }
+
   SASThreadSetUp ();
 #ifdef DEBUG_PRINT
   char number[128];
@@ -805,11 +820,18 @@ test_pcq_reset ()
 }
 
 int
-main ()
+main (int argc, char *argv[])
 {
   int rc, rc3;
   double clock, nano, rate;
   sphtimer_t tempt, startt, endt, freqt;
+  int i;
+
+  for (i = 1; i < argc; i++) {
+    cpu_list[i-1] = strtol(argv[i],0,0);
+    if (cpu_list[i-1] > cpu_max) cpu_max = cpu_list[i-1];
+    cpu_list_len++;
+  }
 
   N_PROC_CONF = sysconf (_SC_NPROCESSORS_ONLN);
   if (N_PROC_CONF < 8)
