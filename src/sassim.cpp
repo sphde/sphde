@@ -119,7 +119,8 @@ typedef struct
 {
 #ifdef __WORDSIZE_64
 #if defined (__x86_64__) || \
-    (defined (__LITTLE_ENDIAN__) && defined (__powerpc64__))
+    (defined (__LITTLE_ENDIAN__) && defined (__powerpc64__)) \
+    || defined (__aarch64__) || defined (__arm__)
   unsigned long offset:56;
   unsigned int size:8;
 #else
