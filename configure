@@ -659,6 +659,8 @@ DX_ENV
 DX_DOCDIR
 DX_CONFIG
 DX_PROJECT
+HTM_FALSE
+HTM_TRUE
 PTHREAD_CFLAGS
 PTHREAD_LIBS
 PTHREAD_CC
@@ -16996,9 +16998,18 @@ if test "x$ax_cv_check_cflags___mhtm" = xyes; then :
 
         CFLAGS="$CFLAGS -mhtm"
         CXXFLAGS="$CXXFLAGS -mhtm"
+        htm=true
 
 else
   :
+fi
+
+ if test x$htm = xtrue; then
+  HTM_TRUE=
+  HTM_FALSE='#'
+else
+  HTM_TRUE='#'
+  HTM_FALSE=
 fi
 
 
@@ -17977,6 +17988,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${am__fastdepCC_TRUE}" && test -z "${am__fastdepCC_FALSE}"; then
   as_fn_error $? "conditional \"am__fastdepCC\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HTM_TRUE}" && test -z "${HTM_FALSE}"; then
+  as_fn_error $? "conditional \"HTM\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${DX_COND_doc_TRUE}" && test -z "${DX_COND_doc_FALSE}"; then

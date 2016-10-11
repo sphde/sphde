@@ -81,6 +81,7 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 bin_PROGRAMS = sasutil$(EXEEXT)
+@HTM_TRUE@am__append_1 = sphmultipcqueue.cpp
 TESTS = sphgtod_t$(EXEEXT) sphgettime_t$(EXEEXT) sasatom_t$(EXEEXT) \
 	bitvec_t$(EXEEXT) sassim_t$(EXEEXT) sascompoundheap_t$(EXEEXT) \
 	sasseg_t$(EXEEXT) sphlockfreeheap_t$(EXEEXT) \
@@ -91,8 +92,9 @@ TESTS = sphgtod_t$(EXEEXT) sphgettime_t$(EXEEXT) sasatom_t$(EXEEXT) \
 	sasstringbtree_t$(EXEEXT) sasstringbtree_tt$(EXEEXT) \
 	sphsinglepcqueue_t$(EXEEXT) sphsinglepcqueue_tt$(EXEEXT) \
 	sphsinglepcqueue_ttt$(EXEEXT) sphdirectpcqueue_ttt$(EXEEXT) \
-	sphmultipcqueue_t$(EXEEXT)
-check_PROGRAMS = $(am__EXEEXT_1)
+	$(am__EXEEXT_1)
+@HTM_TRUE@am__append_2 = sphmultipcqueue_t
+check_PROGRAMS = $(am__EXEEXT_2)
 subdir = src
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(top_srcdir)/depcomp $(libsphdeinclude_HEADERS) \
@@ -145,6 +147,16 @@ am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" \
 LTLIBRARIES = $(lib_LTLIBRARIES)
 am__DEPENDENCIES_1 =
 libsphde_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
+am__libsphde_la_SOURCES_DIST = sasshm.c sasmsync.c sasstname.c sasio.c \
+	bitv.c freenode.c sphtimer.c sphthread.c sassim.cpp \
+	sasalloc.cpp ultree.cpp saslock.cpp sasmlock.cpp sasulock.cpp \
+	sassimplespace.cpp sassimplestack.cpp sassimpleheap.cpp \
+	sascompoundheap.cpp sasindex.cpp sasindexnode.cpp \
+	sasindexenum.cpp sasstringbtreenode.cpp sasstringbtree.cpp \
+	sasstringbtreeenum.cpp sphcontext.cpp sphlockfreeheap.cpp \
+	sphlflogger.cpp sphlogportal.cpp sphsinglepcqueue.cpp \
+	sasallocpriv.h sphcontextpriv.h sphmultipcqueue.cpp
+@HTM_TRUE@am__objects_1 = libsphde_la-sphmultipcqueue.lo
 am_libsphde_la_OBJECTS = libsphde_la-sasshm.lo libsphde_la-sasmsync.lo \
 	libsphde_la-sasstname.lo libsphde_la-sasio.lo \
 	libsphde_la-bitv.lo libsphde_la-freenode.lo \
@@ -159,8 +171,8 @@ am_libsphde_la_OBJECTS = libsphde_la-sasshm.lo libsphde_la-sasmsync.lo \
 	libsphde_la-sasstringbtree.lo \
 	libsphde_la-sasstringbtreeenum.lo libsphde_la-sphcontext.lo \
 	libsphde_la-sphlockfreeheap.lo libsphde_la-sphlflogger.lo \
-	libsphde_la-sphlogportal.lo libsphde_la-sphmultipcqueue.lo \
-	libsphde_la-sphsinglepcqueue.lo
+	libsphde_la-sphlogportal.lo libsphde_la-sphsinglepcqueue.lo \
+	$(am__objects_1)
 libsphde_la_OBJECTS = $(am_libsphde_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
@@ -182,7 +194,8 @@ libsphgtod_la_OBJECTS = $(am_libsphgtod_la_OBJECTS)
 libsphgtod_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(libsphgtod_la_CFLAGS) \
 	$(CFLAGS) $(libsphgtod_la_LDFLAGS) $(LDFLAGS) -o $@
-am__EXEEXT_1 = sphgtod_t$(EXEEXT) sphgettime_t$(EXEEXT) \
+@HTM_TRUE@am__EXEEXT_1 = sphmultipcqueue_t$(EXEEXT)
+am__EXEEXT_2 = sphgtod_t$(EXEEXT) sphgettime_t$(EXEEXT) \
 	sasatom_t$(EXEEXT) bitvec_t$(EXEEXT) sassim_t$(EXEEXT) \
 	sascompoundheap_t$(EXEEXT) sasseg_t$(EXEEXT) \
 	sphlockfreeheap_t$(EXEEXT) sphlflogger_t$(EXEEXT) \
@@ -193,7 +206,7 @@ am__EXEEXT_1 = sphgtod_t$(EXEEXT) sphgettime_t$(EXEEXT) \
 	sasstringbtree_t$(EXEEXT) sasstringbtree_tt$(EXEEXT) \
 	sphsinglepcqueue_t$(EXEEXT) sphsinglepcqueue_tt$(EXEEXT) \
 	sphsinglepcqueue_ttt$(EXEEXT) sphdirectpcqueue_ttt$(EXEEXT) \
-	sphmultipcqueue_t$(EXEEXT)
+	$(am__EXEEXT_1)
 PROGRAMS = $(bin_PROGRAMS)
 am__dirstamp = $(am__leading_dot)dirstamp
 am_bitvec_t_OBJECTS = tests/bitvec_t.$(OBJEXT)
@@ -267,9 +280,11 @@ sphlogportal_t_DEPENDENCIES = libsphde.la
 am_sphlogportal_tt_OBJECTS = tests/sphlogportal_t.$(OBJEXT)
 sphlogportal_tt_OBJECTS = $(am_sphlogportal_tt_OBJECTS)
 sphlogportal_tt_DEPENDENCIES = libsphde.la
-am_sphmultipcqueue_t_OBJECTS = tests/sphmultipcqueue_t.$(OBJEXT)
+am__sphmultipcqueue_t_SOURCES_DIST = tests/sphmultipcqueue_t.c
+@HTM_TRUE@am_sphmultipcqueue_t_OBJECTS =  \
+@HTM_TRUE@	tests/sphmultipcqueue_t.$(OBJEXT)
 sphmultipcqueue_t_OBJECTS = $(am_sphmultipcqueue_t_OBJECTS)
-sphmultipcqueue_t_DEPENDENCIES = libsphde.la
+@HTM_TRUE@sphmultipcqueue_t_DEPENDENCIES = libsphde.la
 am_sphsinglepcqueue_t_OBJECTS = tests/sphsinglepcqueue_t.$(OBJEXT)
 sphsinglepcqueue_t_OBJECTS = $(am_sphsinglepcqueue_t_OBJECTS)
 sphsinglepcqueue_t_DEPENDENCIES = libsphde.la
@@ -349,18 +364,19 @@ SOURCES = $(libsphde_la_SOURCES) $(libsphgettime_la_SOURCES) \
 	$(sphlogportal_tt_SOURCES) $(sphmultipcqueue_t_SOURCES) \
 	$(sphsinglepcqueue_t_SOURCES) $(sphsinglepcqueue_tt_SOURCES) \
 	$(sphsinglepcqueue_ttt_SOURCES) $(sphthread_t_SOURCES)
-DIST_SOURCES = $(libsphde_la_SOURCES) $(libsphgettime_la_SOURCES) \
-	$(libsphgtod_la_SOURCES) $(bitvec_t_SOURCES) \
-	$(sasatom_t_SOURCES) $(sascompoundheap_t_SOURCES) \
-	$(sasindex_t_SOURCES) $(sasindex_tt_SOURCES) \
-	$(sasseg_t_SOURCES) $(sassim_t_SOURCES) \
+DIST_SOURCES = $(am__libsphde_la_SOURCES_DIST) \
+	$(libsphgettime_la_SOURCES) $(libsphgtod_la_SOURCES) \
+	$(bitvec_t_SOURCES) $(sasatom_t_SOURCES) \
+	$(sascompoundheap_t_SOURCES) $(sasindex_t_SOURCES) \
+	$(sasindex_tt_SOURCES) $(sasseg_t_SOURCES) $(sassim_t_SOURCES) \
 	$(sasstringbtree_t_SOURCES) $(sasstringbtree_tt_SOURCES) \
 	$(sasutil_SOURCES) $(sphcontext_t_SOURCES) \
 	$(sphdirectpcqueue_ttt_SOURCES) $(sphgettime_t_SOURCES) \
 	$(sphgtod_t_SOURCES) $(sphlflogger_t_SOURCES) \
 	$(sphlflogger_tt_SOURCES) $(sphlflogger_ttt_SOURCES) \
 	$(sphlockfreeheap_t_SOURCES) $(sphlogportal_t_SOURCES) \
-	$(sphlogportal_tt_SOURCES) $(sphmultipcqueue_t_SOURCES) \
+	$(sphlogportal_tt_SOURCES) \
+	$(am__sphmultipcqueue_t_SOURCES_DIST) \
 	$(sphsinglepcqueue_t_SOURCES) $(sphsinglepcqueue_tt_SOURCES) \
 	$(sphsinglepcqueue_ttt_SOURCES) $(sphthread_t_SOURCES)
 am__can_run_installinfo = \
@@ -786,40 +802,15 @@ libsphde_la_INCLUDES = \
 
 libsphgtod_la_SOURCES = sphgtod.c
 libsphgettime_la_SOURCES = sphgettime.c
-libsphde_la_SOURCES = \
-	sasshm.c \
-	sasmsync.c \
-	sasstname.c \
-	sasio.c \
-	bitv.c \
-	freenode.c \
-	sphtimer.c \
-	sphthread.c \
-	sassim.cpp \
-	sasalloc.cpp \
-	ultree.cpp \
-	saslock.cpp \
-	sasmlock.cpp \
-	sasulock.cpp \
-	sassimplespace.cpp \
-	sassimplestack.cpp \
-	sassimpleheap.cpp \
-	sascompoundheap.cpp \
-	sasindex.cpp \
-	sasindexnode.cpp \
-	sasindexenum.cpp \
-	sasstringbtreenode.cpp \
-	sasstringbtree.cpp \
-	sasstringbtreeenum.cpp \
-	sphcontext.cpp \
-	sphlockfreeheap.cpp \
-	sphlflogger.cpp \
-	sphlogportal.cpp \
-	sphmultipcqueue.cpp \
-	sphsinglepcqueue.cpp \
-	sasallocpriv.h \
-	sphcontextpriv.h
-
+libsphde_la_SOURCES = sasshm.c sasmsync.c sasstname.c sasio.c bitv.c \
+	freenode.c sphtimer.c sphthread.c sassim.cpp sasalloc.cpp \
+	ultree.cpp saslock.cpp sasmlock.cpp sasulock.cpp \
+	sassimplespace.cpp sassimplestack.cpp sassimpleheap.cpp \
+	sascompoundheap.cpp sasindex.cpp sasindexnode.cpp \
+	sasindexenum.cpp sasstringbtreenode.cpp sasstringbtree.cpp \
+	sasstringbtreeenum.cpp sphcontext.cpp sphlockfreeheap.cpp \
+	sphlflogger.cpp sphlogportal.cpp sphsinglepcqueue.cpp \
+	sasallocpriv.h sphcontextpriv.h $(am__append_1)
 libsphde_la_CFLAGS = -D__SASSIM__ $(AM_CFLAGS)
 libsphde_la_CXXFLAGS = -D__SASSIM__ $(AM_CXXFLAGS)
 libsphgtod_la_CFLAGS = $(AM_CFLAGS)
@@ -888,8 +879,8 @@ sphsinglepcqueue_ttt_SOURCES = tests/sphsinglepcqueue_ttt.c
 sphsinglepcqueue_ttt_LDADD = libsphde.la
 sphdirectpcqueue_ttt_SOURCES = tests/sphdirectpcqueue_ttt.c
 sphdirectpcqueue_ttt_LDADD = libsphde.la
-sphmultipcqueue_t_SOURCES = tests/sphmultipcqueue_t.c
-sphmultipcqueue_t_LDADD = libsphde.la
+@HTM_TRUE@sphmultipcqueue_t_SOURCES = tests/sphmultipcqueue_t.c
+@HTM_TRUE@sphmultipcqueue_t_LDADD = libsphde.la
 all: all-am
 
 .SUFFIXES:
@@ -1529,19 +1520,19 @@ libsphde_la-sphlogportal.lo: sphlogportal.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsphde_la_CXXFLAGS) $(CXXFLAGS) -c -o libsphde_la-sphlogportal.lo `test -f 'sphlogportal.cpp' || echo '$(srcdir)/'`sphlogportal.cpp
 
-libsphde_la-sphmultipcqueue.lo: sphmultipcqueue.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsphde_la_CXXFLAGS) $(CXXFLAGS) -MT libsphde_la-sphmultipcqueue.lo -MD -MP -MF $(DEPDIR)/libsphde_la-sphmultipcqueue.Tpo -c -o libsphde_la-sphmultipcqueue.lo `test -f 'sphmultipcqueue.cpp' || echo '$(srcdir)/'`sphmultipcqueue.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libsphde_la-sphmultipcqueue.Tpo $(DEPDIR)/libsphde_la-sphmultipcqueue.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='sphmultipcqueue.cpp' object='libsphde_la-sphmultipcqueue.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsphde_la_CXXFLAGS) $(CXXFLAGS) -c -o libsphde_la-sphmultipcqueue.lo `test -f 'sphmultipcqueue.cpp' || echo '$(srcdir)/'`sphmultipcqueue.cpp
-
 libsphde_la-sphsinglepcqueue.lo: sphsinglepcqueue.cpp
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsphde_la_CXXFLAGS) $(CXXFLAGS) -MT libsphde_la-sphsinglepcqueue.lo -MD -MP -MF $(DEPDIR)/libsphde_la-sphsinglepcqueue.Tpo -c -o libsphde_la-sphsinglepcqueue.lo `test -f 'sphsinglepcqueue.cpp' || echo '$(srcdir)/'`sphsinglepcqueue.cpp
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libsphde_la-sphsinglepcqueue.Tpo $(DEPDIR)/libsphde_la-sphsinglepcqueue.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='sphsinglepcqueue.cpp' object='libsphde_la-sphsinglepcqueue.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsphde_la_CXXFLAGS) $(CXXFLAGS) -c -o libsphde_la-sphsinglepcqueue.lo `test -f 'sphsinglepcqueue.cpp' || echo '$(srcdir)/'`sphsinglepcqueue.cpp
+
+libsphde_la-sphmultipcqueue.lo: sphmultipcqueue.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsphde_la_CXXFLAGS) $(CXXFLAGS) -MT libsphde_la-sphmultipcqueue.lo -MD -MP -MF $(DEPDIR)/libsphde_la-sphmultipcqueue.Tpo -c -o libsphde_la-sphmultipcqueue.lo `test -f 'sphmultipcqueue.cpp' || echo '$(srcdir)/'`sphmultipcqueue.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libsphde_la-sphmultipcqueue.Tpo $(DEPDIR)/libsphde_la-sphmultipcqueue.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='sphmultipcqueue.cpp' object='libsphde_la-sphmultipcqueue.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsphde_la_CXXFLAGS) $(CXXFLAGS) -c -o libsphde_la-sphmultipcqueue.lo `test -f 'sphmultipcqueue.cpp' || echo '$(srcdir)/'`sphmultipcqueue.cpp
 
 mostlyclean-libtool:
 	-rm -f *.lo
