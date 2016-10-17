@@ -81,7 +81,8 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 bin_PROGRAMS = sasutil$(EXEEXT)
-@HTM_TRUE@am__append_1 = sphmultipcqueue.cpp
+@HTM_TRUE@am__append_1 = sphmultipcqueue.h
+@HTM_TRUE@am__append_2 = sphmultipcqueue.cpp
 TESTS = sphgtod_t$(EXEEXT) sphgettime_t$(EXEEXT) sasatom_t$(EXEEXT) \
 	bitvec_t$(EXEEXT) sassim_t$(EXEEXT) sascompoundheap_t$(EXEEXT) \
 	sasseg_t$(EXEEXT) sphlockfreeheap_t$(EXEEXT) \
@@ -93,11 +94,11 @@ TESTS = sphgtod_t$(EXEEXT) sphgettime_t$(EXEEXT) sasatom_t$(EXEEXT) \
 	sphsinglepcqueue_t$(EXEEXT) sphsinglepcqueue_tt$(EXEEXT) \
 	sphsinglepcqueue_ttt$(EXEEXT) sphdirectpcqueue_ttt$(EXEEXT) \
 	$(am__EXEEXT_1)
-@HTM_TRUE@am__append_2 = sphmultipcqueue_t
+@HTM_TRUE@am__append_3 = sphmultipcqueue_t
 check_PROGRAMS = $(am__EXEEXT_2)
 subdir = src
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
-	$(top_srcdir)/depcomp $(libsphdeinclude_HEADERS) \
+	$(top_srcdir)/depcomp $(am__libsphdeinclude_HEADERS_DIST) \
 	$(libsphgettimeinclude_HEADERS) $(libsphgtodinclude_HEADERS) \
 	$(top_srcdir)/test-driver
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -384,6 +385,16 @@ am__can_run_installinfo = \
     n|no|NO) false;; \
     *) (install-info --version) >/dev/null 2>&1;; \
   esac
+am__libsphdeinclude_HEADERS_DIST = sasatom.h sasatom_generic.h \
+	sasatom_i386.h sasatom_powerpc.h sasatom_x86_64.h \
+	sascompoundheap.h sphcompoundpcqheap.h sasindexenum.h sassim.h \
+	sasalloc.h sphcontext.h saslock.h sasmsync.h sasindex.h \
+	sasindexnode.h sasindexkey.h freenode.h sasconf.h sastype.h \
+	sasstname.h sassimpleheap.h sassimplespace.h sassimplestack.h \
+	sasstringbtree.h sasstringbtreeenum.h sasstringbtreenode.h \
+	sphsinglepcqueue.h sphdirectpcqueue.h sphlfentry.h \
+	sphlflogentry.h sphlflogger.h sphlockfreeheap.h sphlogportal.h \
+	sphthread.h sphtimer.h sphmultipcqueue.h
 HEADERS = $(libsphdeinclude_HEADERS) $(libsphgettimeinclude_HEADERS) \
 	$(libsphgtodinclude_HEADERS)
 am__tagged_files = $(HEADERS) $(SOURCES) $(TAGS_FILES) $(LISP)
@@ -739,44 +750,16 @@ libsphgettimeincludedir = $(includedir)/sphde
 
 # The headers in 'libsphdeinclude_HEADERS' are meant to be the ones installed
 # on 'make install'
-libsphdeinclude_HEADERS = \
-	sasatom.h \
-	sasatom_generic.h \
-	sasatom_i386.h \
-	sasatom_powerpc.h \
-	sasatom_x86_64.h \
-	sascompoundheap.h \
-	sphcompoundpcqheap.h \
-	sasindexenum.h \
-	sassim.h \
-	sasalloc.h \
-	sphcontext.h \
-	saslock.h \
-	sasmsync.h \
-	sasindex.h \
-	sasindexnode.h \
-	sasindexkey.h \
-	freenode.h \
-	sasconf.h \
-	sastype.h \
-	sasstname.h \
-	sassimpleheap.h \
-	sassimplespace.h \
-	sassimplestack.h \
-	sasstringbtree.h \
-	sasstringbtreeenum.h \
-	sasstringbtreenode.h \
-	sphmultipcqueue.h \
-	sphsinglepcqueue.h \
-	sphdirectpcqueue.h \
-	sphlfentry.h \
-	sphlflogentry.h \
-	sphlflogger.h \
-	sphlockfreeheap.h \
-	sphlogportal.h \
-	sphthread.h \
-	sphtimer.h
-
+libsphdeinclude_HEADERS = sasatom.h sasatom_generic.h sasatom_i386.h \
+	sasatom_powerpc.h sasatom_x86_64.h sascompoundheap.h \
+	sphcompoundpcqheap.h sasindexenum.h sassim.h sasalloc.h \
+	sphcontext.h saslock.h sasmsync.h sasindex.h sasindexnode.h \
+	sasindexkey.h freenode.h sasconf.h sastype.h sasstname.h \
+	sassimpleheap.h sassimplespace.h sassimplestack.h \
+	sasstringbtree.h sasstringbtreeenum.h sasstringbtreenode.h \
+	sphsinglepcqueue.h sphdirectpcqueue.h sphlfentry.h \
+	sphlflogentry.h sphlflogger.h sphlockfreeheap.h sphlogportal.h \
+	sphthread.h sphtimer.h $(am__append_1)
 libsphgtodinclude_HEADERS = sphgtod.h
 libsphgettimeinclude_HEADERS = sphgettime.h
 libsphde_la_INCLUDES = \
@@ -810,7 +793,7 @@ libsphde_la_SOURCES = sasshm.c sasmsync.c sasstname.c sasio.c bitv.c \
 	sasindexenum.cpp sasstringbtreenode.cpp sasstringbtree.cpp \
 	sasstringbtreeenum.cpp sphcontext.cpp sphlockfreeheap.cpp \
 	sphlflogger.cpp sphlogportal.cpp sphsinglepcqueue.cpp \
-	sasallocpriv.h sphcontextpriv.h $(am__append_1)
+	sasallocpriv.h sphcontextpriv.h $(am__append_2)
 libsphde_la_CFLAGS = -D__SASSIM__ $(AM_CFLAGS)
 libsphde_la_CXXFLAGS = -D__SASSIM__ $(AM_CXXFLAGS)
 libsphgtod_la_CFLAGS = $(AM_CFLAGS)

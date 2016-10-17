@@ -52,7 +52,6 @@ libsphdeinclude_HEADERS = \
 	sasstringbtree.h \
 	sasstringbtreeenum.h \
 	sasstringbtreenode.h \
-	sphmultipcqueue.h \
 	sphsinglepcqueue.h \
 	sphdirectpcqueue.h \
 	sphlfentry.h \
@@ -126,6 +125,7 @@ libsphde_la_SOURCES = \
 	sphcontextpriv.h
 
 if HTM
+libsphdeinclude_HEADERS += sphmultipcqueue.h
 libsphde_la_SOURCES += sphmultipcqueue.cpp
 endif
 
