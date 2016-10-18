@@ -10,6 +10,7 @@
 #define _GNU_SOURCE
 #include <stdlib.h>
 #include <stdio.h>
+#include <errno.h>
 #include <semaphore.h>
 #include <limits.h>
 #include <unistd.h>
@@ -844,9 +845,11 @@ fill_test_parallel_thread (void *arg)
 			printf("%6d: sched_setaffinity(thread %d to CPU %d)\n",
 				sphFastGetTID(),tn,cpu_list[tn]);
 		} else {
-			fprintf(stderr,"%6d: sched_setaffinity(thread %d to CPU %d) ",
-				sphFastGetTID(),tn,cpu_list[tn]);
-			perror(0);
+			char buf[1024];
+			char *msg = strerror_r(errno,buf,sizeof buf);
+			if (!msg) msg = buf;
+			fprintf(stderr,"%6d: sched_setaffinity(thread %d to CPU %d) %s\n",
+				sphFastGetTID(),tn,cpu_list[tn],msg);
 		}
 		CPU_FREE(cset);
 	}

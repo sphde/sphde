@@ -669,8 +669,16 @@ fill_test_parallel_thread (void *arg)
     CPU_ZERO_S(size,cset);
     CPU_SET_S(cpu_list[tn],size,cset);
     rc = sched_setaffinity(sphFastGetTID(),size,cset);
-    printf("%6d: sched_setaffinity(thread %d to CPU %d)=%d\n",
-      sphFastGetTID(),tn,cpu_list[tn],rc);
+      if (rc == 0) {
+        printf("%6d: sched_setaffinity(thread %d to CPU %d)\n",
+          sphFastGetTID(),tn,cpu_list[tn]);
+      } else {
+        char buf[1024];
+        char *msg = strerror_r(errno,buf,sizeof buf);
+        if (!msg) msg = buf;
+        fprintf(stderr,"%6d: sched_setaffinity(thread %d to CPU %d) %s\n",
+          sphFastGetTID(),tn,cpu_list[tn],msg);
+      }
     CPU_FREE(cset);
   }
 
