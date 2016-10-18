@@ -7,10 +7,14 @@
 
 //#define DebugPrint
 
+#define _GNU_SOURCE
+#include <stdlib.h>
 #include <stdio.h>
+#include <errno.h>
 #include <semaphore.h>
 #include <limits.h>
 #include <unistd.h>
+#include <sched.h>
 #include <pthread.h>
 #include <sys/auxv.h>
 #include "sassim.h"
@@ -22,6 +26,10 @@
 #define Q_SIZE 1024
 #define Q_STRIDE 128
 #define MAX_THREADS 256
+
+static int cpu_list[MAX_THREADS] = {0};
+static int cpu_list_len = 0;
+static int cpu_max = 0;
 
 #ifndef debug_printf
 #ifdef DebugPrint
@@ -827,6 +835,26 @@ fill_test_parallel_thread (void *arg)
 	cqueue = consumer_pcq_list[tn];
 	test_func = test_funclist[tn];
 
+	if (cpu_list_len > tn) {
+		int rc;
+		cpu_set_t *cset = CPU_ALLOC(cpu_max+1);
+		int size = CPU_ALLOC_SIZE(cpu_max+1);
+		CPU_ZERO_S(size,cset);
+		CPU_SET_S(cpu_list[tn],size,cset);
+		rc = sched_setaffinity(sphFastGetTID(),size,cset);
+		if (rc == 0) {
+			printf("%6d: sched_setaffinity(thread %d to CPU %d)\n",
+				sphFastGetTID(),tn,cpu_list[tn]);
+		} else {
+			char buf[1024];
+			char *msg = strerror_r(errno,buf,sizeof buf);
+			if (!msg) msg = buf;
+			fprintf(stderr,"%6d: sched_setaffinity(thread %d to CPU %d) %s\n",
+				sphFastGetTID(),tn,cpu_list[tn],msg);
+		}
+		CPU_FREE(cset);
+	}
+
 	SASThreadSetUp ();
 	debug_printf ("ltt(%d, %d, @%p, @%p): begin\n", tn, sphFastGetTID(),
 			pqueue, cqueue);
@@ -894,6 +922,12 @@ main(int argc, char *argv[]) {
 	int rc = 0;
 	int test_id,i;
 	int num_producers, num_consumers;
+
+	for (i = 1; i < argc; i++) {
+		cpu_list[i-1] = strtol(argv[i],0,0);
+		if (cpu_list[i-1] > cpu_max) cpu_max = cpu_list[i-1];
+		cpu_list_len++;
+	}
 
 	rc = SASJoinRegion();
 	if (rc) {
