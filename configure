@@ -659,6 +659,8 @@ DX_ENV
 DX_DOCDIR
 DX_CONFIG
 DX_PROJECT
+HTM_FALSE
+HTM_TRUE
 PTHREAD_CFLAGS
 PTHREAD_LIBS
 PTHREAD_CC
@@ -16878,91 +16880,6 @@ fi
 LDFLAGS="$SAVE_LDFLAGS"
 fi
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether C compiler accepts -fgnu-tm" >&5
-$as_echo_n "checking whether C compiler accepts -fgnu-tm... " >&6; }
-if ${ax_cv_check_cflags___fgnu_tm+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-
-  ax_check_save_flags=$CFLAGS
-  CFLAGS="$CFLAGS  -fgnu-tm"
-  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-int
-main ()
-{
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"; then :
-  ax_cv_check_cflags___fgnu_tm=yes
-else
-  ax_cv_check_cflags___fgnu_tm=no
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-  CFLAGS=$ax_check_save_flags
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ax_cv_check_cflags___fgnu_tm" >&5
-$as_echo "$ax_cv_check_cflags___fgnu_tm" >&6; }
-if test "x$ax_cv_check_cflags___fgnu_tm" = xyes; then :
-
-        CFLAGS="$CFLAGS -fgnu-tm -DHAS_GNU_TM"
-        CXXFLAGS="$CXXFLAGS -fgnu-tm -DHAS_GNU_TM"
-        { $as_echo "$as_me:${as_lineno-$LINENO}: checking for _ITM_libraryVersion in -litm" >&5
-$as_echo_n "checking for _ITM_libraryVersion in -litm... " >&6; }
-if ${ac_cv_lib_itm__ITM_libraryVersion+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-litm  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-char _ITM_libraryVersion ();
-int
-main ()
-{
-return _ITM_libraryVersion ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_link "$LINENO"; then :
-  ac_cv_lib_itm__ITM_libraryVersion=yes
-else
-  ac_cv_lib_itm__ITM_libraryVersion=no
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_itm__ITM_libraryVersion" >&5
-$as_echo "$ac_cv_lib_itm__ITM_libraryVersion" >&6; }
-if test "x$ac_cv_lib_itm__ITM_libraryVersion" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_LIBITM 1
-_ACEOF
-
-  LIBS="-litm $LIBS"
-
-else
-  as_fn_error $? "*** libitm not found. Try to install libitm." "$LINENO" 5
-fi
-
-
-else
-  :
-fi
-
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether C compiler accepts -mhtm" >&5
 $as_echo_n "checking whether C compiler accepts -mhtm... " >&6; }
 if ${ax_cv_check_cflags___mhtm+:} false; then :
@@ -16996,9 +16913,18 @@ if test "x$ax_cv_check_cflags___mhtm" = xyes; then :
 
         CFLAGS="$CFLAGS -mhtm"
         CXXFLAGS="$CXXFLAGS -mhtm"
+        htm=true
 
 else
   :
+fi
+
+ if test x$htm = xtrue; then
+  HTM_TRUE=
+  HTM_FALSE='#'
+else
+  HTM_TRUE='#'
+  HTM_FALSE=
 fi
 
 
@@ -17977,6 +17903,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${am__fastdepCC_TRUE}" && test -z "${am__fastdepCC_FALSE}"; then
   as_fn_error $? "conditional \"am__fastdepCC\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HTM_TRUE}" && test -z "${HTM_FALSE}"; then
+  as_fn_error $? "conditional \"HTM\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${DX_COND_doc_TRUE}" && test -z "${DX_COND_doc_FALSE}"; then

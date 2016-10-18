@@ -10,6 +10,9 @@
  *     IBM Corporation, Paul Clarke   - MPMC implementation
  */
 
+/* This implementation of MCMPQ requires HTM support. */
+#ifdef __HTM__
+
 //#define __SASDebugPrint__ 1
 
 #define sas_printf printf
@@ -17,9 +20,8 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <time.h>
-#ifdef __HTM__
+#include <sys/auxv.h>
 #include <htmxlintrin.h>
-#endif
 #include "sasalloc.h"
 #include "freenode.h"
 #ifdef __SASDebugPrint__
@@ -75,6 +77,12 @@ SPHMPMCQInitInternal (void *buf_seg, sas_type_t sasType,
 		      block_size_t buf_size,
 		      unsigned int stride, unsigned int options)
 {
+	unsigned long hwcap2 = getauxval(AT_HWCAP2);
+	if ((hwcap2 & PPC_FEATURE2_HAS_HTM) == 0) {
+		fprintf(stderr,"MPMCQ requires Hardware Transactional Memory support.\n");
+		return NULL;
+	}
+
 	SPHMPMCQHeader *heapBlock = (SPHMPMCQHeader *) buf_seg;
 	char *qStart = NULL;
 	char *qEnd = NULL;
@@ -325,10 +333,8 @@ SPHMPMCQAdvanceHead(SPHLFEntryHeader_t **head_p, sphLFEntryID_t idAlloc, sphLFEn
 	return 0;
 }
 
-#if defined(HAS_GNU_TM) || defined(__HTM__)
 SPHLFEntryDirect_t
-SPHMPMCQAllocStrideDirectTM (SPHMPMCQ_t queue)
-{
+SPHMPMCQAllocStrideDirectHTM(SPHMPMCQ_t queue) {
 	SPHMPMCQHeader *headerBlock = (SPHMPMCQHeader *) queue;
 	SPHLFEntryHeader_t *entryPtr = 0;
 
@@ -339,9 +345,7 @@ SPHMPMCQAllocStrideDirectTM (SPHMPMCQ_t queue)
 		const unsigned short stride = headerBlock->default_entry_stride;
 		const longPtr_t qlo = headerBlock->startq;
 		const longPtr_t qhi = headerBlock->endq;
-#ifdef __HTM__
 		TM_buff_type TM_buff;
-#endif
 
 		entrytemp.detail.valid = 0;
 		entrytemp.detail.timestamped = 0;
@@ -351,31 +355,17 @@ SPHMPMCQAllocStrideDirectTM (SPHMPMCQ_t queue)
 		entrytemp.detail.subcat = 0;
 		entrytemp.detail.len = (stride / DEFAULT_ALLOC_UNIT);
 
-#ifdef __HTM__
 		if (__TM_begin (TM_buff) == _HTM_TBEGIN_STARTED) {
 			/* Transaction State Initiated. */
 			entryPtr = SPHMPMCQAdvanceHead((SPHLFEntryHeader_t **)&headerBlock->qhead,entrytemp.idUnit,entryfree.idUnit,stride,qlo,qhi);
 			__TM_end ();
-		} else {
-			if (__TM_is_failure_persistent (TM_buff)) {
-				/* revert to GNU TM */
-#endif
-#ifdef HAS_GNU_TM
-				__transaction_atomic {
-					entryPtr = SPHMPMCQAdvanceHead((SPHLFEntryHeader_t **)&headerBlock->qhead,entrytemp.idUnit,entryfree.idUnit,stride,qlo,qhi);
-				}
-#endif
-#ifdef __HTM__
-			}
 		}
-#endif
 	} else {
 		debug_printf("%-6d: %s(%p) type check failed\n",sphdeGetTID(),__FUNCTION__,queue);
 	}
 	debug_printf("%-6d: %s = %p\n",sphdeGetTID(),__FUNCTION__,entryPtr);
 	return entryPtr;
 }
-#endif
 
 SPHLFEntryDirect_t
 SPHSPMCQAllocStrideDirect(SPHMPMCQ_t queue)
@@ -424,9 +414,8 @@ SPHMPMCQAdvanceTail(SPHLFEntryHeader_t **tail_p, unsigned short len, longPtr_t q
 	return 0;
 }
 
-#if defined(HAS_GNU_TM) || defined(__HTM__)
 SPHLFEntryDirect_t
-SPHMPMCQGetNextCompleteDirectTM (SPHMPMCQ_t queue)
+SPHMPMCQGetNextCompleteDirectHTM (SPHMPMCQ_t queue)
 {
 	SPHMPMCQHeader *headerBlock = (SPHMPMCQHeader *) queue;
 	SPHLFEntryHeader_t *entryPtr = 0;
@@ -437,41 +426,18 @@ SPHMPMCQGetNextCompleteDirectTM (SPHMPMCQ_t queue)
 		const unsigned short stride = headerBlock->default_entry_stride;
 		const longPtr_t qlo = headerBlock->startq;
 		const longPtr_t qhi = headerBlock->endq;
-#ifdef __HTM__
 		TM_buff_type TM_buff;
 		if (__TM_begin (TM_buff) == _HTM_TBEGIN_STARTED) {
 			/* Transaction State Initiated. */
 			entryPtr = SPHMPMCQAdvanceTail((SPHLFEntryHeader_t **)&headerBlock->qtail,stride,qlo,qhi);
 			__TM_end ();
-		} else {
-			if (__TM_is_failure_persistent (TM_buff)) {
-				/* revert to GNU TM */
-#endif
-#ifdef HAS_GNU_TM
-				__transaction_atomic {
-					entryPtr = SPHMPMCQAdvanceTail((SPHLFEntryHeader_t **)&headerBlock->qtail,stride,qlo,qhi);
-				}
-#endif
-#ifdef __HTM__
-			}
 		}
-#endif
 	} else {
 		debug_printf("%s(%p) type check failed\n",__FUNCTION__,queue);
 	}
-#if 0
-	{
-		SPHLFEntryHeader_t **tail_p = (SPHLFEntryHeader_t **)&headerBlock->qtail;
-		SPHLFEntryHeader_t *entryPtr = *tail_p;
-		sphLFEntry_t entrytemp;
-		entrytemp.idUnit = entryPtr->entryID.idUnit;
-		printf("%-6d: tail = %lx entryPtr = %p allocated = %d valid = %d\n",sphdeGetTID(),headerBlock->qtail,entryPtr,entrytemp.detail.allocated,entrytemp.detail.valid);
-	}
-#endif
 	debug_printf("%-6d: %s = %p\n",sphdeGetTID(),__FUNCTION__,entryPtr);
 	return ((SPHLFEntryDirect_t)entryPtr);
 }
-#endif
 
 SPHLFEntryDirect_t
 SPHMPSCQGetNextCompleteDirect(SPHMPMCQ_t queue)
@@ -605,3 +571,4 @@ SPHMPMCQDestroy (SPHMPMCQ_t queue)
 	}
 	return rc;
 }
+#endif
