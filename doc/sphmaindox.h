@@ -290,6 +290,7 @@ int main ()
 *  - sphlflogentry.h Logger Entry access API
 *  - sphdirectpcqueue.h Lock Free Direct Single Producer / Single Consumer Queue
 *  - sphsinglepcqueue.h Lock Free Single Producer / Single Consumer Queue
+*  - sphmultipcqueue.h Lock Free Multi Producer / Multi Consumer Queue
 *  - sphlfentry.h SPH Entry access API
 *
 *  \subsection SPH MultiCore Utility functions
