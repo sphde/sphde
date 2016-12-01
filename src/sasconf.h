@@ -93,6 +93,14 @@
 # define     __SAS_SHMAP_MAX         0x01000000UL    /*  16MB */
 #endif
 
+#ifdef __mips64
+# define     __WORDSIZE_64
+# define     __SAS_BASE_ADDRESS      0x4000000000L   /* 256GB */
+# define     RegionSize              0x2000000000L   /* 128GB */
+# define     SegmentSize             0x0010000000L   /* 256MB */
+# define     __SAS_SHMAP_MAX         0x0001000000L   /*  16MB */
+#endif
+
 /* 
  * If the platform is not recognized above, select some resonable default.
  */
