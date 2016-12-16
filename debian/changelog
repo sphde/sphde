@@ -1,0 +1,5 @@
+sphde (1.0.0-1) UNRELEASED; urgency=low
+
+  * Initial release (Closes: #787491)
+
+ -- Frédéric Bonnard <frediz@linux.vnet.ibm.com>  Mon, 01 Jun 2015 14:49:24 +0000

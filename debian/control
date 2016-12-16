@@ -1,0 +1,28 @@
+Source: sphde
+Priority: optional
+Maintainer: Frédéric Bonnard <frediz@linux.vnet.ibm.com>
+Build-Depends: debhelper (>= 9), dh-autoreconf, doxygen
+Standards-Version: 3.9.6
+Section: libs
+Homepage: https://github.com/sphde/sphde
+
+Package: libsphde-dev
+Section: libdevel
+Architecture: any
+Depends: libsphde1 (= ${binary:Version}), ${misc:Depends}
+Description: Shared Persistent Heap Data Environment library development files
+ SPHDE is composed of two major software layers: The Shared Address Space (SAS)
+ layer provides the basic services for a shared address space and transparent,
+ persistent storage. The Shared Persistent Heap (SPH) layer organizes blocks of
+ SAS storage into useful functions for storing and retrieving data.
+ .
+ This package contains the static library and header files used in development.
+
+Package: libsphde1
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Shared Persistent Heap Data Environment library
+ SPHDE is composed of two major software layers: The Shared Address Space (SAS)
+ layer provides the basic services for a shared address space and transparent,
+ persistent storage. The Shared Persistent Heap (SPH) layer organizes blocks of
+ SAS storage into useful functions for storing and retrieving data.

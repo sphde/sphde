@@ -1,0 +1,3 @@
+usr/bin/sasutil
+usr/lib/*/libsphde.so.*
+usr/share/man/man1/sasutil.1
