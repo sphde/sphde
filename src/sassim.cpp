@@ -44,6 +44,7 @@
 #include "saslock.h"
 #include "sasconf.h"
 #include "sasstname.h"
+#include "sphthread.h"
 
 #define	createOnlyFlags (IPC_EXCL | IPC_CREAT | 0666 )
 #define	createFlags (IPC_CREAT | 0666 )
@@ -1494,6 +1495,11 @@ void
 SASThreadSetUp ()
 {
   SASThreadEnableSigSegv ();
+#ifdef SPH_THREADINIT_CTOR
+  /* Initialize the thread local variable threadID with this threads
+   * unique ID.  */
+  sphdeGetTID ();
+#endif
 }
 
 void

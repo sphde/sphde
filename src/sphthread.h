@@ -52,6 +52,9 @@
 #define __C__
 #endif
 
+#define SPH_PROCINIT_CTOR 1
+#define SPH_THREADINIT_CTOR 1
+
 /*!
  * \brief Return the process identification.
  *
@@ -103,12 +106,16 @@ extern pid_t procID;
 static inline int
 sphFastGetPID (void)
 {
+#ifdef SPH_PROCINIT_CTOR
+	return (procID);
+#else
   int pid = procID;
   if (__builtin_expect ((!pid), 0))
     {
       pid = sphdeGetPID ();
     }
-  return pid;
+  return (pid);
+#endif
 }
 
 /*!
@@ -127,12 +134,16 @@ extern __thread pid_t threadID __attribute__ ((tls_model ("initial-exec")));
 static inline int
 sphFastGetTID (void)
 {
+#ifdef SPH_THREADINIT_CTOR
+	return (threadID);
+#else
   int tid = threadID;
   if (__builtin_expect ((!tid), 0))
     {
       tid = sphdeGetTID ();
     }
-  return tid;
+  return (tid);
+#endif
 }
 
 #endif

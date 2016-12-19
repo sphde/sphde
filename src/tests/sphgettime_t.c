@@ -101,5 +101,19 @@ main (int argc, char *argv[])
      return 1;
    }
 
+ clock_gettime(CLOCK_MONOTONIC, &ts1);
+ for(i=0; i < COUNT; i++)
+	 sphgettimer();
+ clock_gettime(CLOCK_MONOTONIC, &ts2);
+
+ /* calculate the delta */
+ ts2.tv_sec -= ts1.tv_sec;
+ ts2.tv_nsec -= ts1.tv_nsec;
+ diff = (uint64_t) ts2.tv_sec * NS_P_S
+               + (uint64_t) ts2.tv_nsec;
+
+ gettime_cost = (double)diff/(COUNT+1);
+ printf ("sphgettimer takes %f nanoseconds\n", gettime_cost);
+
  return 0;
 }

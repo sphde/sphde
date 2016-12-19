@@ -140,10 +140,22 @@ sphgetcpufreq (void)
 {
   sphtimer_t result = sph_cpu_frequency;
 
+#ifdef SPH_TIMEBASEFREQ_CTOR
+#else
   if (result == 0)
     {
       sph_cpu_frequency = get_cpu_freq_internal ();
       result = sph_cpu_frequency;
     }
+#endif
   return result;
 }
+
+#ifdef SPH_TIMEBASEFREQ_CTOR
+void
+__attribute__((constructor))
+sph_init_timebasefreq (void)
+{
+    sph_cpu_frequency = get_cpu_freq_internal ();
+}
+#endif

@@ -31,9 +31,15 @@
 
 #if defined(_ARCH_PWR7)
 /* For ISA 2.6 or later we can change the thread priority.  */
+
 #define __arch_sas_PPR_low()  __asm ("or 1,1,1;" ::: "memory")
 #define __arch_sas_PPR_medium_low()  __asm ("or 6,6,6;" ::: "memory")
 #define __arch_sas_PPR_medium()  __asm ("or 2,2,2;" ::: "memory")
+#if defined(_ARCH_PWR8)
+#define __arch_sas_PPR_verylow()  __asm ("or 31,31,31;" ::: "memory")
+#else
+#define __arch_sas_PPR_verylow()  __asm ("or 1,1,1;" ::: "memory")
+#endif
 #endif
 
 static inline void
@@ -44,6 +50,17 @@ __arch_pause (void)
    :
    :
    : "memory"
+  );
+}
+
+static inline void
+__arch_cache_line_zero(void *pointer)
+{
+  __asm__ (
+    "	dcbz	0,%0;"
+    :
+    : "b" (pointer)
+    : "memory"
   );
 }
 
@@ -132,7 +149,7 @@ __arch_compare_and_swap (volatile long int *p, long int oldval,
    : "cr0", "memory"
   );
 
-  return ret == 0;
+  return (ret == 0);
 }
 #endif
 

@@ -53,6 +53,8 @@
  * \endcode
  */
 
+#define SPH_TIMEBASEFREQ_CTOR 1
+
 /** \brief ignore this macro behind the curtain. **/
 #ifdef __cplusplus
 #define __C__ "C"
@@ -174,11 +176,13 @@ static inline sphtimer_t
 sphfastcpufreq (void)
 {
   sphtimer_t result = sph_cpu_frequency;
-
+#ifdef SPH_TIMEBASEFREQ_CTOR
+#else
   if (__builtin_expect ((result == 0), 0))
     {
       result = sphgetcpufreq ();
     }
+#endif
   return result;
 }
 

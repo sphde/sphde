@@ -32,8 +32,11 @@ tt1 (void *arg)
   pid_t th_pid, th_tid;
   char number[160];
 
-  th_pid = sphdeGetPID ();
-  th_tid = sphdeGetTID ();
+#ifdef SPH_THREADINIT_CTOR
+  SASThreadSetUp();
+#endif
+  th_pid = sphFastGetPID ();
+  th_tid = sphFastGetTID ();
 
   sprintf (number, "tt1(%ld): begin[%d,%d]", (long) arg, th_pid, th_tid);
   puts (number);
@@ -54,8 +57,8 @@ tt1 (void *arg)
       (void)__sync_fetch_and_add (&thread_rc, (int) 1);
     }
 
-  th_pid = sphFastGetPID ();
-  th_tid = sphFastGetTID ();
+  th_pid = sphdeGetPID ();
+  th_tid = sphdeGetTID ();
 
   if (th_pid != main_pid)
     {

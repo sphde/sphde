@@ -94,3 +94,13 @@ sphdeGetCmdLine (void)
     }
   return sph_cmdLine;
 }
+
+#ifdef SPH_PROCINIT_CTOR
+void
+__attribute__((constructor))
+sph_init_procinfo (void)
+{
+	procID = getpid ();
+    sphdeGetCmdLine_internal (procID);
+}
+#endif /* SPH_PROCINIT_CTOR */
