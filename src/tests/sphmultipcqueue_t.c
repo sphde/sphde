@@ -21,6 +21,12 @@
 #include "sphmultipcqueue.h"
 #include "sphthread.h"
 
+#ifdef LONGCHECK
+# define ITERATIONS 1000000
+#else
+# define ITERATIONS 100000
+#endif
+
 #define DEFAULT_ITERS 1
 
 #define Q_SIZE 1024
@@ -950,7 +956,7 @@ main(int argc, char *argv[]) {
 
 	rc = test_pcq_init (4096);
 
-	p10 = units * 1000000;
+	p10 = units * ITERATIONS;
 #if defined(__HTM__)
 #if 1
 	block_size_t remainder;
