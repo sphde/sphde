@@ -475,7 +475,7 @@ SPHLFEntryAllocStruct (SPHLFEntryHandle_t *handle,
 */
 static inline int
 SPHLFEntryAddString (SPHLFEntryHandle_t *handle,
-			char *value)
+			const char *value)
 {
 	char		*ptr	= handle->next;
 	unsigned short int	len	= handle->remaining;

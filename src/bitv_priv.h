@@ -18,7 +18,7 @@
 #include <bitv.h>
 
 static inline bitv_word
-bitv_round_mask (bitv_cb_t *cb)
+bitv_round_mask (const bitv_cb_t *cb)
 {
 /* Assumes:
 	cb has been initialized by bitvector_init()
@@ -29,7 +29,7 @@ bitv_round_mask (bitv_cb_t *cb)
 }
 
 static inline void*
-bitv_round_ptr_to_unit (bitv_cb_t *cb, void *ptr)
+bitv_round_ptr_to_unit (const bitv_cb_t *cb, const void *ptr)
 {
 /* Assumes:
 	cb has been initialized by bitvector_init()
@@ -74,7 +74,7 @@ bitv_popcountl_one (bitv_word vec)
 }
 
 static inline size_t
-bitv_round_unit (bitv_cb_t *cb, size_t size)
+bitv_round_unit (const bitv_cb_t *cb, size_t size)
 {
 /* Assumes:
 	cb has been initialized by bitvector_init()
@@ -84,7 +84,7 @@ bitv_round_unit (bitv_cb_t *cb, size_t size)
 }
 
 static inline size_t
-bitv_round_size (bitv_cb_t *cb, size_t size)
+bitv_round_size (const bitv_cb_t *cb, size_t size)
 {
 /* Assumes:
 	cb has been initialized by bitvector_init()
@@ -96,7 +96,7 @@ bitv_round_size (bitv_cb_t *cb, size_t size)
 }
 
 static inline bitv_word
-bitv_size_to_mask (bitv_cb_t *cb, size_t size)
+bitv_size_to_mask (const bitv_cb_t *cb, size_t size)
 {
 /* Assumes:
 	cb has been initialized by bitvector_init()
@@ -122,7 +122,7 @@ bitv_units_to_mask (size_t units)
 }
 
 static inline size_t
-bitv_allocated_size (bitv_cb_t *cb, bitv_word *bvec, bitv_word *endvec, bitv_word at)
+bitv_allocated_size (const bitv_cb_t *cb, const bitv_word *bvec, const bitv_word *endvec, bitv_word at)
 {
 /* Assumes:
 	cb has been initialized by bitv_init()
@@ -150,7 +150,7 @@ bitv_allocated_size (bitv_cb_t *cb, bitv_word *bvec, bitv_word *endvec, bitv_wor
 }
 
 static inline size_t
-bitv_allocated_size_chk (bitv_cb_t *cb, bitv_word *bvec, bitv_word *endvec, bitv_word at, size_t alloc_size)
+bitv_allocated_size_chk (const bitv_cb_t *cb, const bitv_word *bvec, const bitv_word *endvec, bitv_word at, size_t alloc_size)
 {
 /* Assumes:
 	cb has been initialized by bitv_init()

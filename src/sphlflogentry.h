@@ -407,7 +407,7 @@ SPHLFlogEntryAllocStruct (SPHLFLoggerHandle_t *handle,
 */
 static inline int
 SPHLFlogEntryAddString (SPHLFLoggerHandle_t *handle,
-			char *value)
+			const char *value)
 {
 	char		*ptr	= handle->next;
 	unsigned short int	len	= handle->remaining;
@@ -582,7 +582,7 @@ SPHLFlogEntryAddLong (SPHLFLoggerHandle_t *handle,
 */
 static inline  int
 SPHLFlogEntryAddPtr (SPHLFLoggerHandle_t *handle,
-			void *value)
+			const void *value)
 {
 	void		**ptr	= (void**)handle->next;
 	unsigned short int	len	= handle->remaining;
@@ -600,7 +600,7 @@ SPHLFlogEntryAddPtr (SPHLFLoggerHandle_t *handle,
 
 	if (len >= sizeof(void*))
 	{
-		*ptr++ = value;
+		*ptr++ = (void *)value;
 		len -= sizeof(void*);
 		handle->next = (char*)ptr;
 		handle->remaining = len;

@@ -321,7 +321,7 @@ SASIndexContainsKey (SASIndex_t btree, SASIndexKey_t * key);
  * @return 1 if the key is within \a btree or 0 otherwise.
  */
 extern __C__ int
-SASIndexContainsKey_nolock (SASIndex_t btree, SASIndexKey_t * key);
+SASIndexContainsKey_nolock (SASIndex_t btree, const SASIndexKey_t * key);
 
 /*!
  * \brief Return the memory address value associated with \a key in
@@ -338,7 +338,7 @@ SASIndexContainsKey_nolock (SASIndex_t btree, SASIndexKey_t * key);
  * btree does not contain the key or if an error occurs.
  */
 extern __C__ void *
-SASIndexGet (SASIndex_t btree, SASIndexKey_t * key);
+SASIndexGet (SASIndex_t btree, const SASIndexKey_t * key);
 
 /*!
  * \brief Return the memory address value associated with \a key in
@@ -358,7 +358,7 @@ SASIndexGet (SASIndex_t btree, SASIndexKey_t * key);
  * btree does not contain the key or if an error occurs.
  */
 extern __C__ void *
-SASIndexGet_nolock (SASIndex_t btree, SASIndexKey_t * key);
+SASIndexGet_nolock (SASIndex_t btree, const SASIndexKey_t * key);
 
 /*!
  * \brief Return true if the SAS B-Tree \a btree is empty.

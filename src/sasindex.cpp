@@ -1217,7 +1217,7 @@ SASIndexContainsKey_nolock (SASIndex_t  heap, SASIndexKey_t *key)
 }
 
 void*
-SASIndexGet (SASIndex_t  heap, SASIndexKey_t *key)
+SASIndexGet (SASIndex_t  heap, const SASIndexKey_t *key)
 {
     SASIndexHeader	*btree = (SASIndexHeader*)heap;
 	void *result = NULL;
@@ -1242,7 +1242,7 @@ SASIndexGet (SASIndex_t  heap, SASIndexKey_t *key)
 }
 
 void*
-SASIndexGet_nolock (SASIndex_t  heap, SASIndexKey_t *key)
+SASIndexGet_nolock (SASIndex_t  heap, const SASIndexKey_t *key)
 {
     SASIndexHeader	*btree = (SASIndexHeader*)heap;
 	void *result = NULL;

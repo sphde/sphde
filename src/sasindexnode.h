@@ -95,34 +95,34 @@ extern __C__ void *SASIndexNodePutValIndexed (SASIndexNode_t header,
 
 extern __C__ int
 SASIndexNodeSearch (SASIndexNode_t header,
-		    SASIndexKey_t * target, IDXnodePosRef * ref);
+		    const SASIndexKey_t * target, IDXnodePosRef * ref);
 
 extern __C__ int
 SASIndexNodeSearchGT (SASIndexNode_t header,
-		      SASIndexKey_t * target, IDXnodePosRef * ref);
+		      const SASIndexKey_t * target, IDXnodePosRef * ref);
 
 extern __C__ int
 SASIndexNodeSearchGE (SASIndexNode_t header,
-		      SASIndexKey_t * target, IDXnodePosRef * ref);
+		      const SASIndexKey_t * target, IDXnodePosRef * ref);
 
 extern __C__ int
 SASIndexNodeSearchLT (SASIndexNode_t header,
-		      SASIndexKey_t * target, IDXnodePosRef * ref);
+		      const SASIndexKey_t * target, IDXnodePosRef * ref);
 
 extern __C__ int
 SASIndexNodeSearchLE (SASIndexNode_t header,
-		      SASIndexKey_t * target, IDXnodePosRef * ref);
+		      const SASIndexKey_t * target, IDXnodePosRef * ref);
 
 extern __C__ SASIndexNode_t
 SASIndexNodeInitialize (SASIndexNode_t header,
-			SASIndexKey_t * newkey, void *newval, lock_on_t lock_on);
+			const SASIndexKey_t * newkey, void *newval, lock_on_t lock_on);
 
 extern __C__ SASIndexNode_t
 SASIndexNodeInsert (SASIndexNode_t header,
 		    SASIndexKey_t * newkey, void *newval, lock_on_t lock_on);
 
 extern __C__ SASIndexNode_t
-SASIndexNodeDelete (SASIndexNode_t header, SASIndexKey_t * target,
+SASIndexNodeDelete (SASIndexNode_t header, const SASIndexKey_t * target,
 		lock_on_t lock_on);
 
 #endif /* __SAS_INDEXNODE_H */

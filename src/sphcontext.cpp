@@ -184,7 +184,7 @@ SPHContextFreeNoLock (SPHContext_t heap,
 }
 
 int
-SPHContextAddNameNoLock (SPHContext_t contxt, char *key, void *value)
+SPHContextAddNameNoLock (SPHContext_t contxt, const char *key, void *value)
 {
     SASBlockHeader	*headerBlock = (SASBlockHeader*)contxt;
     int			rc = 0;
@@ -239,7 +239,7 @@ SPHContextAddNameNoLock (SPHContext_t contxt, char *key, void *value)
 }
 
 int
-SPHContextAddName (SPHContext_t contxt, char *key, void *value)
+SPHContextAddName (SPHContext_t contxt, const char *key, void *value)
 {
     SASBlockHeader	*headerBlock = (SASBlockHeader*)contxt;
     int				result = 0;
@@ -260,7 +260,7 @@ SPHContextAddName (SPHContext_t contxt, char *key, void *value)
 }
 
 void*
-SPHContextFindByNameNoLock (SPHContext_t contxt, char *key)
+SPHContextFindByNameNoLock (SPHContext_t contxt, const char *key)
 {
     SASBlockHeader	*headerBlock = (SASBlockHeader*)contxt;
     void			*result = NULL;
@@ -286,7 +286,7 @@ SPHContextFindByNameNoLock (SPHContext_t contxt, char *key)
 }
 
 void*
-SPHContextFindByAddrNoLock (SPHContext_t contxt, void *value)
+SPHContextFindByAddrNoLock (SPHContext_t contxt, const void *value)
 {
     SASBlockHeader	*headerBlock = (SASBlockHeader*)contxt;
     void			*result = NULL;
@@ -337,7 +337,7 @@ SPHContextGetNameEnum (SPHContext_t contxt)
 }
 
 void*
-SPHContextFindByName (SPHContext_t contxt, char *key)
+SPHContextFindByName (SPHContext_t contxt, const char *key)
 {
     SASBlockHeader	*headerBlock = (SASBlockHeader*)contxt;
     void			*result = NULL;
@@ -358,7 +358,7 @@ SPHContextFindByName (SPHContext_t contxt, char *key)
 }
 
 void*
-SPHContextFindByAddr (SPHContext_t contxt, void *value)
+SPHContextFindByAddr (SPHContext_t contxt, const void *value)
 {
     SASBlockHeader	*headerBlock = (SASBlockHeader*)contxt;
     void			*result = NULL;
@@ -379,7 +379,7 @@ SPHContextFindByAddr (SPHContext_t contxt, void *value)
 }
 
 int
-SPHContextRemoveByNameNoLock (SPHContext_t contxt, char *key)
+SPHContextRemoveByNameNoLock (SPHContext_t contxt, const char *key)
 {
     SASBlockHeader	*headerBlock = (SASBlockHeader*)contxt;
     void			*value = NULL;
@@ -435,7 +435,7 @@ SPHContextRemoveByNameNoLock (SPHContext_t contxt, char *key)
 }
 
 int
-SPHContextRename (SPHContext_t contxt, char *oldkey, char *newkey, void *value)
+SPHContextRename (SPHContext_t contxt, const char *oldkey, const char *newkey, void *value)
 {
     SASBlockHeader	*headerBlock = (SASBlockHeader*)contxt;
     void			*oldval;
@@ -463,7 +463,7 @@ SPHContextRename (SPHContext_t contxt, char *oldkey, char *newkey, void *value)
 
 
 int
-SPHContextRemoveByAddrNoLock (SPHContext_t contxt, void *value)
+SPHContextRemoveByAddrNoLock (SPHContext_t contxt, const void *value)
 {
     SASBlockHeader	*headerBlock = (SASBlockHeader*)contxt;
     int				result = 0;
@@ -524,7 +524,7 @@ SPHContextRemoveByAddrNoLock (SPHContext_t contxt, void *value)
 }
 
 int
-SPHContextRemoveByName (SPHContext_t contxt, char *key)
+SPHContextRemoveByName (SPHContext_t contxt, const char *key)
 {
     SASBlockHeader	*headerBlock = (SASBlockHeader*)contxt;
     int				result = -1;
@@ -545,7 +545,7 @@ SPHContextRemoveByName (SPHContext_t contxt, char *key)
 }
 
 int
-SPHContextRemoveByAddr (SPHContext_t contxt, void *value)
+SPHContextRemoveByAddr (SPHContext_t contxt, const void *value)
 {
     SASBlockHeader	*headerBlock = (SASBlockHeader*)contxt;
     int				result = -1;
@@ -710,7 +710,7 @@ SPHContextDestroy (SPHContext_t heap)
 }
 
 SPHContext_t
-SPHSetupProjectContext(char *project_name)
+SPHSetupProjectContext(const char *project_name)
 {
 	SPHContext_t result = NULL;
 	SPHContext_t rootcntx;
@@ -757,7 +757,7 @@ SPHSetupProjectContext(char *project_name)
 }
 
 SPHContext_t
-SPHSetupAltProjectContext(char *project_name)
+SPHSetupAltProjectContext(const char *project_name)
 {
 	SPHContext_t result = NULL;
 	SPHContext_t rootcntx;
@@ -798,7 +798,7 @@ SPHSetupAltProjectContext(char *project_name)
 }
 
 SPHContext_t
-SPHRemoveProjectContext(char *project_name)
+SPHRemoveProjectContext(const char *project_name)
 {
 	SPHContext_t result = NULL;
 	SPHContext_t rootcntx;
@@ -832,7 +832,7 @@ SPHRemoveProjectContext(char *project_name)
 }
 
 int
-SPHDestroyProjectContext(char *project_name)
+SPHDestroyProjectContext(const char *project_name)
 {
 	SPHContext_t projcntx;
 	SPHContext_t rootcntx;
@@ -865,7 +865,7 @@ SPHDestroyProjectContext(char *project_name)
 }
 
 SPHContext_t
-getProjectContextByName(char *project_name)
+getProjectContextByName(const char *project_name)
 {
 	SPHContext_t result = NULL;
 	SPHContext_t rootcntx;

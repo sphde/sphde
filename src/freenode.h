@@ -43,12 +43,12 @@ extern __C__ void
 freeNode_deallocSpace(FreeNode *freeNode, FreeNode **head, node_size_t size);
 
 extern __C__ node_size_t
-freeNode_freeSpaceTotal (FreeNode *freeNode);
+freeNode_freeSpaceTotal (const FreeNode *freeNode);
 
 extern __C__ node_size_t
-freeNode_freeFragmentsTotal (FreeNode *freeNode);
+freeNode_freeFragmentsTotal (const FreeNode *freeNode);
 
 extern __C__ node_size_t
-freeNode_maxFragment (FreeNode *freeNode);
+freeNode_maxFragment (const FreeNode *freeNode);
 
 #endif
