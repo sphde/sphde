@@ -227,7 +227,7 @@ SASStringBTreeNodeAlloc (SASStringBTreeNode_t heap, block_size_t alloc_size,
 
 int
 SASStringBTreeNodeFreeNoLock (SASStringBTreeNode_t heap,
-			      void *free_block, block_size_t alloc_size)
+			      const void *free_block, block_size_t alloc_size)
 {
   SASBlockHeader *headerBlock = (SASBlockHeader *) heap;
   block_size_t heapSize;
@@ -268,7 +268,7 @@ SASStringBTreeNodeFreeNoLock (SASStringBTreeNode_t heap,
 
 int
 SASStringBTreeNodeFree (SASStringBTreeNode_t heap,
-			void *free_block, block_size_t alloc_size,
+			const void *free_block, block_size_t alloc_size,
 			lock_on_t lock_on)
 {
   SASBlockHeader *headerBlock = (SASBlockHeader *) heap;
@@ -320,7 +320,7 @@ SASStringBTreeNodeIsSpill (SASStringBTreeNode_t heap)
  * local to this node and we can use FreeNoLock. Otherwise it must be 
  * non-local and we need to lock the spill node before we free the block.  */
 int
-SASStringBTreeNodeNearDealloc (SASStringBTreeNode_t heap, void *free_block,
+SASStringBTreeNodeNearDealloc (SASStringBTreeNode_t heap, const void *free_block,
 			       block_size_t alloc_size, lock_on_t lock_on)
 {
   SASBlockHeader *headerBlock = (SASBlockHeader *) heap;
@@ -684,7 +684,7 @@ SASStringBTreeNodeGetCount (SASStringBTreeNode_t header)
 // result is >=0 and == "position". Otherwise result < 0 and
 // "position == result + 256;
 short
-SASStringBTreeNodeSearchNode (SASStringBTreeNode_t header, char *target)
+SASStringBTreeNodeSearchNode (SASStringBTreeNode_t header, const char *target)
 {
   SASStringBTreeNodeHeader *node = (SASStringBTreeNodeHeader *) header;
   short position;
@@ -805,7 +805,7 @@ SASStringBTreeNodeSearchNode (SASStringBTreeNode_t header, char *target)
 
 int
 SASStringBTreeNodeSearch (SASStringBTreeNode_t header,
-			  char *target, SBTnodePosRef * ref)
+			  const char *target, SBTnodePosRef * ref)
 {
   SASStringBTreeNodeHeader *node = (SASStringBTreeNodeHeader *) header;
   short pos;
@@ -861,7 +861,7 @@ SASStringBTreeNodeSearch (SASStringBTreeNode_t header,
 
 int
 SASStringBTreeNodeSearchGT (SASStringBTreeNode_t header,
-			    char *target, SBTnodePosRef * ref)
+			    const char *target, SBTnodePosRef * ref)
 {
   SASStringBTreeNodeHeader *node = (SASStringBTreeNodeHeader *) header;
   short pos;
@@ -957,7 +957,7 @@ SASStringBTreeNodeSearchGT (SASStringBTreeNode_t header,
 
 int
 SASStringBTreeNodeSearchGE (SASStringBTreeNode_t header,
-			    char *target, SBTnodePosRef * ref)
+			    const char *target, SBTnodePosRef * ref)
 {
   SASStringBTreeNodeHeader *node = (SASStringBTreeNodeHeader *) header;
   short pos;
@@ -1037,7 +1037,7 @@ SASStringBTreeNodeSearchGE (SASStringBTreeNode_t header,
 
 int
 SASStringBTreeNodeSearchLT (SASStringBTreeNode_t header,
-			    char *target, SBTnodePosRef * ref)
+			    const char *target, SBTnodePosRef * ref)
 {
   SASStringBTreeNodeHeader *node = (SASStringBTreeNodeHeader *) header;
   short pos;
@@ -1137,7 +1137,7 @@ SASStringBTreeNodeSearchLT (SASStringBTreeNode_t header,
 
 int
 SASStringBTreeNodeSearchLE (SASStringBTreeNode_t header,
-			    char *target, SBTnodePosRef * ref)
+			    const char *target, SBTnodePosRef * ref)
 {
   SASStringBTreeNodeHeader *node = (SASStringBTreeNodeHeader *) header;
   short pos;
@@ -1216,11 +1216,11 @@ SASStringBTreeNodeSearchLE (SASStringBTreeNode_t header,
 }
 
 static inline void
-SASStringBTreeNodeKeyMove (SASStringBTreeNode_t heap, short pos, char *key,
+SASStringBTreeNodeKeyMove (SASStringBTreeNode_t heap, short pos, const char *key,
 				lock_on_t lock_on)
 {
   SASStringBTreeNodeHeader *node = (SASStringBTreeNodeHeader *) heap;
-  char *oldkey = node->keys[pos];
+  const char *oldkey = node->keys[pos];
   char *tempkey;
   int key_len = strlen (key) + 1;
 
@@ -1245,11 +1245,11 @@ SASStringBTreeNodeKeyMove (SASStringBTreeNode_t heap, short pos, char *key,
 }
 
 static inline void
-SASStringBTreeNodeKeyCopy (SASStringBTreeNode_t heap, short pos, char *key,
+SASStringBTreeNodeKeyCopy (SASStringBTreeNode_t heap, short pos, const char *key,
 				lock_on_t lock_on)
 {
   SASStringBTreeNodeHeader *node = (SASStringBTreeNodeHeader *) heap;
-  char *oldkey = node->keys[pos];
+  const char *oldkey = node->keys[pos];
   char *tempkey;
   int key_len = strlen (key) + 1;
 
@@ -1268,7 +1268,7 @@ SASStringBTreeNodeKeyDelete (SASStringBTreeNode_t heap, short pos,
 				lock_on_t lock_on)
 {
   SASStringBTreeNodeHeader *node = (SASStringBTreeNodeHeader *) heap;
-  char *oldkey = node->keys[pos];
+  const char *oldkey = node->keys[pos];
 
   if (oldkey != NULL)
     {
@@ -1278,7 +1278,7 @@ SASStringBTreeNodeKeyDelete (SASStringBTreeNode_t heap, short pos,
 }
 
 static inline void
-SASStringBTreeNodeKeyReplace (SASStringBTreeNode_t heap, short pos, char *key,
+SASStringBTreeNodeKeyReplace (SASStringBTreeNode_t heap, short pos, const char *key,
 				lock_on_t lock_on)
 {
   SASStringBTreeNodeHeader *node = (SASStringBTreeNodeHeader *) heap;
@@ -1433,7 +1433,7 @@ SASStringBTreeNodeSplit (SASStringBTreeNode_t node_t,
 
 static int
 SASStringBTreeNodePushDown (SASStringBTreeNode_t node_t,
-			    char *newkey, void *newval, __SBTnodeKeyRef * ref,
+			    const char *newkey, void *newval, __SBTnodeKeyRef * ref,
 				lock_on_t lock_on)
 {
   SASStringBTreeNodeHeader *node = (SASStringBTreeNodeHeader *) node_t;
@@ -1477,7 +1477,7 @@ SASStringBTreeNodePushDown (SASStringBTreeNode_t node_t,
   else
     {
       pushup = true;
-      ref->key = newkey;
+      ref->key = (char *)newkey;
       ref->val = newval;
       ref->node = NULL;
     }
@@ -1506,7 +1506,7 @@ SASStringBTreeNodePushDown (SASStringBTreeNode_t node_t,
 
 void
 SASStringBTreeNodeInitialize (SASStringBTreeNode_t node_t,
-			      char *newkey, void *newval,
+			      const char *newkey, void *newval,
 				lock_on_t lock_on)
 {
   SASStringBTreeNodeHeader *node = (SASStringBTreeNodeHeader *) node_t;
@@ -1524,7 +1524,7 @@ SASStringBTreeNodeInitialize (SASStringBTreeNode_t node_t,
 
 SASStringBTreeNode_t
 SASStringBTreeNodeInsert (SASStringBTreeNode_t node_t,
-			  char *newkey, void *newval, lock_on_t lock_on)
+			  const char *newkey, void *newval, lock_on_t lock_on)
 {
   SASStringBTreeNodeHeader *node = (SASStringBTreeNodeHeader *) node_t;
   int pushup;
@@ -1926,7 +1926,7 @@ SASStringBTreeNodeSuccessor (SASStringBTreeNode_t header, short pos,
 
 // recursive delete
 int
-SASStringBTreeNodeRecDelete (SASStringBTreeNode_t header, char *target,
+SASStringBTreeNodeRecDelete (SASStringBTreeNode_t header, const char *target,
 				lock_on_t lock_on)
 {
   SASStringBTreeNodeHeader *node = (SASStringBTreeNodeHeader *) header;
@@ -2015,7 +2015,7 @@ SASStringBTreeNodeRecDelete (SASStringBTreeNode_t header, char *target,
 }
 
 SASStringBTreeNode_t
-SASStringBTreeNodeDelete (SASStringBTreeNode_t header, char *target,
+SASStringBTreeNodeDelete (SASStringBTreeNode_t header, const char *target,
 				lock_on_t lock_on)
 {
   SASStringBTreeNodeHeader *node = (SASStringBTreeNodeHeader *) header;

@@ -25,7 +25,7 @@ void freeNode_init (FreeNode *freeNode, node_size_t size)
   freeNode->nodeSize = (node_size_t)size;
 }
 
-node_size_t freeNode_freeFragmentsTotal (FreeNode *freeNode)
+node_size_t freeNode_freeFragmentsTotal (const FreeNode *freeNode)
 {  
    node_size_t freeNodes = 1;
    FreeNode *head = freeNode->nextNode;
@@ -36,7 +36,7 @@ node_size_t freeNode_freeFragmentsTotal (FreeNode *freeNode)
    return freeNodes;
 };
 
-node_size_t freeNode_maxFragment (FreeNode *freeNode)
+node_size_t freeNode_maxFragment (const FreeNode *freeNode)
 {  
    node_size_t freeSize = freeNode->nodeSize;
    FreeNode *head = freeNode->nextNode;
@@ -49,7 +49,7 @@ node_size_t freeNode_maxFragment (FreeNode *freeNode)
    return freeSize;
 };
 
-node_size_t freeNode_freeSpaceTotal (FreeNode *freeNode)
+node_size_t freeNode_freeSpaceTotal (const FreeNode *freeNode)
 {  
    node_size_t freeSpace = freeNode->nodeSize;
    FreeNode *head = freeNode->nextNode;

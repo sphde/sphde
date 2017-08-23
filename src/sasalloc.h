@@ -109,24 +109,24 @@ typedef struct SASBlockHeader {
 #endif
 
 extern __C__ void
-*getSASBlockSpecial(void *block);
+*getSASBlockSpecial (const void *block);
 
 extern __C__ void
 setSASBlockSpecial (void *block, void *val);
 
 extern __C__ void
-initSOMSASBlock(SASBlockHeader *header, sas_type_t sasType,
+initSOMSASBlock (SASBlockHeader *header, sas_type_t sasType,
 					long blockSize, void* blockHeap);
 
 static inline int
-SOMSASCheckBlockSig (SASBlockHeader* header)
+SOMSASCheckBlockSig (const SASBlockHeader* header)
 {
     return ((header->blockSig1 == block__Signature_1)
 	    &&(header->blockSig2 == block__Signature_2));
 }
 
 static inline int
-SOMSASCheckBlockSigAndType (SASBlockHeader* header, 
+SOMSASCheckBlockSigAndType (const SASBlockHeader* header,
                                                            sas_type_t sasType)
 {
     return ((header->blockSig1 == block__Signature_1)
@@ -136,7 +136,7 @@ SOMSASCheckBlockSigAndType (SASBlockHeader* header,
 }
 
 static inline int
-SOMSASCheckBlockSigAndTypeAndSubtype (SASBlockHeader* header, 
+SOMSASCheckBlockSigAndTypeAndSubtype (const SASBlockHeader* header,
                                                            sas_type_t sasType)
 {
     return ((header->blockSig1 == block__Signature_1)
@@ -146,7 +146,7 @@ SOMSASCheckBlockSigAndTypeAndSubtype (SASBlockHeader* header,
 }
 
 static inline int
-SOMSASCheckBlockSubType (SASBlockHeader* header, 
+SOMSASCheckBlockSubType (const SASBlockHeader* header,
                                                            sas_type_t sasType)
 {
     return ((header->blockType &  SAS_SUB_TYPE_MASK)
@@ -162,19 +162,19 @@ SOMSASSetBlockSubType (SASBlockHeader* header,
 }
 
 static inline sas_type_t
-SOMSASGetBlockSubType (SASBlockHeader* header)
+SOMSASGetBlockSubType (const SASBlockHeader* header)
 {
     return (header->blockType &  SAS_SUB_TYPE_MASK);
 }
 
 static inline sas_type_t
-SOMSASGetBlockType (SASBlockHeader* header)
+SOMSASGetBlockType (const SASBlockHeader* header)
 {
     return (header->blockType);
 }
 
 extern __C__ SASBlockHeader *
-SASFindHeader (void *nearObj);
+SASFindHeader (const void *nearObj);
 
 extern __C__ void
 SASMemSync(void *startAddr, long size, int asyncBool);

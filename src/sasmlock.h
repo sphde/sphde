@@ -102,7 +102,5 @@ private:
 
 };
 
-
-
 #endif /* _SasMasterLock_H */
 

@@ -405,7 +405,7 @@ SASStringBTreeGetMinKey_nolock (SASStringBTree_t btree);
  * @return 1 if the key is within \a btree or 0 otherwise.
  */
 extern __C__ int
-SASStringBTreeContainsKey (SASStringBTree_t btree, char *key);
+SASStringBTreeContainsKey (SASStringBTree_t btree, const char *key);
 
 /*!
  * \brief Return true if the SAS B-Tree \a btree contains the key \a key.
@@ -422,7 +422,7 @@ SASStringBTreeContainsKey (SASStringBTree_t btree, char *key);
  * @return 1 if the key is within \a btree or 0 otherwise.
  */
 extern __C__ int
-SASStringBTreeContainsKey_nolock (SASStringBTree_t btree, char *key);
+SASStringBTreeContainsKey_nolock (SASStringBTree_t btree, const char *key);
 
 /*!
  * \brief Return the memory address value associated with \a key in
@@ -439,7 +439,7 @@ SASStringBTreeContainsKey_nolock (SASStringBTree_t btree, char *key);
  * btree does not contain the key or if an error occurs.
  */
 extern __C__ void *
-SASStringBTreeGet (SASStringBTree_t btree, char *key);
+SASStringBTreeGet (SASStringBTree_t btree, const char *key);
 
 /*!
  * \brief Return the memory address value associated with \a key in
@@ -459,7 +459,7 @@ SASStringBTreeGet (SASStringBTree_t btree, char *key);
  * btree does not contain the key or if an error occurs.
  */
 extern __C__ void *
-SASStringBTreeGet_nolock (SASStringBTree_t btree, char *key);
+SASStringBTreeGet_nolock (SASStringBTree_t btree, const char *key);
 
 /*!
  * \brief Return true if the SAS B-Tree \a btree is empty.
@@ -518,7 +518,7 @@ SASStringBTreeGetCurCount (SASStringBTree_t btree);
  * For example if the key already exist in this B-Tree.
  */
 extern __C__ int
-SASStringBTreePut (SASStringBTree_t btree, char *key, void *value);
+SASStringBTreePut (SASStringBTree_t btree, const char *key, void *value);
 
 /*!
  * \brief Add a new element \a value with key \a key in the SAS B-Tree
@@ -540,7 +540,7 @@ SASStringBTreePut (SASStringBTree_t btree, char *key, void *value);
  * For example if the key already exist in this B-Tree.
  */
 extern __C__ int
-SASStringBTreePut_nolock (SASStringBTree_t btree, char *key, void *value);
+SASStringBTreePut_nolock (SASStringBTree_t btree, const char *key, void *value);
 
 
 /*!
@@ -560,7 +560,7 @@ SASStringBTreePut_nolock (SASStringBTree_t btree, char *key, void *value);
  * matching key, or 0 if an error occurs.
  */
 extern __C__ void *
-SASStringBTreeReplace (SASStringBTree_t btree, char *key, void *value);
+SASStringBTreeReplace (SASStringBTree_t btree, const char *key, void *value);
 
 /*!
  * \brief Replace the associated value of the element with key \a key
@@ -582,7 +582,7 @@ SASStringBTreeReplace (SASStringBTree_t btree, char *key, void *value);
  * matching key, or 0 if an error occurs.
  */
 extern __C__ void *
-SASStringBTreeReplace_nolock (SASStringBTree_t btree, char *key, void *value);
+SASStringBTreeReplace_nolock (SASStringBTree_t btree, const char *key, void *value);
 
 
 /*!
@@ -602,7 +602,7 @@ SASStringBTreeReplace_nolock (SASStringBTree_t btree, char *key, void *value);
  * @return The address of the previous item or 0 if an error occurs.
  */
 extern __C__ void *
-SASStringBTreeRemove (SASStringBTree_t btree, char *key);
+SASStringBTreeRemove (SASStringBTree_t btree, const char *key);
 
 /*!
  * \brief Remove the key \a key and its associated value from SAS B-Tree \a btree.
@@ -624,7 +624,7 @@ SASStringBTreeRemove (SASStringBTree_t btree, char *key);
  * @return The address of the previous item or 0 if an error occurs.
  */
 extern __C__ void *
-SASStringBTreeRemove_nolock (SASStringBTree_t btree, char *key);
+SASStringBTreeRemove_nolock (SASStringBTree_t btree, const char *key);
 
 /*!
  * \brief Internal function to initialize storage as a B-tree.

@@ -1278,7 +1278,7 @@ SASStringBTreeGetMinKey_nolock (SASStringBTree_t heap)
 };
 
 int
-SASStringBTreeContainsKey (SASStringBTree_t heap, char *key)
+SASStringBTreeContainsKey (SASStringBTree_t heap, const char *key)
 {
   SASStringBTreeHeader *btree = (SASStringBTreeHeader *) heap;
   SBTnodePosRef ref = { NULL, 0 };
@@ -1298,7 +1298,7 @@ SASStringBTreeContainsKey (SASStringBTree_t heap, char *key)
 }
 
 int
-SASStringBTreeContainsKey_nolock (SASStringBTree_t heap, char *key)
+SASStringBTreeContainsKey_nolock (SASStringBTree_t heap, const char *key)
 {
   SASStringBTreeHeader *btree = (SASStringBTreeHeader *) heap;
   SBTnodePosRef ref = { NULL, 0 };
@@ -1316,7 +1316,7 @@ SASStringBTreeContainsKey_nolock (SASStringBTree_t heap, char *key)
 }
 
 void *
-SASStringBTreeGet (SASStringBTree_t heap, char *key)
+SASStringBTreeGet (SASStringBTree_t heap, const char *key)
 {
   SASStringBTreeHeader *btree = (SASStringBTreeHeader *) heap;
   void *result = NULL;
@@ -1341,7 +1341,7 @@ SASStringBTreeGet (SASStringBTree_t heap, char *key)
 }
 
 void *
-SASStringBTreeGet_nolock (SASStringBTree_t heap, char *key)
+SASStringBTreeGet_nolock (SASStringBTree_t heap, const char *key)
 {
   SASStringBTreeHeader *btree = (SASStringBTreeHeader *) heap;
   void *result = NULL;
@@ -1435,7 +1435,7 @@ SASStringBTreeHeaderAlloc (SASStringBTree_t heap, block_size_t size)
 }
 
 static inline void
-SASStringBTreeUpdateMax (SASStringBTree_t heap, char *key)
+SASStringBTreeUpdateMax (SASStringBTree_t heap, const char *key)
 {
   SASStringBTreeHeader *btree = (SASStringBTreeHeader *) heap;
   char *oldkey = btree->common->max_key;
@@ -1461,7 +1461,7 @@ SASStringBTreeUpdateMax (SASStringBTree_t heap, char *key)
 }
 
 static inline void
-SASStringBTreeUpdateMin (SASStringBTree_t heap, char *key)
+SASStringBTreeUpdateMin (SASStringBTree_t heap, const char *key)
 {
   SASStringBTreeHeader *btree = (SASStringBTreeHeader *) heap;
   char *oldkey = btree->common->min_key;
@@ -1487,7 +1487,7 @@ SASStringBTreeUpdateMin (SASStringBTree_t heap, char *key)
 }
 
 int
-SASStringBTreePut (SASStringBTree_t heap, char *key, void *value)
+SASStringBTreePut (SASStringBTree_t heap, const char *key, void *value)
 {
   SASStringBTreeHeader *btree = (SASStringBTreeHeader *) heap;
   int result = false;
@@ -1528,7 +1528,7 @@ SASStringBTreePut (SASStringBTree_t heap, char *key, void *value)
 }
 
 int
-SASStringBTreePut_nolock (SASStringBTree_t heap, char *key, void *value)
+SASStringBTreePut_nolock (SASStringBTree_t heap, const char *key, void *value)
 {
   SASStringBTreeHeader *btree = (SASStringBTreeHeader *) heap;
   int result = false;
@@ -1566,7 +1566,7 @@ SASStringBTreePut_nolock (SASStringBTree_t heap, char *key, void *value)
 }
 
 void *
-SASStringBTreeReplace (SASStringBTree_t heap, char *key, void *value)
+SASStringBTreeReplace (SASStringBTree_t heap, const char *key, void *value)
 {
   SASStringBTreeHeader *btree = (SASStringBTreeHeader *) heap;
   SBTnodePosRef ref = { NULL, 0 };
@@ -1596,7 +1596,7 @@ SASStringBTreeReplace (SASStringBTree_t heap, char *key, void *value)
 }
 
 void *
-SASStringBTreeReplace_nolock (SASStringBTree_t heap, char *key, void *value)
+SASStringBTreeReplace_nolock (SASStringBTree_t heap, const char *key, void *value)
 {
   SASStringBTreeHeader *btree = (SASStringBTreeHeader *) heap;
   SBTnodePosRef ref = { NULL, 0 };
@@ -1624,7 +1624,7 @@ SASStringBTreeReplace_nolock (SASStringBTree_t heap, char *key, void *value)
 }
 
 void *
-SASStringBTreeRemove (SASStringBTree_t heap, char *key)
+SASStringBTreeRemove (SASStringBTree_t heap, const char *key)
 {
   SASStringBTreeHeader *btree = (SASStringBTreeHeader *) heap;
   SASStringBTreeNode_t newRoot;
@@ -1692,7 +1692,7 @@ SASStringBTreeRemove (SASStringBTree_t heap, char *key)
 }
 
 void *
-SASStringBTreeRemove_nolock (SASStringBTree_t heap, char *key)
+SASStringBTreeRemove_nolock (SASStringBTree_t heap, const char *key)
 {
   SASStringBTreeHeader *btree = (SASStringBTreeHeader *) heap;
   SASStringBTreeNode_t newRoot;

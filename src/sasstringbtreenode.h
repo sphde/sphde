@@ -374,7 +374,7 @@ SASStringBTreeNodePutValIndexed (SASStringBTreeNode_t header, short pos,
  * 0 or a negative value if the functions fails.
  */
 extern __C__ int
-SASStringBTreeNodeSearch (SASStringBTreeNode_t header, char *target,
+SASStringBTreeNodeSearch (SASStringBTreeNode_t header, const char *target,
 			  SBTnodePosRef * ref);
 
 /*!
@@ -393,7 +393,7 @@ SASStringBTreeNodeSearch (SASStringBTreeNode_t header, char *target,
  * 0 or a negative value if the functions fails.
  */
 extern __C__ int
-SASStringBTreeNodeSearchGT (SASStringBTreeNode_t header, char *target,
+SASStringBTreeNodeSearchGT (SASStringBTreeNode_t header, const char *target,
 			    SBTnodePosRef * ref);
 
 /*!
@@ -412,7 +412,7 @@ SASStringBTreeNodeSearchGT (SASStringBTreeNode_t header, char *target,
  * 0 or a negative value if the functions fails.
  */
 extern __C__ int
-SASStringBTreeNodeSearchGE (SASStringBTreeNode_t header, char *target,
+SASStringBTreeNodeSearchGE (SASStringBTreeNode_t header, const char *target,
 			    SBTnodePosRef * ref);
 
 /*!
@@ -431,7 +431,7 @@ SASStringBTreeNodeSearchGE (SASStringBTreeNode_t header, char *target,
  * 0 or a negative value if the functions fails.
  */
 extern __C__ int
-SASStringBTreeNodeSearchLT (SASStringBTreeNode_t header, char *target,
+SASStringBTreeNodeSearchLT (SASStringBTreeNode_t header, const char *target,
 			    SBTnodePosRef * ref);
 
 /*!
@@ -450,7 +450,7 @@ SASStringBTreeNodeSearchLT (SASStringBTreeNode_t header, char *target,
  * 0 or a negative value if the functions fails.
  */
 extern __C__ int
-SASStringBTreeNodeSearchLE (SASStringBTreeNode_t header, char *target,
+SASStringBTreeNodeSearchLE (SASStringBTreeNode_t header, const char *target,
 			    SBTnodePosRef * ref);
 
 /*!
@@ -462,7 +462,7 @@ SASStringBTreeNodeSearchLE (SASStringBTreeNode_t header, char *target,
  * @param newval Valued to set on SAS B-tree node.
  */
 extern __C__ void
-SASStringBTreeNodeInitialize (SASStringBTreeNode_t header, char *newkey,
+SASStringBTreeNodeInitialize (SASStringBTreeNode_t header, const char *newkey,
 			      void *newval, lock_on_t lock_on);
 
 /*!
@@ -475,7 +475,7 @@ SASStringBTreeNodeInitialize (SASStringBTreeNode_t header, char *newkey,
  * @return A handle to new SAS B-tree node or 0 if an error occurs.
  */
 extern __C__ SASStringBTreeNode_t
-SASStringBTreeNodeInsert (SASStringBTreeNode_t header, char *newkey,
+SASStringBTreeNodeInsert (SASStringBTreeNode_t header, const char *newkey,
 			  void *newval, lock_on_t lock_on);
 
 /*!
@@ -488,7 +488,7 @@ SASStringBTreeNodeInsert (SASStringBTreeNode_t header, char *newkey,
  * element itself.
  */
 extern __C__ SASStringBTreeNode_t
-SASStringBTreeNodeDelete (SASStringBTreeNode_t header, char *target,
+SASStringBTreeNodeDelete (SASStringBTreeNode_t header, const char *target,
 				lock_on_t lock_on);
 
 #endif /* __SAS_STRINGBTREENODE_H */

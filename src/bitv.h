@@ -155,12 +155,12 @@ bitv_free_marked (bitv_cb_t *cb, bitv_word *bvec, bitv_word *endvec,
 	bitv_aligned_alloc_marked
    verifies:
 	That an end mark is set between the starting offset and the
-	end of end makr vector.
+	end of end mark vector.
    returns:
 	0 if the deallocation was successful from this bitv_word
 	or nonzero if something failed
 */
 extern __C__ size_t
-bitv_free_space (bitv_cb_t *cb, bitv_word *bvec);
+bitv_free_space (const bitv_cb_t *cb, const bitv_word *bvec);
 
 #endif /* _BITV_H */

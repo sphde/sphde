@@ -80,7 +80,7 @@ typedef struct SASIndexKey_t
  * and +1 for op_a > op_b.
  */
 static inline int
-SASIndexKeyCompare (SASIndexKey_t * op_a, SASIndexKey_t * op_b)
+SASIndexKeyCompare (const SASIndexKey_t * op_a, const SASIndexKey_t * op_b)
 {
   int rc = 0;
   if (op_a->data[0] != op_b->data[0])
@@ -139,7 +139,7 @@ SASIndexKeyCompare (SASIndexKey_t * op_a, SASIndexKey_t * op_b)
  * @param src Handle of the source SASIndexKey_t.
  */
 static inline void
-SASIndexKeyCopy (SASIndexKey_t * dest, SASIndexKey_t * src)
+SASIndexKeyCopy (SASIndexKey_t * dest, const SASIndexKey_t * src)
 {
   memcpy (dest, src, src->copy_size);
 }
@@ -154,19 +154,19 @@ SASIndexKeyCopy (SASIndexKey_t * dest, SASIndexKey_t * src)
  * @return current copy_size of the referenced key.
  */
 static inline size_t
-SASIndexKeySize (SASIndexKey_t * key)
+SASIndexKeySize (const SASIndexKey_t * key)
 {
   return key->copy_size;
 }
 
 /*!
- * \brief Initial a binary key @ destination with a address value
+ * \brief Initialize a binary key @ destination with a address value
  *
  * @param dest Handle of the destination SASIndexKey_t.
  * @param value Address value which will be the key.
  */
 static inline void
-SASIndexKeyInitRef (SASIndexKey_t * dest, void *value)
+SASIndexKeyInitRef (SASIndexKey_t * dest, const void *value)
 {
   dest->compare_size = sizeof (void *);
   dest->copy_size = 2 * sizeof (void *);
@@ -200,7 +200,7 @@ typedef union {
 	} sasindexkeymap_t;
 
 /*!
- * \brief Initial a binary key @ destination with a unsigned 64-bit
+ * \brief Initialize a binary key @ destination with a unsigned 64-bit
  * integer value.
  *
  * @param dest Handle of the destination SASIndexKey_t.
@@ -232,7 +232,7 @@ SASIndexKeyInitUInt64 (SASIndexKey_t * dest, unsigned long long value)
  * @return value of the 1st key element as a unsigned 64-bit integer.
  */
 static inline unsigned long long
-SASIndexKeyReturn1stUInt64 (SASIndexKey_t * dest)
+SASIndexKeyReturn1stUInt64 (const SASIndexKey_t * dest)
 {
   sasindexkeymap_t	key_val;
 
@@ -246,7 +246,7 @@ SASIndexKeyReturn1stUInt64 (SASIndexKey_t * dest)
 }
 
 /*!
- * \brief Initial a binary key @ destination with a signed 64-bit
+ * \brief Initialize a binary key @ destination with a signed 64-bit
  * integer value.
  *
  * \note Need to flip the sign bit to get the correct ordering with a
@@ -281,7 +281,7 @@ SASIndexKeyInitInt64 (SASIndexKey_t * dest, signed long long value)
  * @return value of the 1st key element as a unsigned 64-bit integer.
  */
 static inline long long
-SASIndexKeyReturn1stInt64 (SASIndexKey_t * dest)
+SASIndexKeyReturn1stInt64 (const SASIndexKey_t * dest)
 {
   sasindexkeymap_t	key_val;
 
@@ -295,7 +295,7 @@ SASIndexKeyReturn1stInt64 (SASIndexKey_t * dest)
 }
 
 /*!
- * \brief Initial a binary key @ destination with a signed 64-bit
+ * \brief Initialize a binary key @ destination with a signed 64-bit
  * integer value.
  *
  * \note Need to flip the sign bit to get the correct ordering with a
@@ -342,7 +342,7 @@ SASIndexKeyInitDouble (SASIndexKey_t * dest, double value)
  * @return value of the 1st key element as a unsigned 64-bit integer.
  */
 static inline double
-SASIndexKeyReturn1stDouble (SASIndexKey_t * dest)
+SASIndexKeyReturn1stDouble (const SASIndexKey_t * dest)
 {
   sasindexkeymap_t	key_val;
 

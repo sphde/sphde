@@ -87,10 +87,10 @@ void setSASFinder (void *val)
 #endif
 }
 
-void *getSASBlockSpecial(void *block)
+void *getSASBlockSpecial(const void *block)
 {
-    SASBlockHeader *blockPtr = (SASBlockHeader*)block;
-    void *result = blockPtr->special;
+    const SASBlockHeader *blockPtr = (SASBlockHeader*)block;
+    void *result = (void *)blockPtr->special;
 #ifdef __SASDebugPrint__
 	sas_printf("getSASBlockSpecial(%p) = %p\n",
 			block, result);
@@ -443,7 +443,7 @@ void  SASLocalDealloc (void *memAddr, long /*allocSize*/)
 #endif
 }; 
 
-SASBlockHeader *SASFindHeader (void *nearObj)
+SASBlockHeader *SASFindHeader (const void *nearObj)
 {
 #ifdef __SASDebugPrint__
    sas_printf("SASFindHeader @%p \n",nearObj);

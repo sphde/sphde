@@ -111,7 +111,7 @@ SPHContextDestroy (SPHContext_t contxt);
 *	@return true (!=0) value indicates success, false (==0) failure.
 */
 extern __C__ int
-SPHContextAddName (SPHContext_t contxt, char *name, void *value);
+SPHContextAddName (SPHContext_t contxt, const char *name, void *value);
 
 /** \brief Replace the existing "old name" with a "new name" string for
 *   the associated address value in this context.
@@ -128,7 +128,7 @@ SPHContextAddName (SPHContext_t contxt, char *name, void *value);
 *	@return true (!=0) value indicates success, false (==0) failure.
 */
 extern __C__ int
-SPHContextRename (SPHContext_t contxt, char *oldname, char *newname, void *value);
+SPHContextRename (SPHContext_t contxt, const char *oldname, const char *newname, void *value);
 
 /** \brief Create a SASStringBTreeEnum_t enumeration that can used to
 *   iterate over the name space of this context.
@@ -155,7 +155,7 @@ SPHContextGetNameEnum (SPHContext_t contxt);
 *	@return address value for the matching association, or NULL is not found.
 */
 extern __C__ void*
-SPHContextFindByName (SPHContext_t contxt, char *name);
+SPHContextFindByName (SPHContext_t contxt, const char *name);
 
 /** \brief Find the name associated with an address value within a specific context.
 *
@@ -167,7 +167,7 @@ SPHContextFindByName (SPHContext_t contxt, char *name);
 *	@return address value for the matching associated name, or NULL is not found.
 */
 extern __C__ void*
-SPHContextFindByAddr (SPHContext_t contxt, void *value);
+SPHContextFindByAddr (SPHContext_t contxt, const void *value);
 
 /** \brief Remove a name/address association by matching name for the specified context.
 *
@@ -180,7 +180,7 @@ SPHContextFindByAddr (SPHContext_t contxt, void *value);
 *	@return a 0 value indicates success, otherwise failure.
 */
 extern __C__ int
-SPHContextRemoveByName (SPHContext_t contxt, char *name);
+SPHContextRemoveByName (SPHContext_t contxt, const char *name);
 
 /** \brief Remove a name/address associations by matching address value for the specified context.
 *
@@ -192,7 +192,7 @@ SPHContextRemoveByName (SPHContext_t contxt, char *name);
 *	@return a 0 value indicates success, otherwise failure.
 */
 extern __C__ int
-SPHContextRemoveByAddr (SPHContext_t contxt, void *value);
+SPHContextRemoveByAddr (SPHContext_t contxt, const void *value);
 
 /** \brief Return the remaining free space within the
 *	specified context.
@@ -229,7 +229,7 @@ SPHContextFreeSpace (SPHContext_t contxt);
 *	A NULL value indicates error.
 */
 extern __C__ SPHContext_t
-SPHSetupProjectContext(char *project_name);
+SPHSetupProjectContext(const char *project_name);
 
 /** \brief Setup root and named project contexts. A project context
 *   is just a second level context named in the regions root context.
@@ -242,7 +242,7 @@ SPHSetupProjectContext(char *project_name);
 *	A NULL value indicates error.
 */
 extern __C__ SPHContext_t
-SPHSetupAltProjectContext(char *project_name);
+SPHSetupAltProjectContext(const char *project_name);
 
 /** \brief Remove an existing project context from the root and return
 *   the named project context. The project context is not destroyed.
@@ -255,7 +255,7 @@ SPHSetupAltProjectContext(char *project_name);
 *	A NULL value indicates error.
 */
 extern __C__ SPHContext_t
-SPHRemoveProjectContext(char *project_name);
+SPHRemoveProjectContext(const char *project_name);
 
 /** \brief Remove an existing project context from the root and destroy
 *   that project context.
@@ -267,7 +267,7 @@ SPHRemoveProjectContext(char *project_name);
 *	@return a 0 value indicates success, otherwise failure.
 */
 extern __C__ int
-SPHDestroyProjectContext(char *project_name);
+SPHDestroyProjectContext(const char *project_name);
 
 /** \brief return the address of the named project context.
 *
@@ -279,7 +279,7 @@ SPHDestroyProjectContext(char *project_name);
 *	@return the address of the named project context, or NULL if not found.
 */
 extern __C__ SPHContext_t
-getProjectContextByName(char *project_name);
+getProjectContextByName(const char *project_name);
 
 /** \brief return the address of the current project context.
 *
