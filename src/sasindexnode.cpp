@@ -670,7 +670,7 @@ SASIndexNodePutValIndexed (SASIndexNode_t header, short pos, void *val)
 // result is >=0 and == "position". Otherwise result < 0 and
 // "position == result + 256;
 short
-SASIndexNodeSearchNode (SASIndexNode_t header, SASIndexKey_t * target)
+SASIndexNodeSearchNode (SASIndexNode_t header, const SASIndexKey_t * target)
 {
   SASIndexNodeHeader *node = (SASIndexNodeHeader *) header;
   short position;
@@ -791,7 +791,7 @@ SASIndexNodeSearchNode (SASIndexNode_t header, SASIndexKey_t * target)
 
 int
 SASIndexNodeSearch (SASIndexNode_t header,
-		    SASIndexKey_t * target, __IDXnodePosRef * ref)
+		    const SASIndexKey_t * target, __IDXnodePosRef * ref)
 {
   SASIndexNodeHeader *node = (SASIndexNodeHeader *) header;
   short pos;
@@ -847,7 +847,7 @@ SASIndexNodeSearch (SASIndexNode_t header,
 
 int
 SASIndexNodeSearchGT (SASIndexNode_t header,
-		      SASIndexKey_t * target, __IDXnodePosRef * ref)
+		      const SASIndexKey_t * target, __IDXnodePosRef * ref)
 {
   SASIndexNodeHeader *node = (SASIndexNodeHeader *) header;
   short pos;
@@ -941,7 +941,7 @@ SASIndexNodeSearchGT (SASIndexNode_t header,
 
 int
 SASIndexNodeSearchGE (SASIndexNode_t header,
-		      SASIndexKey_t * target, __IDXnodePosRef * ref)
+		      const SASIndexKey_t * target, __IDXnodePosRef * ref)
 {
   SASIndexNodeHeader *node = (SASIndexNodeHeader *) header;
   short pos;
@@ -1026,7 +1026,7 @@ SASIndexNodeSearchGE (SASIndexNode_t header,
 
 int
 SASIndexNodeSearchLT (SASIndexNode_t header,
-		      SASIndexKey_t * target, __IDXnodePosRef * ref)
+		      const SASIndexKey_t * target, __IDXnodePosRef * ref)
 {
   SASIndexNodeHeader *node = (SASIndexNodeHeader *) header;
   short pos;
@@ -1124,7 +1124,7 @@ SASIndexNodeSearchLT (SASIndexNode_t header,
 
 int
 SASIndexNodeSearchLE (SASIndexNode_t header,
-		      SASIndexKey_t * target, __IDXnodePosRef * ref)
+		      const SASIndexKey_t * target, __IDXnodePosRef * ref)
 {
   SASIndexNodeHeader *node = (SASIndexNodeHeader *) header;
   short pos;
@@ -1234,7 +1234,7 @@ SASIndexNodeKeyMove (SASIndexNode_t heap, short pos,
 
 static inline void
 SASIndexNodeKeyCopy (SASIndexNode_t heap, short pos,
-		SASIndexKey_t * key, lock_on_t lock_on)
+		const SASIndexKey_t * key, lock_on_t lock_on)
 {
   SASIndexNodeHeader *node = (SASIndexNodeHeader *) heap;
   SASIndexKey_t *oldkey = node->keys[pos];
@@ -1269,7 +1269,7 @@ SASIndexNodeKeyDelete (SASIndexNode_t heap, short pos,
 
 static inline void
 SASIndexNodeKeyReplace (SASIndexNode_t heap, short pos,
-		SASIndexKey_t * key, lock_on_t lock_on)
+		const SASIndexKey_t * key, lock_on_t lock_on)
 {
   SASIndexNodeHeader *node = (SASIndexNodeHeader *) heap;
   SASIndexKey_t *tempkey;
@@ -1499,7 +1499,7 @@ SASIndexNodePushDown (SASIndexNode_t node_t,
 
 SASIndexNode_t
 SASIndexNodeInitialize (SASIndexNode_t node_t,
-			SASIndexKey_t * newkey, void *newval, lock_on_t lock_on)
+			const SASIndexKey_t * newkey, void *newval, lock_on_t lock_on)
 {
   SASIndexNodeHeader *node = (SASIndexNodeHeader *) node_t;
   SASIndexNode_t result = node_t;
@@ -1928,7 +1928,7 @@ SASIndexNodeSuccessor (SASIndexNode_t header, short pos, lock_on_t lock_on)
 
 // recursive delete
 int
-SASIndexNodeRecDelete (SASIndexNode_t header, SASIndexKey_t * target,
+SASIndexNodeRecDelete (SASIndexNode_t header, const SASIndexKey_t * target,
 		lock_on_t lock_on)
 {
   SASIndexNodeHeader *node = (SASIndexNodeHeader *) header;
@@ -2017,7 +2017,7 @@ SASIndexNodeRecDelete (SASIndexNode_t header, SASIndexKey_t * target,
 }
 
 SASIndexNode_t
-SASIndexNodeDelete (SASIndexNode_t header, SASIndexKey_t * target, lock_on_t lock_on)
+SASIndexNodeDelete (SASIndexNode_t header, const SASIndexKey_t * target, lock_on_t lock_on)
 {
   SASIndexNodeHeader *node = (SASIndexNodeHeader *) header;
   SASIndexNodeHeader *result = node;
