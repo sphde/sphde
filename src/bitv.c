@@ -444,7 +444,7 @@ bitv_dealloc (bitv_cb_t * cb, bitv_word * bvec, bitv_word at, size_t size)
 }
 
 size_t
-bitv_free_space (bitv_cb_t * cb, bitv_word * bvec)
+bitv_free_space (const bitv_cb_t * cb, const bitv_word * bvec)
 {
   return (size_t) __builtin_popcountl (*bvec) << cb->alloc_shift;
 }
