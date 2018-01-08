@@ -798,6 +798,7 @@ enable_option_checking
 enable_silent_rules
 enable_maintainer_mode
 enable_debug
+enable_htm
 enable_dependency_tracking
 enable_shared
 enable_static
@@ -1448,6 +1449,7 @@ Optional Features:
                           enable make rules and dependencies not useful (and
                           sometimes confusing) to the casual installer
   --enable-debug          Enable debugging information
+  --disable-htm           Disable hardware transactional memory
   --enable-dependency-tracking
                           do not reject slow dependency extractors
   --disable-dependency-tracking
@@ -3149,6 +3151,11 @@ if test "x$enable_debug" = "xyes" ; then
   CFLAGS="$CFLAGS -D__SOMDebugPrint__ -Dmylockdebug -DcoherenceCheck -D__SASDebugPrint__"
   CXXFLAGS="$CXXFLAGS -D__SOMDebugPrint__ -Dmylockdebug -DcoherenceCheck -D__SASDebugPrint__"
 fi
+# Check whether --enable-htm was given.
+if test "${enable_htm+set}" = set; then :
+  enableval=$enable_htm;
+fi
+
 
 # This directive is to avoid buggy libtool that don't add the -Wl,--no-as-needed
 # directive in the correct position of LDFLAGS
@@ -16880,6 +16887,7 @@ fi
 LDFLAGS="$SAVE_LDFLAGS"
 fi
 
+if test "$enable_htm" != no ; then
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether C compiler accepts -mhtm" >&5
 $as_echo_n "checking whether C compiler accepts -mhtm... " >&6; }
 if ${ax_cv_check_cflags___mhtm+:} false; then :
@@ -16919,6 +16927,7 @@ else
   :
 fi
 
+fi
  if test x$htm = xtrue; then
   HTM_TRUE=
   HTM_FALSE='#'

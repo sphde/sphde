@@ -32,6 +32,9 @@ if test "x$enable_debug" = "xyes" ; then
   CFLAGS="$CFLAGS -D__SOMDebugPrint__ -Dmylockdebug -DcoherenceCheck -D__SASDebugPrint__"
   CXXFLAGS="$CXXFLAGS -D__SOMDebugPrint__ -Dmylockdebug -DcoherenceCheck -D__SASDebugPrint__"
 fi
+AC_ARG_ENABLE([htm],
+  [AS_HELP_STRING([--disable-htm],
+    [Disable hardware transactional memory])])
 
 # This directive is to avoid buggy libtool that don't add the -Wl,--no-as-needed
 # directive in the correct position of LDFLAGS
@@ -114,11 +117,13 @@ AC_CHECK_LIB([c], [printf], [],
 LDFLAGS="$SAVE_LDFLAGS"
 fi
 
+if test "$enable_htm" != no ; then
 AX_CHECK_COMPILE_FLAG([-mhtm],[
         CFLAGS="$CFLAGS -mhtm"
         CXXFLAGS="$CXXFLAGS -mhtm"
         htm=true
 ])
+fi
 AM_CONDITIONAL([HTM], [test x$htm = xtrue])
 
 # Doxygen support
