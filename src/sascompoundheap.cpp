@@ -480,7 +480,7 @@ SASCompoundHeapAlloc (SASCompoundHeap_t heap)
 		      < expandBlock->loadFactor)
 		    {
 		      expandHeader = expandBlock;
-		      last_lock = i;
+		      last_lock = i + 1;
 		      break;
 		    }
 		}
@@ -489,21 +489,23 @@ SASCompoundHeapAlloc (SASCompoundHeap_t heap)
 		  expandHeader = (SASCompoundHeapHeader *)
 		    SASCompoundHeapExpandCreate (heap);
 		}
-	    }
-	  else
-	    {
-	      expandHeader = lastHeader;
-	    }
-	  if (expandHeader != NULL)
-	    newHeap = SASCompoundHeapAllocInternal (expandHeader);
-
-	  if (lastHeader != expandHeader)
-	    {
-	      for (i = 1; i <= last_lock; i++)
+	      /* Need to check again, in case the
+	       * SASCompoundHeapExpandCreate is needed but fails.  */
+	      if (expandHeader != NULL)
+		newHeap = SASCompoundHeapAllocInternal (expandHeader);
+              /* Now that we have allocated from a CompoundHeap, we can
+               * unlock any (other than first and last) from the
+               * ExpandList that we have accessed.  */
+	      for (i = 1; i < last_lock; i++)
 		{
 		  SASUnlock (list->heap[i]);
 		}
 	    }
+	  else
+	    {
+	      newHeap = SASCompoundHeapAllocInternal (lastHeader);
+	    }
+
 	  if (lastHeader != heapHeader)
 	    SASUnlock (lastHeader);
 	}
@@ -1363,7 +1365,7 @@ SPHCompoundPCQAlloc (SASCompoundHeap_t heap)
 		      < expandBlock->loadFactor)
 		    {
 		      expandHeader = expandBlock;
-		      last_lock = i;
+		      last_lock = i + 1;
 		      break;
 		    }
 		}
@@ -1372,21 +1374,23 @@ SPHCompoundPCQAlloc (SASCompoundHeap_t heap)
 		  expandHeader = (SASCompoundHeapHeader *)
 		    SASCompoundHeapExpandCreate (heap);
 		}
-	    }
-	  else
-	    {
-	      expandHeader = lastHeader;
-	    }
-	  if (expandHeader != NULL)
-	    newHeap = SPHCompoundPCQAllocInternal (expandHeader);
-
-	  if (lastHeader != expandHeader)
-	    {
-	      for (i = 1; i <= last_lock; i++)
+	      /* Need to check again, in case the
+	       * SASCompoundHeapExpandCreate is needed but fails.  */
+	      if (expandHeader != NULL)
+		newHeap = SPHCompoundPCQAllocInternal (expandHeader);
+              /* Now that we have allocated from a CompoundHeap, we can
+               * unlock any (other than first and last) from the
+               * ExpandList that we have accessed.  */
+	      for (i = 1; i < last_lock; i++)
 		{
 		  SASUnlock (list->heap[i]);
 		}
 	    }
+	  else
+	    {
+	      newHeap = SPHCompoundPCQAllocInternal (lastHeader);
+	    }
+
 	  if (lastHeader != heapHeader)
 	    SASUnlock (lastHeader);
 	}
@@ -1669,3 +1673,4 @@ SPHCompoundPCQNearAlloc (void *nearObj)
     }
   return newHeap;
 }
+
