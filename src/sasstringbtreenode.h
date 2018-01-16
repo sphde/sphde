@@ -109,8 +109,8 @@ typedef void *SASStringBTreeNode_t;
 #ifndef LOCK_ON_T
 #define LOCK_ON_T
 typedef int lock_on_t;
-const lock_on_t LOCK_ON = 1;
-const lock_on_t LOCK_OFF = 0;
+static const lock_on_t LOCK_ON = 1;
+static const lock_on_t LOCK_OFF = 0;
 #endif
 
 /*!
@@ -492,3 +492,4 @@ SASStringBTreeNodeDelete (SASStringBTreeNode_t header, const char *target,
 				lock_on_t lock_on);
 
 #endif /* __SAS_STRINGBTREENODE_H */
+
