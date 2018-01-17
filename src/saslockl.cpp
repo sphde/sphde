@@ -16,6 +16,8 @@
 // Includes
 //----------------------------------------------------------------------------
 
+#include <assert.h>
+
 #include "saslockl.h"
 extern "C" {
 /*   #include <mach.h> */
@@ -277,7 +279,7 @@ SasLockList<Item, Key>::unlockNode(Key keyAddr)
 #endif
 
    SasLockListNode<Item, Key> * iterPtr;
-   lock->write_lock();
+   lock->write_lock();		// lock the lock list
 
    // Search the list for the specified key
    for (iterPtr = headPtr; iterPtr != NULL; iterPtr = iterPtr->next)
@@ -285,16 +287,21 @@ SasLockList<Item, Key>::unlockNode(Key keyAddr)
       if (iterPtr->item->operator==(keyAddr))
          break;
     }
-   if (iterPtr == NULL)
+
+  if (iterPtr != NULL)
     {
+      iterPtr->item->unlock ();	// unlock the item
+    } else {
 #ifdef __SOMDebugPrint__
       fprintf (stderr, "%s: error - unlock requested for an address that "
-               "is not locked\n", __FUNCTION__);
+	       "is not locked\n",
+	       __FUNCTION__);
+#else
+      assert (iterPtr == NULL);
 #endif
-      return;
     }
-   iterPtr->item->unlock();	// unlock item
-   lock->unlock();		// unlock list
+
+   lock->unlock();		// unlock the lock list
 }
 
 #ifdef collectstats
