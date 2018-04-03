@@ -87,7 +87,6 @@ typedef int (*test_fill_ptr_t) (SPHMPMCQ_t, SPHMPMCQ_t, int, long);
 static test_fill_ptr_t test_funclist[MAX_THREADS];
 static int arg_list[MAX_THREADS];
 
-#if defined(__HTM__)
 int test0(unsigned int iters) {
 	SPHMPMCQ_t pcq;
 	SPHLFEntryDirect_t send_handle[Q_SIZE/Q_STRIDE],recv_handle[Q_SIZE/Q_STRIDE];
@@ -124,9 +123,9 @@ int test0(unsigned int iters) {
 			debug_printf("Q is full = %d\n",full);
 			if (full) return 1;
 
-			send_handle[i] = SPHMPMCQAllocStrideDirectHTM(pcq);
+			send_handle[i] = SPHMPMCQAllocStrideDirectSync(pcq);
 			if (!send_handle[i]) {
-				fprintf(stderr,"SPHMPMCQAllocStrideDirectHTM Error\n");
+				fprintf(stderr,"SPHMPMCQAllocStrideDirectSync Error\n");
 				return 1;
 			}
 			debug_printf("ALLOC %p\n",send_handle[i]);
@@ -161,9 +160,9 @@ int test0(unsigned int iters) {
 			debug_printf("Q is empty = %d\n",empty);
 			if (empty) return 1;
 
-			recv_handle[i] = SPHMPMCQGetNextCompleteDirectHTM(pcq);
+			recv_handle[i] = SPHMPMCQGetNextCompleteDirectSync(pcq);
 			if (!recv_handle[i]) {
-				fprintf(stderr,"SPHMPMCQGetNextDirectCompleteHTM Error\n");
+				fprintf(stderr,"SPHMPMCQGetNextCompleteDirectSync Error\n");
 				return 1;
 			}
 			debug_printf("GET   %p\n",recv_handle[i]);
@@ -202,9 +201,9 @@ int test0(unsigned int iters) {
 			debug_printf("Q is full = %d\n",full);
 			if (full) return 1;
 
-			send_handle[i] = SPHMPMCQAllocStrideDirectHTM(pcq);
+			send_handle[i] = SPHMPMCQAllocStrideDirectSync(pcq);
 			if (!send_handle[i]) {
-				fprintf(stderr,"SPHMPMCQAllocStrideDirectHTM Error\n");
+				fprintf(stderr,"SPHMPMCQAllocStrideDirectSync Error\n");
 				return 1;
 			}
 			debug_printf("ALLOC %p\n",send_handle[i]);
@@ -233,9 +232,9 @@ int test0(unsigned int iters) {
 			debug_printf("Q is empty = %d\n",empty);
 			if (empty) return 1;
 
-			recv_handle[i] = SPHMPMCQGetNextCompleteDirectHTM(pcq);
+			recv_handle[i] = SPHMPMCQGetNextCompleteDirectSync(pcq);
 			if (!recv_handle[i]) {
-				fprintf(stderr,"SPHMPMCQGetNextCompleteDirectHTM Error\n");
+				fprintf(stderr,"SPHMPMCQGetNextCompleteDirectSync Error\n");
 				return 1;
 			}
 			debug_printf("GET   %p\n",recv_handle[i]);
@@ -284,7 +283,6 @@ int test0(unsigned int iters) {
 	}
 	return 0;
 }
-#endif
 
 int
 test_pcq_init (block_size_t pcq_size)
@@ -341,13 +339,12 @@ test_pcq_init (block_size_t pcq_size)
 	return rc;
 }
 
-#if defined(__HTM__)
 int
 lfPCQentry_test (SPHMPMCQ_t pqueue, SPHMPMCQ_t cqueue, sphLFEntryID_t qtmpl, int val1, int val2, int val3)
 {
 	SPHLFEntryDirect_t *handle;
 
-	while ((handle = SPHMPMCQAllocStrideDirectHTM(pqueue)) == 0)
+	while ((handle = SPHMPMCQAllocStrideDirectSync(pqueue)) == 0)
 		sched_yield();
 
 	int *array = (int *) SPHLFEntryDirectGetFreePtr(handle);
@@ -368,7 +365,7 @@ lfPCQentry_verify (SPHMPMCQ_t pqueue, SPHMPMCQ_t cqueue, int val1, int val2, int
 
 	debug_printf("%s(%p,%x,%x,%x)\n",__FUNCTION__,cqueue,val1,val2,val3);
 
-	while ((handle = SPHMPMCQGetNextCompleteDirectHTM (cqueue)) == 0)
+	while ((handle = SPHMPMCQGetNextCompleteDirectSync (cqueue)) == 0)
 		sched_yield();
 
 	int *array = (int *) SPHLFEntryDirectGetFreePtr(handle);
@@ -391,7 +388,6 @@ lfPCQentry_verify (SPHMPMCQ_t pqueue, SPHMPMCQ_t cqueue, int val1, int val2, int
 
 	return (rc1 | rc2 | rc3 | rc4);
 }
-#endif
 
 int
 lfPCQsend(SPHMPMCQ_t pqueue, SPHMPMCQ_t cqueue, sphLFEntryID_t qtmpl, int val1, int val2, int val3)
@@ -457,7 +453,6 @@ lfPCQreceive(SPHMPMCQ_t pqueue, SPHMPMCQ_t cqueue, int val1, int val2, int val3)
 	return rc;
 }
 
-#if defined(__HTM__)
 int
 test_thread_Producer_fill (SPHMPMCQ_t pqueue, SPHMPMCQ_t cqueue,
 			   int thread_ID, long iterations)
@@ -626,7 +621,6 @@ test_MPSC_ponger(SPHMPMCQ_t pqueue, SPHMPMCQ_t cqueue,
 	debug_printf ("%s END\n",__FUNCTION__);
 	return rtn;
 }
-#endif
 
 int
 test_SPSC_pinger(SPHMPMCQ_t pqueue, SPHMPMCQ_t cqueue,
@@ -686,7 +680,6 @@ test_SPSC_ponger(SPHMPMCQ_t pqueue, SPHMPMCQ_t cqueue,
 	return rtn;
 }
 
-#if defined(__HTM__)
 int
 test_thread_ponger(SPHMPMCQ_t pqueue, SPHMPMCQ_t cqueue,
 		   int thread_ID, long iterations)
@@ -738,7 +731,6 @@ test_thread_consumer_verify (SPHMPMCQ_t pqueue, SPHMPMCQ_t cqueue,
 	debug_printf ("%s END\n",__FUNCTION__);
 	return rtn;
 }
-#endif
 
 int
 test_single_producer_fill(SPHMPMCQ_t pqueue, SPHMPMCQ_t cqueue,
@@ -917,21 +909,23 @@ void compute_stats(unsigned long count, sphtimer_t delta, double *per, double *r
 
 int
 main(int argc, char *argv[]) {
-	unsigned long hwcap2 = getauxval(AT_HWCAP2);
-#ifdef __s390x__
-	if ((hwcap2 & HWCAP_S390_TE) == 0) {
-#else
-	if ((hwcap2 & PPC_FEATURE2_HAS_HTM) == 0) {
-#endif
-		fprintf(stderr,"MPMCQ requires Hardware Transactional Memory support.\n");
-		exit(0);
-	}
-
 	double nano, rate;
 	sphtimer_t startt, endt;
 	int rc = 0;
 	int test_id,i;
 	int num_producers, num_consumers;
+
+#ifdef __HTM__
+	unsigned long hwcap2 = getauxval(AT_HWCAP2);
+# ifdef __s390x__
+	if ((hwcap2 & HWCAP_S390_TE) == 0) {
+# elif defined __powerpc__
+	  if ((hwcap2 & PPC_FEATURE2_HAS_HTM) == 0) {
+# endif
+	    fprintf(stderr,"MPMCQ requires Hardware Transactional Memory support.\n");
+	    exit(0);
+	  }
+#endif
 
 	for (i = 1; i < argc; i++) {
 		cpu_list[i-1] = strtol(argv[i],0,0);
@@ -946,7 +940,6 @@ main(int argc, char *argv[]) {
 	}
 	debug_printf("SAS Joined\n");
 
-#if defined(__HTM__)
 	unsigned long iters = DEFAULT_ITERS;
 	printf("START 0 test0(%lu)\n",iters);
 	if (argc > 1) {
@@ -956,12 +949,10 @@ main(int argc, char *argv[]) {
 
 	rc = test0(iters);
 	printf("END   0 test0 = %d\n",rc);
-#endif
 
 	rc = test_pcq_init (4096);
 
 	p10 = units * ITERATIONS;
-#if defined(__HTM__)
 #if 1
 	block_size_t remainder;
 
@@ -1088,7 +1079,6 @@ main(int argc, char *argv[]) {
 	printf("END   %u   test single producer | %d consumers (%p,%zu) = %d\n",
 		test_id,num_consumers,pcqueue,units,rc);
 #endif
-#endif
 #if 1
 	test_id = 4;
 
@@ -1124,7 +1114,6 @@ main(int argc, char *argv[]) {
 	printf("END   %u   test single producer | single consumer (%p,%zu) = %d\n",
 		test_id,pcqueue,units,rc);
 #endif
-#if defined(__HTM__)
 #if 1
 	test_id = 5;
 
@@ -1440,7 +1429,6 @@ main(int argc, char *argv[]) {
 	printf("END   %u   test thread %d pingers | single ponger (%p,%p,%zu) = %d\n",
 	       test_id,num_producers,pcqueue,pcqueue2,units,rc);
 #endif
-#endif
 #if 1
 	test_id = 13;
 
@@ -1478,7 +1466,6 @@ main(int argc, char *argv[]) {
 	printf("END   %u   test thread single pinger | single ponger (%p,%p,%zu) = %d\n",
 	       test_id,pcqueue,pcqueue2,units,rc);
 #endif
-#if defined(__HTM__)
 #if 0
 	test_id = 14;
 
@@ -1589,7 +1576,6 @@ main(int argc, char *argv[]) {
 	       num_producers,num_consumers,p10,nano,rate);
 	printf("END   %u   test thread %d pingers | %d pongers (%p,%p,%zu) = %d\n",
 	       test_id,num_producers,num_consumers,pcqueue,pcqueue2,units,rc);
-#endif
 #endif
 	SASRemove();
 	return rc;

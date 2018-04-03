@@ -36,7 +36,7 @@ typedef struct data_struct11 {
 } data_struct11;
 
 // Allocate zero copy queue entry
-handle = SPHMPMCQMultiAllocStrideDirectHTM (pcqueue);
+handle = SPHMPMCQMultiAllocStrideDirectSync (pcqueue);
 if (handle)
 {	// insert data into the allocated queue entry
 	sphLFEntryID_t tmpl;
@@ -84,7 +84,7 @@ typedef struct data_struct11 {
 } data_struct11;
 
 // Get next queue entry
-handle = SPHMPMCQGetNextCompleteDirectHTM (pcqueue);
+handle = SPHMPMCQGetNextCompleteDirectSync (pcqueue);
 if (handle)
 {	// insert data into the allocated queue entry
 	data_struct11 *struct_ptr;
@@ -327,7 +327,7 @@ SPHMPMCQGetEntryTemplate (SPHMPMCQ_t queue);
 *       For example the Allocate may fail if the queue is full.
 */
 extern __C__ SPHLFEntryDirect_t
-SPHMPMCQAllocStrideDirectHTM (SPHMPMCQ_t queue);
+SPHMPMCQAllocStrideDirectSync (SPHMPMCQ_t queue);
 
 /** \brief Allows the producer thread to allocate and initialize the
 *   header of a queue entry for access. The allocation is from the
@@ -373,7 +373,7 @@ SPHSPMCQAllocStrideDirect(SPHMPMCQ_t queue);
 *       is empty or the next tail entry is not yet completed.
 */
 extern __C__ SPHLFEntryDirect_t
-SPHMPMCQGetNextCompleteDirectHTM (SPHMPMCQ_t queue);
+SPHMPMCQGetNextCompleteDirectSync (SPHMPMCQ_t queue);
 
 /** \brief Allows the consumer to get the next completed queue entry
 *       from the specified multi producer multi consumer queue.
