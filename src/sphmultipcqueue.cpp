@@ -10,9 +10,6 @@
  *     IBM Corporation, Paul Clarke   - MPMC implementation
  */
 
-/* This implementation of MCMPQ requires HTM support. */
-#ifdef __HTM__
-
 //#define __SASDebugPrint__ 1
 
 #define sas_printf printf
@@ -21,7 +18,9 @@
 #include <unistd.h>
 #include <time.h>
 #include <sys/auxv.h>
+#ifdef __HTM__
 #include <htmxlintrin.h>
+#endif
 #include "sasalloc.h"
 #include "freenode.h"
 #ifdef __SASDebugPrint__
@@ -77,15 +76,17 @@ SPHMPMCQInitInternal (void *buf_seg, sas_type_t sasType,
 		      block_size_t buf_size,
 		      unsigned int stride, unsigned int options)
 {
+#ifdef __HTM__
 	unsigned long hwcap2 = getauxval(AT_HWCAP2);
-#ifdef __s390x__
+# ifdef __s390x__
 	if ((hwcap2 & HWCAP_S390_TE) == 0) {
-#else
+# elif defined __powerpc__
 	if ((hwcap2 & PPC_FEATURE2_HAS_HTM) == 0) {
-#endif
+# endif
 		fprintf(stderr,"MPMCQ requires Hardware Transactional Memory support.\n");
-		return NULL;
+		exit(0);
 	}
+#endif
 
 	SPHMPMCQHeader *heapBlock = (SPHMPMCQHeader *) buf_seg;
 	char *qStart = NULL;
@@ -338,7 +339,7 @@ SPHMPMCQAdvanceHead(SPHLFEntryHeader_t **head_p, sphLFEntryID_t idAlloc, sphLFEn
 }
 
 SPHLFEntryDirect_t
-SPHMPMCQAllocStrideDirectHTM(SPHMPMCQ_t queue) {
+SPHMPMCQAllocStrideDirectSync(SPHMPMCQ_t queue) {
 	SPHMPMCQHeader *headerBlock = (SPHMPMCQHeader *) queue;
 	SPHLFEntryHeader_t *entryPtr = 0;
 
@@ -349,7 +350,6 @@ SPHMPMCQAllocStrideDirectHTM(SPHMPMCQ_t queue) {
 		const unsigned short stride = headerBlock->default_entry_stride;
 		const longPtr_t qlo = headerBlock->startq;
 		const longPtr_t qhi = headerBlock->endq;
-
 		entrytemp.detail.valid = 0;
 		entrytemp.detail.timestamped = 0;
 		entrytemp.detail.allocated = 1;
@@ -357,12 +357,17 @@ SPHMPMCQAllocStrideDirectHTM(SPHMPMCQ_t queue) {
 		entrytemp.detail.category = 0;
 		entrytemp.detail.subcat = 0;
 		entrytemp.detail.len = (stride / DEFAULT_ALLOC_UNIT);
-
+#ifdef __HTM__
 		if (__TM_simple_begin () == _HTM_TBEGIN_STARTED) {
 			/* Transaction State Initiated. */
 			entryPtr = SPHMPMCQAdvanceHead((SPHLFEntryHeader_t **)&headerBlock->qhead,entrytemp.idUnit,entryfree.idUnit,stride,qlo,qhi);
 			__TM_end ();
 		}
+#else
+		SASLock(queue, SasUserLock__WRITE);
+		entryPtr = SPHMPMCQAdvanceHead((SPHLFEntryHeader_t **)&headerBlock->qhead,entrytemp.idUnit,entryfree.idUnit,stride,qlo,qhi);
+		SASUnlock(queue);
+#endif
 	} else {
 		debug_printf("%-6d: %s(%p) type check failed\n",sphdeGetTID(),__FUNCTION__,queue);
 	}
@@ -418,7 +423,7 @@ SPHMPMCQAdvanceTail(SPHLFEntryHeader_t **tail_p, unsigned short len, longPtr_t q
 }
 
 SPHLFEntryDirect_t
-SPHMPMCQGetNextCompleteDirectHTM (SPHMPMCQ_t queue)
+SPHMPMCQGetNextCompleteDirectSync (SPHMPMCQ_t queue)
 {
 	SPHMPMCQHeader *headerBlock = (SPHMPMCQHeader *) queue;
 	SPHLFEntryHeader_t *entryPtr = 0;
@@ -429,11 +434,17 @@ SPHMPMCQGetNextCompleteDirectHTM (SPHMPMCQ_t queue)
 		const unsigned short stride = headerBlock->default_entry_stride;
 		const longPtr_t qlo = headerBlock->startq;
 		const longPtr_t qhi = headerBlock->endq;
+#ifdef __HTM__
 		if (__TM_simple_begin () == _HTM_TBEGIN_STARTED) {
 			/* Transaction State Initiated. */
 			entryPtr = SPHMPMCQAdvanceTail((SPHLFEntryHeader_t **)&headerBlock->qtail,stride,qlo,qhi);
 			__TM_end ();
 		}
+#else
+		SASLock(queue, SasUserLock__WRITE);
+		entryPtr = SPHMPMCQAdvanceTail((SPHLFEntryHeader_t **)&headerBlock->qtail,stride,qlo,qhi);
+		SASUnlock(queue);
+#endif
 	} else {
 		debug_printf("%s(%p) type check failed\n",__FUNCTION__,queue);
 	}
@@ -573,4 +584,3 @@ SPHMPMCQDestroy (SPHMPMCQ_t queue)
 	}
 	return rc;
 }
-#endif
