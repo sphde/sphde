@@ -150,12 +150,14 @@ sassim_msync_test ()
     }
   page1_ptr = (char *) baseAddr1;
   memset (baseAddr1, 0, blockSize);
-  sprintf ((char *) baseAddr1, "SAS Page 0@%p", baseAddr1);
+  char *baseAddr2 = baseAddr1;
+  sprintf (baseAddr2, "SAS Page 0@%p", baseAddr1);
   for (pageX_ptr = (page1_ptr + 4096); pageX_ptr < (page1_ptr + blockSize);
        pageX_ptr += 4096)
     {
+      char *pageX = pageX_ptr;
       long page_num = (long) (pageX_ptr - page1_ptr) / 4096;
-      sprintf (pageX_ptr, "SAS Page %ld@%p", page_num, pageX_ptr);
+      sprintf (pageX, "SAS Page %ld@%p", page_num, pageX_ptr);
     } SASSIM_DUMP_BLOCK (baseAddr1, 32);
   SASSIM_PRINT_MSG ("sasMsyncWrite (%p, 4096, %d)", page1_ptr, SAS_SYNC);
   if ((rc = sasMsyncWrite (page1_ptr, 4096, SAS_SYNC)))
