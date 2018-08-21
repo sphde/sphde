@@ -918,7 +918,11 @@ void compute_stats(unsigned long count, sphtimer_t delta, double *per, double *r
 int
 main(int argc, char *argv[]) {
 	unsigned long hwcap2 = getauxval(AT_HWCAP2);
+#ifdef __s390x__
+	if ((hwcap2 & HWCAP_S390_TE) == 0) {
+#else
 	if ((hwcap2 & PPC_FEATURE2_HAS_HTM) == 0) {
+#endif
 		fprintf(stderr,"MPMCQ requires Hardware Transactional Memory support.\n");
 		exit(0);
 	}

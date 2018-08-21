@@ -78,7 +78,11 @@ SPHMPMCQInitInternal (void *buf_seg, sas_type_t sasType,
 		      unsigned int stride, unsigned int options)
 {
 	unsigned long hwcap2 = getauxval(AT_HWCAP2);
+#ifdef __s390x__
+	if ((hwcap2 & HWCAP_S390_TE) == 0) {
+#else
 	if ((hwcap2 & PPC_FEATURE2_HAS_HTM) == 0) {
+#endif
 		fprintf(stderr,"MPMCQ requires Hardware Transactional Memory support.\n");
 		return NULL;
 	}
@@ -345,7 +349,6 @@ SPHMPMCQAllocStrideDirectHTM(SPHMPMCQ_t queue) {
 		const unsigned short stride = headerBlock->default_entry_stride;
 		const longPtr_t qlo = headerBlock->startq;
 		const longPtr_t qhi = headerBlock->endq;
-		TM_buff_type TM_buff;
 
 		entrytemp.detail.valid = 0;
 		entrytemp.detail.timestamped = 0;
@@ -355,7 +358,7 @@ SPHMPMCQAllocStrideDirectHTM(SPHMPMCQ_t queue) {
 		entrytemp.detail.subcat = 0;
 		entrytemp.detail.len = (stride / DEFAULT_ALLOC_UNIT);
 
-		if (__TM_begin (TM_buff) == _HTM_TBEGIN_STARTED) {
+		if (__TM_simple_begin () == _HTM_TBEGIN_STARTED) {
 			/* Transaction State Initiated. */
 			entryPtr = SPHMPMCQAdvanceHead((SPHLFEntryHeader_t **)&headerBlock->qhead,entrytemp.idUnit,entryfree.idUnit,stride,qlo,qhi);
 			__TM_end ();
@@ -426,8 +429,7 @@ SPHMPMCQGetNextCompleteDirectHTM (SPHMPMCQ_t queue)
 		const unsigned short stride = headerBlock->default_entry_stride;
 		const longPtr_t qlo = headerBlock->startq;
 		const longPtr_t qhi = headerBlock->endq;
-		TM_buff_type TM_buff;
-		if (__TM_begin (TM_buff) == _HTM_TBEGIN_STARTED) {
+		if (__TM_simple_begin () == _HTM_TBEGIN_STARTED) {
 			/* Transaction State Initiated. */
 			entryPtr = SPHMPMCQAdvanceTail((SPHLFEntryHeader_t **)&headerBlock->qtail,stride,qlo,qhi);
 			__TM_end ();
