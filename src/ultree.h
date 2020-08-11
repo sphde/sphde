@@ -9,6 +9,7 @@
  *     IBM Corporation, Steven Munroe - initial API and implementation
  */
 
+#include <stddef.h>
 #ifndef _ULONGTREE_H
 #define _ULONGTREE_H
 
@@ -21,43 +22,55 @@ class uLongTreeNode {
 		uLongTreeNode	*left;
 		uLongTreeNode	*right;
 	public:
+		uLongTreeNode(void);
+		~uLongTreeNode(void);
+		uLongTreeNode (search_t keys, info_t data)
+		  {
+		    key	= keys;
+		    info = data;
+		    left = NULL;
+		    right = NULL;
+		  };
 		void setInfo(info_t i)
-			{
-				info = i;
-			};
+		  {
+		    info = i;
+		  };
 		void setKey(search_t k)
-			{
-				key = k;
-			};
+		  {
+		    key = k;
+		  };
 		info_t getInfo()
-			{
-				return info;
-			};
+		  {
+		    return info;
+		  };
 		search_t getKey()
-			{
-				return key;
-			};
+		  {
+		    return key;
+		  };
 		void init(search_t k, info_t i);
 		void kill();
-		uLongTreeNode *insertNode (	uLongTreeNode **root,
-									search_t k, info_t i);
-		uLongTreeNode *insertNode (	uLongTreeNode **root,
-									uLongTreeNode *node);
-		uLongTreeNode *searchNode (	uLongTreeNode *root,
-									search_t key);
-		uLongTreeNode *searchNextNode (	uLongTreeNode *root,
-										search_t key);
-		uLongTreeNode *searchEqualOrNextNode (	uLongTreeNode *root,
-												search_t key);
-		uLongTreeNode *searchPrevNode (	uLongTreeNode *root,
-										search_t key);
-		uLongTreeNode **searchNode (uLongTreeNode **root,
-									search_t key);
-		uLongTreeNode **searchEqualOrNextNode (	uLongTreeNode **root,
-												search_t key);
-		uLongTreeNode *removeNode (uLongTreeNode **pp);
+		void * operator new (size_t, uLongTreeNode * root);
+		void operator delete( void *deadObject );
+		uLongTreeNode * insertNode (uLongTreeNode **root,
+					    search_t k, info_t i);
+		uLongTreeNode * insertNode (uLongTreeNode **root,
+					    uLongTreeNode *node);
+		uLongTreeNode * searchNode (uLongTreeNode *root,
+					    search_t key);
+		uLongTreeNode * searchNextNode (uLongTreeNode *root,
+						search_t key);
+		uLongTreeNode * searchEqualOrNextNode (uLongTreeNode *root,
+						       search_t key);
+		uLongTreeNode * searchPrevNode (uLongTreeNode *root,
+						search_t key);
+		uLongTreeNode ** searchNode (uLongTreeNode **root,
+					     search_t key);
+		uLongTreeNode ** searchEqualOrNextNode (uLongTreeNode **root,
+							search_t key);
+		uLongTreeNode * removeNode (uLongTreeNode **pp);
 		void deleteNode (uLongTreeNode **pp);
-		int totalNodes ();		int maxNodeDepth ();
+		int totalNodes ();
+		int maxNodeDepth ();
 
 		void listNodes (int indent);
 		void listNodesDepth ();
