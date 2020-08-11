@@ -1673,4 +1673,3 @@ SPHCompoundPCQNearAlloc (void *nearObj)
     }
   return newHeap;
 }
-
