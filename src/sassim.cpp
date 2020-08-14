@@ -485,16 +485,6 @@ destroySASSem (SASAnchor_t * anchor)
 #endif
 }
 
-static inline void
-initULTreeList (uLongTreeNode **root,
-		search_t keys, info_t info)
-{
-  uLongTreeNode *n = (uLongTreeNode *)SASNearAlloc(root, sizeof(uLongTreeNode));
-  n->init(keys, info);
-
-  *root = n;
-}
-
 static void
 initRegion ()
 {
@@ -529,7 +519,17 @@ initRegion ()
 #endif
   nn = &(anchor->uncommitted);
   keys = nodeToLong (0, SizeToLog2 (SegmentSize));
-  initULTreeList (nn, keys, (unsigned long) anchorBlock);
+  anchor->uncommitted = new ((uLongTreeNode *) anchor) uLongTreeNode (
+      (search_t) keys, (unsigned long) anchorBlock);
+
+#ifdef __SASDebugPrint__
+  sas_printf ("initRegion uncommitted list=%lx\n",
+	      (unsigned long) anchor->uncommitted);
+  sas_printf ("\tkey  =%lx\n",
+	      (unsigned long) anchor->uncommitted->getKey());
+  sas_printf ("\tinfo =%lx\n",
+	      (unsigned long) anchor->uncommitted->getInfo());
+#endif
 
 #ifdef __SASDebugPrint__
   sas_printf ("initRegion used %lx\n", block__Size1M);
@@ -544,7 +544,17 @@ initRegion ()
 #endif
   nn = &(anchor->region);
   keys = nodeToLong (0, SizeToLog2 (RegionSize));
-  initULTreeList (nn, keys, (unsigned long) anchorBlock);
+  anchor->region = new ((uLongTreeNode *) anchor) uLongTreeNode (
+      (search_t) keys, (unsigned long) anchorBlock);
+
+#ifdef __SASDebugPrint__
+  sas_printf ("initRegion region list=%lx\n",
+	      (unsigned long) anchor->region);
+  sas_printf ("\tkey  =%lx\n",
+	      (unsigned long) anchor->region->getKey());
+  sas_printf ("\tinfo =%lx\n",
+	      (unsigned long) anchor->region->getInfo());
+#endif
 
 #ifdef __SASDebugPrint__
   sas_printf ("initRegion allocate %lx\n", SegmentSize);
