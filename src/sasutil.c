@@ -278,6 +278,8 @@ sasutil_stat_cmd(int argc, char *argv[])
   unsigned long sizeList[MAX_ADDR_LIST];
   int count;
   unsigned long tUsed, tFree, tUncom, tUsedReg, tFreeReg;
+  unsigned int cUsed, mUsed;
+  unsigned int cUsedReg, mUsedReg;
   unsigned int anchorFree;
   int i;
 
@@ -288,6 +290,8 @@ sasutil_stat_cmd(int argc, char *argv[])
   for (i = 0; i < count; ++i) {
     tUsed = tUsed + sizeList[i];
   };
+  cUsed = count;
+  mUsed = SASMaxDepthAllocatedRegion();
 
   SASListFreeMem (addrList, sizeList, &count);
   tFree = 0L;
@@ -312,14 +316,23 @@ sasutil_stat_cmd(int argc, char *argv[])
   for ( i = 0; i < count; i++) {
     tUsedReg = tUsedReg + sizeList[i];
   };
+  cUsedReg = count;
+  mUsedReg = SASMaxDepthAllocatedRegion();
 
   anchorFree = SASAnchorFreeSpace();
 
+  if (getSASUseListFlag () == 1)
+    printf ("Use List Flag     compact\n");
+  else
+    printf ("Use List Flag     linear\n");
+
   printf ("Total in use      %ldKB\n", (tUsed/1024));
+  printf (" Max Tree Depth:    %d over %d entries\n", mUsed, cUsed);
   printf ("Total free        %ldKB\n", (tFree/1024));
   printf ("Total Uncommitted %ldKB\n", (tUncom/1024));
   printf ("Total Region free %ldKB\n", (tFreeReg/1024));
   printf ("Total Region used %ldKB\n", (tUsedReg/1024));
+  printf (" Max Tree Depth:    %d over %d entries\n", mUsedReg, cUsedReg);
   printf ("Anchor Free Space %d\n",    (anchorFree));
 
   sasutil_cleanup();
@@ -333,9 +346,15 @@ sasutil_detail_cmd(int argc, char *argv[])
   unsigned long sizeList[MAX_ADDR_LIST];
   int count;
   unsigned long tUsed, tFree, tUncom, tUsedReg, tFreeReg;
+  unsigned int maxd, anchorFree;
   int i;
 
   sasutil_join_region(storepath);
+
+  if (getSASUseListFlag () == 1)
+    printf ("Use List Flag     compact\n");
+  else
+    printf ("Use List Flag     linear\n");
 
   SASListInUseMem (addrList, sizeList, &count);
   printf ("Memory in use:\n");
@@ -344,7 +363,10 @@ sasutil_detail_cmd(int argc, char *argv[])
     tUsed = tUsed + sizeList[i];
     printf ("%03d: %p - %ldKB\n", i, addrList[i], (sizeList[i]/1024));
   }
-  printf ("Total in use:      %ldKB\n\n", (tUsed/1024));
+  maxd = SASMaxDepthAllocatedRegion();
+
+  printf ("Total in use:      %ldKB\n", (tUsed/1024));
+  printf (" Max Tree Depth:    %d over %d entries\n\n", maxd, count);
 
   SASListFreeMem (addrList, sizeList, &count);
   printf ("Memory free:\n");
@@ -380,7 +402,13 @@ sasutil_detail_cmd(int argc, char *argv[])
     tUsedReg = tUsedReg + sizeList[i];
     printf ("%03d: %p - %ldKB\n", i, addrList[i], (sizeList[i]/1024));
   }
+  maxd = SASMaxDepthAllocatedRegion();
+
   printf ("Total Region used: %ldKB\n", (tUsedReg/1024));
+  printf (" Max Tree Depth:    %d over %d entries\n\n", maxd, count);
+
+  anchorFree = SASAnchorFreeSpace();
+  printf ("Anchor Free Space %d\n",    (anchorFree));
 
   sasutil_cleanup();
 }

@@ -20,6 +20,31 @@
 #include <semaphore.h>
 # endif
 
+
+typedef struct
+{
+#ifdef __WORDSIZE_64
+#if defined (__x86_64__) || \
+    (defined (__LITTLE_ENDIAN__) && defined (__powerpc64__)) \
+    || defined (__aarch64__) || defined (__arm__) \
+    || ((__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__) && defined(__mips64))
+  unsigned int compactUseList:1;
+  unsigned long reserved0:63;
+#else
+  unsigned long reserved0:63;
+  unsigned int compactUseList:1;
+#endif
+#else
+#if __BYTE_ORDER == __ORDER_LITTLE_ENDIAN__
+  unsigned int compactUseList:1;
+  unsigned int reserved0:31;
+#else
+  unsigned int reserved0:31;
+  unsigned int compactUseList:1;
+#endif
+#endif
+} regionFlags;
+
 typedef struct {
 	unsigned long	regionSize;
 	void		*finder;
@@ -34,7 +59,7 @@ typedef struct {
 #  else
 	msemaphore	SASSem;
 #  endif
-	void		*reserved1;
+	regionFlags	rFlags;
 # endif
 } SASAnchor_t;
 
