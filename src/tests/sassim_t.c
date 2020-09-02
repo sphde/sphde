@@ -547,6 +547,229 @@ sassim_space_test1 ()
   return 0;
 }
 
+#define ARRAY_SIZE(x)  (sizeof(x)/sizeof(x[0]))
+#define MAX_ADDR_LIST  8192
+#define MAX_LINE_LEN   512
+
+static void
+sassim_display_uselist_flag ()
+{
+  if (getSASUseListFlag () == 1)
+    printf ("Use List Flag = compact\n");
+  else
+    printf ("Use List Flag = linear\n");
+}
+
+static void
+sassim_display_summary ()
+{
+  void *addrList[MAX_ADDR_LIST];
+  unsigned long sizeList[MAX_ADDR_LIST];
+  unsigned long tUsed, tFree, tUncom, tUsedReg, tFreeReg;
+  int count, maxd;
+  unsigned int anchorFree;
+  int i;
+
+//  printf ("Use List Flag =%d\n", getSASUseListFlag ());
+  sassim_display_uselist_flag ();
+  SASListInUseMem (addrList, sizeList, &count);
+  tUsed = 0L;
+  for (i = 0; i < count; ++i) {
+    tUsed = tUsed + sizeList[i];
+  }
+  printf ("Total in use:      %ldKB\n", (tUsed/1024));
+  maxd = SASMaxDepthUseMem ();
+  printf (" Max Tree Depth:    %d over %d entries\n", maxd, count);
+
+  SASListFreeMem (addrList, sizeList, &count);
+  tFree = 0L;
+  for (i = 0; i < count; ++i) {
+    tFree = tFree + sizeList[i];
+  }
+  printf ("Total free:        %ldKB\n", (tFree/1024));
+
+  SASListUncommittedMem (addrList, sizeList, &count);
+  tUncom = 0;
+  for (i = 0; i < count; ++i) {
+    tUncom = tUncom + sizeList[i];
+  }
+  printf ("Total Uncommitted: %ldKB\n", (tUncom/1024));
+
+  SASListFreeRegion (addrList, sizeList, &count);
+  tFreeReg = 0;
+  for (i = 0; i < count; ++i) {
+    tFreeReg = tFreeReg + sizeList[i];
+  }
+  printf ("Total Region free: %ldKB\n", (tFreeReg/1024));
+
+  SASListAllocatedRegion (addrList, sizeList, &count);
+  tUsedReg = 0;
+  for (i = 0; i < count; ++i) {
+    tUsedReg = tUsedReg + sizeList[i];
+  }
+  printf ("Total Region used: %ldKB\n", (tUsedReg/1024));
+  maxd = SASMaxDepthAllocatedRegion();
+  printf (" Max Tree Depth:    %d over %d entries\n", maxd, count);
+
+  anchorFree = SASAnchorFreeSpace();
+  printf ("Anchor Free Space: %d\n",    (anchorFree));
+
+}
+
+static void
+sassim_display_detail()
+{
+  void *addrList[MAX_ADDR_LIST];
+  unsigned long sizeList[MAX_ADDR_LIST];
+  unsigned long tUsed, tFree, tUncom, tUsedReg, tFreeReg;
+  int count, maxd;
+  unsigned int anchorFree;
+  int i;
+
+  printf ("Use List Flag =%d\n", getSASUseListFlag ());
+  SASListInUseMem (addrList, sizeList, &count);
+  printf ("Memory in use:\n");
+  tUsed = 0L;
+  for (i = 0; i < count; ++i) {
+    tUsed = tUsed + sizeList[i];
+    printf ("%03d: %p - %ldKB\n", i, addrList[i], (sizeList[i]/1024));
+  }
+  maxd = SASMaxDepthUseMem ();
+  printf ("Max Tree Depth:    %d over %d entries\n", maxd, count);
+  printf ("Total in use:      %ldKB\n\n", (tUsed/1024));
+
+  SASListFreeMem (addrList, sizeList, &count);
+  printf ("Memory free:\n");
+  tFree = 0L;
+  for (i = 0; i < count; ++i) {
+    tFree = tFree + sizeList[i];
+    printf ("%03d: %p - %ldKB\n", i, addrList[i], (sizeList[i]/1024));
+  }
+  printf ("Total free:        %ldKB\n\n", (tFree/1024));
+
+  SASListUncommittedMem (addrList, sizeList, &count);
+  printf ("Memory uncommitted:\n");
+  tUncom = 0;
+  for (i = 0; i < count; ++i) {
+    tUncom = tUncom + sizeList[i];
+    printf ("%03d: %p - %ldKB\n", i, addrList[i], (sizeList[i]/1024));
+  }
+  printf ("Total Uncommitted: %ldKB\n\n", (tUncom/1024));
+
+  SASListFreeRegion (addrList, sizeList, &count);
+  printf ("Region free:\n");
+  tFreeReg = 0;
+  for (i = 0; i < count; ++i) {
+    tFreeReg = tFreeReg + sizeList[i];
+    printf ("%03d: %p - %ldKB\n", i, addrList[i], (sizeList[i]/1024));
+  }
+  printf ("Total Region free: %ldKB\n\n", (tFreeReg/1024));
+
+  SASListAllocatedRegion (addrList, sizeList, &count);
+  printf ("Region allocated:\n");
+  tUsedReg = 0;
+  for (i = 0; i < count; ++i) {
+    tUsedReg = tUsedReg + sizeList[i];
+    printf ("%03d: %p - %ldKB\n", i, addrList[i], (sizeList[i]/1024));
+  }
+  maxd = SASMaxDepthAllocatedRegion();
+  printf ("Max Tree Depth:    %d over %d entries\n", maxd, count);
+  printf ("Total Region used: %ldKB\n", (tUsedReg/1024));
+
+  anchorFree = SASAnchorFreeSpace();
+  printf ("Anchor Free Space: %d\n",    (anchorFree));
+
+}
+
+#define TEST_BLOCKS 32
+static void *blocks_s [TEST_BLOCKS];
+static void *blocks_m [TEST_BLOCKS];
+static void *blocks_l [TEST_BLOCKS];
+
+static void
+sassim_alloc_uselist ()
+{
+  int cnt;
+
+  for (cnt = 0; cnt < TEST_BLOCKS; cnt++)
+    {
+      blocks_s[cnt] = SASBlockAlloc (block__Size4K);
+      blocks_m[cnt] = SASBlockAlloc (block__Size64K);
+      blocks_l[cnt] = SASBlockAlloc (block__max);
+    }
+}
+
+static void
+sasim_dealloc_uselist ()
+{
+  int cnt;
+
+  for (cnt = 0; cnt < TEST_BLOCKS; cnt++)
+    {
+      SASBlockDealloc (blocks_s[cnt], block__Size4K);
+      SASBlockDealloc (blocks_m[cnt], block__Size64K);
+      SASBlockDealloc (blocks_l[cnt], block__max);
+    }
+}
+
+static int
+sassim_UseList ()
+{
+  unsigned int anchorFree;
+  unsigned int anchorFree0, anchorFree1, anchorFree2;
+  int rc = 0;
+
+  sassim_display_detail ();
+
+  printf ("\ntest alloc Linear Use List\n");
+  setSASLinearUseList ();
+  sassim_display_uselist_flag ();
+  anchorFree = SASAnchorFreeSpace();
+  printf ("Anchor Free Space %d\n",    (anchorFree));
+  sassim_alloc_uselist ();
+  anchorFree = SASAnchorFreeSpace();
+  anchorFree0 = anchorFree; // After alloc to Linear UseList.
+  printf ("Anchor Free Space %d\n",    (anchorFree));
+
+  sassim_display_summary ();
+
+  printf ("\ntest dealloc\n");
+  sasim_dealloc_uselist ();
+  anchorFree = SASAnchorFreeSpace();
+  anchorFree1 = anchorFree; // After Free to Compact FreeList.
+  printf ("Anchor Free Space %d\n",    (anchorFree));
+
+  sassim_display_summary ();
+
+  // For linear UseList.
+  // Anchor free space should after freeing blocks.
+  if (anchorFree1 <= anchorFree0)
+    rc++;
+
+  printf ("\ntest alloc Compact Use List\n");
+  setSASCompactUseList ();
+  sassim_display_uselist_flag ();
+  anchorFree = SASAnchorFreeSpace();
+  printf ("Anchor Free Space before %d\n",    (anchorFree));
+  sassim_alloc_uselist ();
+  anchorFree = SASAnchorFreeSpace();
+  anchorFree2 = anchorFree; // After Alloc to Compact UseList.
+  printf ("Anchor Free Space after  %d\n",    (anchorFree));
+
+  // Anchor free space should improve with Compact UseList.
+  if (anchorFree2 <= anchorFree0)
+    rc++;
+
+  sassim_display_summary ();
+
+  printf ("\ntest dealloc\n");
+  sasim_dealloc_uselist ();
+  anchorFree = SASAnchorFreeSpace();
+  sassim_display_summary ();
+
+  return rc;
+}
+
 int
 main ()
 {
@@ -573,6 +796,8 @@ main ()
   failures += sassim_heap_test2 ();
 
   failures += sassim_space_test1 ();
+
+  failures += sassim_UseList ();
 
   SASRemove ();
 
