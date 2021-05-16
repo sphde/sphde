@@ -492,4 +492,3 @@ SASStringBTreeNodeDelete (SASStringBTreeNode_t header, const char *target,
 				lock_on_t lock_on);
 
 #endif /* __SAS_STRINGBTREENODE_H */
-

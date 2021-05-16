@@ -126,4 +126,3 @@ SASIndexNodeDelete (SASIndexNode_t header, const SASIndexKey_t * target,
 		lock_on_t lock_on);
 
 #endif /* __SAS_INDEXNODE_H */
-
