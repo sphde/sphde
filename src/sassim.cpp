@@ -34,6 +34,7 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <pthread.h>
+#include <semaphore.h>
 
 #include "sasio.h"
 #include "freenode.h"
@@ -194,6 +195,12 @@ SizeToLog2 (unsigned long size)
   return result;
 }
 
+unsigned int
+SASS2Log2 (unsigned long size)
+{
+  return SizeToLog2 (size);
+}
+
 static void
 p2AddUsed (uLongTreeNode ** root, unsigned long size, void *loc)
 {
@@ -207,14 +214,150 @@ p2AddUsed (uLongTreeNode ** root, unsigned long size, void *loc)
   (*root)->insertNode (root, n);
 }
 
+//#define __SASDebugPrint__ 1
+// Find containing block on used list for dealloc block
+static uLongTreeNode*
+p2FindCont (uLongTreeNode ** root, unsigned long size, void *loc)
+{
+  uLongTreeNode *n, *r;
+  uLongTreeNode **nn;
+  unsigned long keys, k;
+  unsigned long offset = ((long) loc) - memLow;
+  unsigned long int toff;
+  unsigned int tsize, lsize;
+
+  tsize = lsize = SizeToLog2 (size);
+  toff = offset;
+  r = n = NULL;
+#ifdef __SASDebugPrint__
+  sas_printf ("p2FindCont (%p, %lx)\n", (void*) loc, size);
+#endif
+  do
+    {
+      tsize++;
+      toff = offset & ~((1L << (tsize + 12)) - 1);
+      keys = nodeToLong (toff, tsize);
+      nn = (*root)->searchEqualOrNextNode (root, keys);
+      if (nn)
+	{
+	  n = *nn;
+	  if (n)
+	    {
+	      k = n->getKey ();
+	      if ((k == keys))
+		{
+		  // return the containing node
+		  r = n->removeNode (nn);
+		}
+#ifdef __SASDebugPrint__
+	      else
+	        {
+		  unsigned long l;
+		  l = n->getInfo ();
+		  sas_printf ("  trying    %p size %d\n", (void *) toff, tsize);
+		  sas_printf ("  last find %p:%p size %lx:%lx\n", (void*)l,  loc, k, keys);
+
+	        }
+#endif
+	    }
+	}
+      else
+	{
+	  sas_printf ("!SASFindCont integrity check failed\n");
+	  sas_printf ("  returning %p size %d\n", (void *) offset, lsize);
+	  sas_printf ("  trying    %p size %d\n", (void *) toff, tsize);
+	  if (n)
+	    {
+	      k = n->getKey ();
+	      toff = longToOffset (k);
+	      tsize = longToSize (k);
+	      sas_printf ("  last find %p size %d\n", (void *) toff, tsize);
+	    }
+	}
+    }
+  while ((nn != NULL) & (r == NULL));
+
+  return r;
+}
+
+// Find containing block on used list for dealloc block
+static void
+p2split (uLongTreeNode ** root, unsigned long size, void *loc,
+	 uLongTreeNode* cblock)
+{
+  uLongTreeNode *n;
+  unsigned long keys;
+  unsigned long k, l;
+  unsigned long offset = ((long) loc) - memLow;
+  unsigned long int toff, aoff, coff, tloc;
+  unsigned long int moff, mloc;
+  unsigned int tsize, asize, csize;
+
+  asize = SizeToLog2 (size);
+  aoff = offset;
+  keys = cblock->getKey ();
+  tloc = cblock->getInfo ();
+  csize = longToSize (keys);
+  coff = longToOffset (keys);
+#ifdef __SASDebugPrint__
+  sas_printf ("p2split (%p, %u by %u)\n", (void*) tloc, csize, asize);
+#endif
+  SASNearDealloc (cblock, sizeof(uLongTreeNode));
+  tsize = csize;
+  toff = coff;
+
+#ifdef __SASDebugPrint__
+  sas_printf ("Split (%u:%u) (%lx:%lx)> ", tsize, asize, toff, aoff);
+#endif
+  while ((tsize > asize))
+    {
+      tsize--;
+      moff = toff + (1L << (tsize + 12));
+      mloc = tloc + (1L << (tsize + 12));
+      n = (uLongTreeNode *) SASNearAlloc (root, sizeof(uLongTreeNode));
+      if (aoff >= moff)
+	{
+	  k = nodeToLong (toff, tsize);
+	  l = tloc;
+#ifdef __SASDebugPrint__
+	  sas_printf (" L");
+#endif
+	  n->init (k, l);
+	  toff = moff;
+	  tloc = mloc;
+	}
+      else
+	{
+	  k = nodeToLong (moff, tsize);
+	  l = mloc;
+#ifdef __SASDebugPrint__
+	  sas_printf (" H");
+#endif
+	  n->init (k, l);
+	}
+#ifdef __SASDebugPrint__
+	  sas_printf (" ->%p-%p", (void *) k, (void *) l);
+#endif
+      (*root)->insertNode (root, n);
+      n = NULL;
+    }
+#ifdef __SASDebugPrint__
+  sas_printf (" <Split\n");
+#endif
+
+}
+
 static void
 p2RemUsed (uLongTreeNode ** root, unsigned long size, void *loc)
 {
-  uLongTreeNode *n;
+  uLongTreeNode *n, *c;
   uLongTreeNode **nn;
   unsigned long keys;
   unsigned long k, l;
   unsigned long offset = ((long) loc) - memLow;
+#ifdef __SASDebugPrint__
+  sas_printf ("p2RemUsed (%p, %lx)\n", (void*) loc, size);
+#endif
 
   keys = nodeToLong (offset, SizeToLog2 (size));
   nn = (*root)->searchEqualOrNextNode (root, keys);
@@ -228,19 +371,33 @@ p2RemUsed (uLongTreeNode ** root, unsigned long size, void *loc)
 	  if ((k == keys) && (l == (unsigned long) loc))
 	    {
 	      n = n->removeNode (nn);
-	      SASNearDealloc (n, sizeof (uLongTreeNode));
+	      SASNearDealloc (n, sizeof(uLongTreeNode));
 	    }
 	  else
 	    {
-	      sas_printf ("!SAS integrity check failed\n");
-	      sas_printf ("  returning %p size %p\n", loc, (void *) size);
+	      c = p2FindCont (root, size, loc);
+	      if (c)
+		p2split (root, size, loc, c);
+	      else
+		{
+		  sas_printf ("!SASRemUsed3 integrity check failed\n");
+		  sas_printf ("  returning %p size %p\n", loc, (void *) keys);
+		  sas_printf ("  found     %p size %p\n", (void *) l,
+			      (void *) k);
+		}
 	    }
 	}
     }
   else
     {
-      sas_printf ("!SAS integrity check failed\n");
-      sas_printf ("  returning %p size %p\n", loc, (void *) size);
+      c = p2FindCont (root, size, loc);
+      if (c)
+	p2split (root, size, loc, c);
+      else
+	{
+	  sas_printf ("!SASRemUsed1 integrity check failed\n");
+	  sas_printf ("  returning %p size %p\n", loc, (void *) size);
+	}
     }
 }
 
@@ -331,7 +488,7 @@ p2Alloc (uLongTreeNode ** root, unsigned long size)
   return ((void *) result);
 }
 
-
+//#define __SASDebugPrint__ 1
 static void
 p2Dealloc (uLongTreeNode ** root, unsigned long size, void *loc)
 {
@@ -339,14 +496,18 @@ p2Dealloc (uLongTreeNode ** root, unsigned long size, void *loc)
   uLongTreeNode **nn;
   unsigned long k;
   unsigned long val = (unsigned long) loc;
-  unsigned long keys;
+  unsigned long keys, ui;
+  unsigned int uj;
   int flag;
-  unsigned int ui, uj;
 
   keys = nodeToLong ((val - memLow), SizeToLog2 (size));
   n = NULL;
 #ifdef __SASDebugPrint__
-  sas_printf ("%p", (void *) keys);
+  sas_printf ("p2Dealloc (%p,%lx,%p)\n", root, size, loc);
+  uj = longToSize (keys);
+  ui = longToOffset (keys);
+  k = logTable[uj];
+  sas_printf ("%p (%lx,%u,%lx)\n", (void *) keys, ui, uj, k);
 #endif
 
   do
@@ -361,7 +522,8 @@ p2Dealloc (uLongTreeNode ** root, unsigned long size, void *loc)
 	  if (k == n->getKey ())
 	    {
 #ifdef __SASDebugPrint__
-	      sas_printf ("&%p", (void *) k);
+	      sas_printf (" &%p", (void *) k);
+	      sas_printf (" @%p", (void *) n->getKey ());
 #endif
 	      n = n->removeNode (nn);
 	      SASNearDealloc (n, sizeof (uLongTreeNode));
@@ -380,6 +542,9 @@ p2Dealloc (uLongTreeNode ** root, unsigned long size, void *loc)
 	    }
 	  else
 	    {
+#ifdef __SASDebugPrint__
+	      sas_printf (" !!%p", (void *) n->getKey ());
+#endif
 	      n = NULL;
 	      flag = 0;
 	    };
@@ -387,6 +552,9 @@ p2Dealloc (uLongTreeNode ** root, unsigned long size, void *loc)
       else
 	{
 	  flag = 0;
+#ifdef __SASDebugPrint__
+	  sas_printf (" !%p", (void *) k);
+#endif
 	};
     }
   while (flag);
@@ -397,8 +565,14 @@ p2Dealloc (uLongTreeNode ** root, unsigned long size, void *loc)
   n->init (keys, val);
   (*root)->insertNode (root, n);
 #ifdef __SASDebugPrint__
-  sas_printf ("\n");
+  sas_printf ("\n -->%p,%p\n", (void *) keys, (void *) val);
 #endif
+}
+
+static void
+p2AddUsedCompact (uLongTreeNode ** root, unsigned long size, void *loc)
+{
+  p2Dealloc (root, size, loc);
 }
 
 unsigned long
@@ -418,6 +592,36 @@ setSASmemrange (unsigned long low, unsigned long high)
 {
     memLow = low;
     memHigh = high;
+}
+
+int
+getSASUseListFlag (void)
+{
+  SASAnchorBlock_t *anchor = (SASAnchorBlock_t *) memLow;
+  int flag = 0;
+
+  if (anchor != NULL)
+    flag = anchor->anchors.rFlags.compactUseList;
+
+  return flag;
+}
+
+void
+setSASLinearUseList (void)
+{
+  SASAnchorBlock_t *anchor = (SASAnchorBlock_t *) memLow;
+
+  if (anchor != NULL)
+    anchor->anchors.rFlags.compactUseList = 0;
+}
+
+void
+setSASCompactUseList (void)
+{
+  SASAnchorBlock_t *anchor = (SASAnchorBlock_t *) memLow;
+
+  if (anchor != NULL)
+    anchor->anchors.rFlags.compactUseList = 1;
 }
 
 static int
@@ -485,16 +689,6 @@ destroySASSem (SASAnchor_t * anchor)
 #endif
 }
 
-static inline void
-initULTreeList (uLongTreeNode **root,
-		search_t keys, info_t info)
-{
-  uLongTreeNode *n = (uLongTreeNode *)SASNearAlloc(root, sizeof(uLongTreeNode));
-  n->init(keys, info);
-
-  *root = n;
-}
-
 static void
 initRegion ()
 {
@@ -529,7 +723,17 @@ initRegion ()
 #endif
   nn = &(anchor->uncommitted);
   keys = nodeToLong (0, SizeToLog2 (SegmentSize));
-  initULTreeList (nn, keys, (unsigned long) anchorBlock);
+  anchor->uncommitted = new ((uLongTreeNode *) anchor) uLongTreeNode (
+      (search_t) keys, (unsigned long) anchorBlock);
+
+#ifdef __SASDebugPrint__
+  sas_printf ("initRegion uncommitted list=%lx\n",
+	      (unsigned long) anchor->uncommitted);
+  sas_printf ("\tkey  =%lx\n",
+	      (unsigned long) anchor->uncommitted->getKey());
+  sas_printf ("\tinfo =%lx\n",
+	      (unsigned long) anchor->uncommitted->getInfo());
+#endif
 
 #ifdef __SASDebugPrint__
   sas_printf ("initRegion used %lx\n", block__Size1M);
@@ -544,7 +748,17 @@ initRegion ()
 #endif
   nn = &(anchor->region);
   keys = nodeToLong (0, SizeToLog2 (RegionSize));
-  initULTreeList (nn, keys, (unsigned long) anchorBlock);
+  anchor->region = new ((uLongTreeNode *) anchor) uLongTreeNode (
+      (search_t) keys, (unsigned long) anchorBlock);
+
+#ifdef __SASDebugPrint__
+  sas_printf ("initRegion region list=%lx\n",
+	      (unsigned long) anchor->region);
+  sas_printf ("\tkey  =%lx\n",
+	      (unsigned long) anchor->region->getKey());
+  sas_printf ("\tinfo =%lx\n",
+	      (unsigned long) anchor->region->getInfo());
+#endif
 
 #ifdef __SASDebugPrint__
   sas_printf ("initRegion allocate %lx\n", SegmentSize);
@@ -899,7 +1113,10 @@ SASBlockAllocNoLock (unsigned long blockSize)
       temp = p2Alloc (nn, blockSize);
       if (temp)
 	{
-	  p2AddUsed (uu, blockSize, temp);
+	  if (anchor->anchors.rFlags.compactUseList)
+	    p2AddUsedCompact (uu, blockSize, temp);
+	  else
+	    p2AddUsed (uu, blockSize, temp);
 	}
       else
 	{
@@ -932,7 +1149,10 @@ SASBlockAllocNoLock (unsigned long blockSize)
     }
   else
     {
-      p2AddUsed (uu, blockSize, temp);
+      if (anchor->anchors.rFlags.compactUseList)
+	p2AddUsedCompact (uu, blockSize, temp);
+      else
+	p2AddUsed (uu, blockSize, temp);
     }
   return temp;
 }
@@ -1178,6 +1398,8 @@ SASJoinRegionByName (const char *store_name)
 			   RegionSize, SegmentSize);
   if (rc)
     {
+      // The Anchor segment does not exist in the named store.
+      // So create a new region in this store.
 #ifdef __SASDebugPrint__
       sas_printf ("SASJoinRegion no anchor found\n");
 #endif
@@ -1190,6 +1412,9 @@ SASJoinRegionByName (const char *store_name)
 	  sas_printf ("SASJoinRegion anchor created\n");
 #endif
 	  initRegion ();
+	  // CompactUseList is now the default for new regions.
+	  setSASCompactUseList ();
+	  // Allocate a guard page immediately after the region.
 	  mmap ((char *) getMemHigh (), pgsize,
 		(PROT_READ | PROT_WRITE),
 		(MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED), -1, 0);
@@ -1291,6 +1516,40 @@ SASListAllocatedRegion (void **blockAddr,
   *count = cnt;
 
   SASRelease ();
+}
+
+int
+SASMaxDepthAllocatedRegion (void)
+{
+  SASAnchorBlock_t *anchor = (SASAnchorBlock_t *) memLow;
+  uLongTreeNode *u = anchor->anchors.allocated;
+  int maxd = 0;
+
+  SASSeize ();
+  if (u != NULL)
+    {
+      maxd = u->maxNodeDepth ();
+    }
+  SASRelease ();
+
+  return maxd;
+}
+
+int
+SASMaxDepthUseMem (void)
+{
+  SASAnchorBlock_t *anchor = (SASAnchorBlock_t *) memLow;
+  uLongTreeNode *u = anchor->anchors.used;
+  int maxd = 0;
+
+  SASSeize ();
+  if (u != NULL)
+    {
+      maxd = u->maxNodeDepth ();
+    }
+  SASRelease ();
+
+  return maxd;
 }
 
 void

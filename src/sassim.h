@@ -120,6 +120,9 @@ typedef unsigned long sasseg_t;
 #define __C__
 #endif
 
+extern __C__ unsigned int
+SASS2Log2 (unsigned long size);
+
 /** \brief SAS clear on block deallocate flag.
 *
 *	Internal flag that requests the SAS runtime to clear blocks as they
@@ -150,6 +153,52 @@ extern __C__ unsigned long getMemHigh();
 */
 extern __C__ void
 setSASmemrange (unsigned long low, unsigned long high);
+
+/** \brief Get UseList tracking mode flag
+*
+*   The in-use blocks can be tracked as a linear list with each block
+*   allocation discreetly listed (old style).
+*   Or tracked with adjacent blocks combined into
+*   larger power of 2 units (New Style).
+*
+*   @return a 0 value indicates a linear list while 1 indicates
+*   combined adjacent blocks.
+*/
+extern __C__ int
+getSASUseListFlag (void);
+
+/** \brief Set UseList tracking to Linear mode
+*
+*   The in-use blocks are tracked as a linear list with each block
+*   allocation discreetly listed.
+*   This can be problematic for large SASSTOREs as;
+*   - the list does not form a balanced tree and search/insert/remove
+*   can require significant time.
+*   - the anchor block heap may become exhausted causing block
+*   allocation to fail.
+*
+*   \note This mode is compatible with libsphde version 1.4 and
+*   earlier. SASSTORE instances create by libsphde v1.4 and earlier
+*   will continue to use this mode unless the user explicitly calls
+*   setSASCompactUseList() while joined to the exiting SASSTORE.
+*/
+extern __C__ void
+setSASLinearUseList (void);
+
+/** \brief Set UseList tracking to Compact mode
+*
+*   The in-use blocks are tracked with adjacent blocks combined into
+*   larger power of 2 units.
+*   This provides a more compact representation requiring less space in
+*   the anchor block heap.
+*
+*   \note This mode is the default for libsphde version 1.5 and
+*   later. SASSTORE instances create by libsphde v1.5 or later
+*   will use this mode unless the user explicitly calls
+*   setSASLinearUseList().
+*/
+extern __C__ void
+setSASCompactUseList (void);
 
 /** \brief Join this process to a SAS Region.
 *
@@ -237,6 +286,29 @@ extern __C__ void *SASBlockAlloc (unsigned long blockSize);
 *   @param blockSize size of the block to be deallocated.
 */
 extern __C__ void SASBlockDealloc (void *blockAddr, unsigned long blockSize);
+
+/** \brief Return the maximum depth for the tree tracking allocated
+*   Region segments.
+*
+*   Returns the maximum depth of the tree of allocated
+*   Region segments.
+*
+*   @return a 0 value indicates an empty list.
+*   Otherwise the depth of deepest subtree.
+*/
+
+extern __C__ int SASMaxDepthAllocatedRegion (void);
+
+/** \brief Return the maximum depth for the tree tracking allocated
+*   blocks.
+*
+*   Returns the maximum depth of the tree of allocated blocks.
+*
+*   @return a 0 value indicates an empty list.
+*   Otherwise the depth of deepest subtree.
+*/
+
+extern __C__ int SASMaxDepthUseMem (void);
 
 /** \brief Return lists of currently free segment block addresses and sizes.
 *

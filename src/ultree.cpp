@@ -32,6 +32,19 @@ uLongTreeNode::init(search_t k, info_t i)
     right	= NULL;
 };
 
+void *
+uLongTreeNode::operator new (size_t , uLongTreeNode * root)
+{
+  return SASNearAlloc(root, sizeof(uLongTreeNode));
+};
+
+void
+uLongTreeNode::operator delete( void *deadObject )
+{
+   // Return storage to heap of the SAS block the object is in.
+   SASNearDealloc( deadObject, sizeof(uLongTreeNode) );
+}
+
 void
 uLongTreeNode::kill()
 {
