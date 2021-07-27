@@ -36,6 +36,10 @@
 #include <pthread.h>
 #include <semaphore.h>
 
+#if __GNUC__
+#include <features.h>
+#endif
+
 #include "sasio.h"
 #include "freenode.h"
 #include "sasanchr.h"
@@ -689,6 +693,15 @@ destroySASSem (SASAnchor_t * anchor)
 #endif
 }
 
+/* Starting with GCC 12, the compiler throws an array-bounds warning because a
+ * constant address is used to set anchorBlock, and it can't distinguish it from
+ * a NULL pointer (see GCC bug 101379). As of now, the best we can do is simply
+ * ignore it. */
+#if __GNUC__ && __GNUC_PREREQ(12,0)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Warray-bounds"
+#endif
+
 static void
 initRegion ()
 {
@@ -769,6 +782,10 @@ initRegion ()
 
   initSASSem (anchor);
 }
+
+#if __GNUC__ && __GNUC_PREREQ(12,0)
+#pragma GCC diagnostic pop
+#endif
 
 int
 SASAttachSegByName (void *baseAddr, unsigned long size,
