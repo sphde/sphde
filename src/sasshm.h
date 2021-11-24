@@ -36,6 +36,8 @@ extern __C__ int SASAllocateShm( void* addr, long size );
 
 extern __C__ int SASAllocateShmID(key_t key_id, void* addr, long size );
 
+extern __C__ int SASAllocateShmID_clear(key_t key_id, void* addr, long size );
+
 extern __C__ int SASAllocateShmName(char *key_name, void* addr, long size );
 
 extern __C__ int SASAllocateShmNameProj( char* key_name, char proj,

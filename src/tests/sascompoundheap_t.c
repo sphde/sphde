@@ -122,14 +122,13 @@ sassim_compound_heap_test1 ()
   sasshm_t lock_mem = 0;
   key_t test_heap = 1234;
 
-  lock_mem = SASAllocateShmID (test_heap, compoundHeap, __SAS_SHMAP_MAX);
+  lock_mem = SASAllocateShmID_clear (test_heap, compoundHeap, __SAS_SHMAP_MAX);
   if (lock_mem == -1)
     {
       SASSIM_PRINT_ERR ("SASAllocateShmID(%d, %p, __SAS_SHMAP_MAX)",
 			test_heap, compoundHeap);
       return 1;
     }
-  memset (compoundHeap, 0, __SAS_SHMAP_MAX);
   compoundHeap =
     SASCompoundHeapInit (compoundHeap, __SAS_SHMAP_MAX, block__Size512, 0);
   SASSIM_PRINT_MSG ("SASCompoundHeapInit (%p, %ld) success", compoundHeap,

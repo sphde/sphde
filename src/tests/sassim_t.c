@@ -394,14 +394,13 @@ sassim_heap_test2 ()
   sasshm_t lock_mem = 0;
   key_t test_heap = 4321;
 
-  lock_mem = SASAllocateShmID (test_heap, simpleHeap, __SAS_SHMAP_MAX);
+  lock_mem = SASAllocateShmID_clear (test_heap, simpleHeap, __SAS_SHMAP_MAX);
   if (lock_mem == -1)
     {
       SASSIM_PRINT_ERR ("SASAllocateShmID(%d, %p, __SAS_SHMAP_MAX)",
 			test_heap, simpleHeap);
       return 1;
     }
-  memset (simpleHeap, 0, __SAS_SHMAP_MAX);
   simpleHeap =
     SASSimpleHeapInit (simpleHeap, SAS_RUNTIME_LOCKTABLE, __SAS_SHMAP_MAX);
   SASSIM_PRINT_MSG ("SASSimpleHeapInit (%p, %ld) success", simpleHeap,
