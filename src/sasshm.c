@@ -107,6 +107,56 @@ SASAllocateShmID (key_t key_id, void *addr, long size)
 }
 
 int
+SASAllocateShmID_clear (key_t key_id, void *addr, long size)
+{
+  int shm_id;
+  int exist = 0;
+  char *shm_addr;
+
+  shm_id = shmget (key_id, size, createOnlyFlags);
+  if (shm_id == -1)
+    {
+      if (errno == EEXIST)
+	{
+	  exist = errno;
+	  shm_id = shmget (key_id, size, createFlags);
+	}
+    }
+
+  if (shm_id == -1)
+    {
+#ifdef __SASDebugPrint__
+      sas_printf ("SASAllocateShmID(%x, %p, %ld); shmget failed;%s\n",
+		  key_id, addr, size, strerror (errno));
+#endif
+      return (-1);
+    }
+
+  shm_addr = shmat (shm_id, addr, 0);
+#ifdef __SASDebugPrint__
+  sas_printf ("SASAllocateShmID(%x, %p, %ld); shmat = %p\n",
+	      key_id, addr, size, shm_addr);
+#endif
+  if ((long) shm_addr != -1L)
+    memset (shm_addr, 0, size);
+  else
+    {
+#ifdef __SASDebugPrint__
+      sas_printf ("SASAllocateShmID(%x, %p, %ld); shmat failed;%s\n",
+		  key_id, addr, size, strerror (errno));
+#endif
+      return (-1);
+    }
+
+#ifdef __SASDebugPrint__
+  sas_printf ("SASAllocateShmID(%x, %p, %ld); allocated ID = %d\n",
+	      key_id, addr, size, shm_id);
+#endif
+  errno = exist;
+  return (shm_id);
+}
+
+int
 SASAllocateShmName (char *key_name, void *addr, long size)
 {
   key_t shm_key;
