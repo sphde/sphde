@@ -1,0 +1,47 @@
+language: c
+
+matrix:
+  include:
+    - name: "linux-amd64-gcc-9"
+      os: linux
+      dist: bionic
+      arch: amd64
+      compiler: gcc-9
+      env:
+        - CXX="g++-9"
+        - CFLAGS="-O2"
+        - CXXFLAGS="-O2"
+        - PKG_CC="gcc-9 g++-9"
+    - name: "linux-amd64-gcc-10"
+      os: linux
+      dist: bionic
+      arch: amd64
+      compiler: gcc-10
+      env:
+        - CXX="g++-10"
+        - CFLAGS="-O2"
+        - CXXFLAGS="-O2"
+        - PKG_CC="gcc-10 g++-10"
+    - name: "linux-amd64-gcc-11"
+      os: linux
+      dist: focal
+      arch: amd64
+      compiler: gcc-11
+      env:
+        - CXX="g++-11"
+        - CFLAGS="-O2 -Wno-error=array-bounds"
+        - CXXFLAGS="-O2 -Wno-error=array-bounds"
+        - PKG_CC="gcc-11 g++-11"
+
+before_install:
+  - sudo add-apt-repository universe
+  - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+  - sudo apt-get update
+  - travis_wait 45 sudo apt-get -y install ${PKG_CC} doxygen graphviz
+
+script:
+  - mkdir $(pwd)/install
+  - ./configure $CONFIGURE_OPTS --prefix=$(pwd)/install
+  - make -j $(nproc)
+  - make install
+  - make -j $(nproc) check
