@@ -79,7 +79,7 @@ main (int argc, char *argv[])
 	llabs(gtod_ns - sphgtod_ns));
       printf ("exceeded the allowable drift of %"PRIu64" ns\n",
 	ALLOWABLE_DRIFT);
-      return 1;
+      return 77; /* SKIP */
     }
 
  factor = sphget_gtod_conv_factor();
@@ -99,7 +99,7 @@ main (int argc, char *argv[])
 	      llabs(gtod_ns - sphgtod_ns));
      printf ("exceeded the allowable drift of %"PRIu64" ns\n",
 	      ALLOWABLE_DRIFT);
-     return 1;
+     return 77; /* SKIP */
    }
 
  return 0;
