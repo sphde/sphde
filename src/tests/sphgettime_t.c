@@ -98,7 +98,7 @@ main (int argc, char *argv[])
 	      llabs(gettime_ns - sphgettime_ns));
      printf ("exceeded the allowable drift of %"PRIu64" ns\n",
 	      ALLOWABLE_DRIFT);
-     return 1;
+     return 77; /* SKIP */
    }
 
  clock_gettime(CLOCK_MONOTONIC, &ts1);
