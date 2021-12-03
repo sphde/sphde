@@ -32,6 +32,36 @@ matrix:
         - CFLAGS="-O2 -Wno-error=array-bounds"
         - CXXFLAGS="-O2 -Wno-error=array-bounds"
         - PKG_CC="gcc-11 g++-11"
+    - name: "linux-s390x-gcc-9"
+      os: linux
+      dist: bionic
+      arch: s390x
+      compiler: gcc-9
+      env:
+        - CXX="g++-9"
+        - CFLAGS="-O2"
+        - CXXFLAGS="-O2"
+        - PKG_CC="gcc-9 g++-9"
+    - name: "linux-s390x-gcc-10"
+      os: linux
+      dist: bionic
+      arch: s390x
+      compiler: gcc-10
+      env:
+        - CXX="g++-10"
+        - CFLAGS="-O2"
+        - CXXFLAGS="-O2"
+        - PKG_CC="gcc-10 g++-10"
+    - name: "linux-s390x-gcc-11"
+      os: linux
+      dist: focal
+      arch: s390x
+      compiler: gcc-11
+      env:
+        - CXX="g++-11"
+        - CFLAGS="-O2 -Wno-error=array-bounds"
+        - CXXFLAGS="-O2 -Wno-error=array-bounds"
+        - PKG_CC="gcc-11 g++-11"
 
 before_install:
   - sudo add-apt-repository universe
