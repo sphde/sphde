@@ -33,8 +33,8 @@ if test "x$enable_debug" = "xyes" ; then
   CXXFLAGS="$CXXFLAGS -D__SOMDebugPrint__ -Dmylockdebug -DcoherenceCheck -D__SASDebugPrint__"
 fi
 AC_ARG_ENABLE([htm],
-  [AS_HELP_STRING([--disable-htm],
-    [Disable hardware transactional memory])])
+  [AS_HELP_STRING([--enable-htm],
+    [Enable hardware transactional memory])])
 
 # This directive is to avoid buggy libtool that don't add the -Wl,--no-as-needed
 # directive in the correct position of LDFLAGS
@@ -122,14 +122,20 @@ AC_CHECK_LIB([c], [printf], [],
 LDFLAGS="$SAVE_LDFLAGS"
 fi
 
-if test "$enable_htm" != no ; then
+if test "$enable_htm" == yes ; then
 AX_CHECK_COMPILE_FLAG([-mhtm],[
         CFLAGS="$CFLAGS -mhtm"
         CXXFLAGS="$CXXFLAGS -mhtm"
-        htm=true
-])
+        htm=yes],
+        AC_MSG_ERROR([*** Compiler does not support HTM.])
+)
+else
+AX_CHECK_COMPILE_FLAG([-mno-htm],[
+        CFLAGS="$CFLAGS -mno-htm"
+        CXXFLAGS="$CXXFLAGS -mno-htm"],
+)
 fi
-AM_CONDITIONAL([HTM], [test x$htm = xtrue])
+AM_CONDITIONAL([HTM], [test x$htm = xyes])
 
 # Doxygen support
 DX_HTML_FEATURE(ON)
