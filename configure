@@ -1464,7 +1464,7 @@ Optional Features:
                           enable make rules and dependencies not useful (and
                           sometimes confusing) to the casual installer
   --enable-debug          Enable debugging information
-  --disable-htm           Disable hardware transactional memory
+  --enable-htm            Enable hardware transactional memory
   --enable-dependency-tracking
                           do not reject slow dependency extractors
   --disable-dependency-tracking
@@ -17888,7 +17888,7 @@ fi
 LDFLAGS="$SAVE_LDFLAGS"
 fi
 
-if test "$enable_htm" != no ; then
+if test "$enable_htm" == yes ; then
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether C compiler accepts -mhtm" >&5
 $as_echo_n "checking whether C compiler accepts -mhtm... " >&6; }
 if ${ax_cv_check_cflags___mhtm+:} false; then :
@@ -17922,14 +17922,52 @@ if test "x$ax_cv_check_cflags___mhtm" = xyes; then :
 
         CFLAGS="$CFLAGS -mhtm"
         CXXFLAGS="$CXXFLAGS -mhtm"
-        htm=true
+        htm=yes
+else
+  as_fn_error $? "*** Compiler does not support HTM." "$LINENO" 5
 
+fi
+
+else
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether C compiler accepts -mno-htm" >&5
+$as_echo_n "checking whether C compiler accepts -mno-htm... " >&6; }
+if ${ax_cv_check_cflags___mno_htm+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+
+  ax_check_save_flags=$CFLAGS
+  CFLAGS="$CFLAGS  -mno-htm"
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main ()
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+  ax_cv_check_cflags___mno_htm=yes
+else
+  ax_cv_check_cflags___mno_htm=no
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+  CFLAGS=$ax_check_save_flags
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ax_cv_check_cflags___mno_htm" >&5
+$as_echo "$ax_cv_check_cflags___mno_htm" >&6; }
+if test "x$ax_cv_check_cflags___mno_htm" = xyes; then :
+
+        CFLAGS="$CFLAGS -mno-htm"
+        CXXFLAGS="$CXXFLAGS -mno-htm"
 else
   :
 fi
 
 fi
- if test x$htm = xtrue; then
+ if test x$htm = xyes; then
   HTM_TRUE=
   HTM_FALSE='#'
 else
