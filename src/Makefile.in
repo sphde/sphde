@@ -613,7 +613,6 @@ RECHECK_LOGS = $(TEST_LOGS)
 AM_RECURSIVE_TARGETS = check recheck
 TEST_SUITE_LOG = test-suite.log
 TEST_EXTENSIONS = @EXEEXT@ .test
-LOG_DRIVER = $(SHELL) $(top_srcdir)/test-driver
 LOG_COMPILE = $(LOG_COMPILER) $(AM_LOG_FLAGS) $(LOG_FLAGS)
 am__set_b = \
   case '$@' in \
@@ -782,6 +781,8 @@ AM_CFLAGS = -Wall -Werror -Wwrite-strings $(PTHREAD_CFLAGS)
 AM_CXXFLAGS = -Wall -Werror -Wwrite-strings -Woverloaded-virtual \
 	      $(PTHREAD_CFLAGS)
 
+TIMEOUT = 300s
+LOG_DRIVER = timeout $(TIMEOUT) $(SHELL) $(top_srcdir)/test-driver
 lib_LTLIBRARIES = libsphde.la libsphgtod.la libsphgettime.la
 EXTRA_DIST = $(libsphde_la_INCLUDES) saslockl.cpp
 

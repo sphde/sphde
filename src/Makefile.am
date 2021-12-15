@@ -4,6 +4,10 @@ AM_CFLAGS   = -Wall -Werror -Wwrite-strings $(PTHREAD_CFLAGS)
 AM_CXXFLAGS = -Wall -Werror -Wwrite-strings -Woverloaded-virtual \
 	      $(PTHREAD_CFLAGS)
 
+TIMEOUT = 300s
+
+LOG_DRIVER = timeout $(TIMEOUT) $(SHELL) $(top_srcdir)/test-driver
+
 lib_LTLIBRARIES = libsphde.la libsphgtod.la libsphgettime.la
 bin_PROGRAMS    = sasutil
 EXTRA_DIST      =
