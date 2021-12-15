@@ -44,4 +44,4 @@ script:
   - ./configure $CONFIGURE_OPTS --prefix=$(pwd)/install
   - make -j $(nproc)
   - make install
-  - make -j $(nproc) check
+  - make check
