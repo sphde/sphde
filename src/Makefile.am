@@ -251,8 +251,10 @@ TESTS                 += sphdirectpcqueue_ttt
 sphdirectpcqueue_ttt_SOURCES = tests/sphdirectpcqueue_ttt.c
 sphdirectpcqueue_ttt_LDADD   = libsphde.la
 
+if HTM
 TESTS                 += sphmultipcqueue_t
 sphmultipcqueue_t_SOURCES = tests/sphmultipcqueue_t.c
 sphmultipcqueue_t_LDADD   = libsphde.la
+endif
 
 check_PROGRAMS = $(TESTS)
