@@ -47,13 +47,8 @@ void
 SASLockInit (void)
 {
     char *lock_addr = (char *)__SAS_TEMP_ADDRESS;
-#if 0
-    SasLockMemID = SASAllocateShmID (__SAS_LOCK_SHMKEY, lock_addr, 
-                                     __SAS_SHMAP_MAX /* SegmentSize */ );
-#else
     SasLockMemID = SASAllocateShmNameProj(sasStorePath, 'L',
                                           lock_addr, __SAS_SHMAP_MAX);
-#endif
     if ( SasLockMemID != -1 )
     {
     	if (errno != EEXIST)
