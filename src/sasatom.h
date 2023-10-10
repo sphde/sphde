@@ -41,6 +41,8 @@ typedef void*         sas_lock_ptr_t;
 #include "sasatom_x86_64.h"
 #elif defined(__i386__)
 #include "sasatom_i386.h"
+#elif defined(__loongarch__)
+#include "sasatom_loongarch.h"
 #else
 #include "sasatom_generic.h"
 #endif
