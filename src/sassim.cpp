@@ -128,7 +128,8 @@ typedef struct
     (defined (__LITTLE_ENDIAN__) && defined (__powerpc64__)) \
     || defined (__aarch64__) || defined (__arm__) \
     || ((__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__) && defined(__mips64)) \
-    || defined (__loongarch__)
+    || defined (__loongarch__) \
+    || defined (__riscv)
   unsigned long offset:56;
   unsigned int size:8;
 #else
