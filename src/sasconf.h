@@ -116,6 +116,21 @@
 # define     __SAS_SHMAP_MAX         0x0001000000L   /* 16MB */
 #endif
 
+#ifdef __riscv
+  #if __riscv_xlen == 32
+  # define     __SAS_BASE_ADDRESS      0x80000000UL    /* 2GB   */
+  # define     RegionSize              0x10000000UL    /* 256MB */
+  # define     SegmentSize             0x01000000UL    /* 16MB  */
+  # define     __SAS_SHMAP_MAX         0x01000000UL    /* 16MB  */
+  #elif __riscv_xlen == 64
+  # define     __WORDSIZE_64
+  # define     __SAS_BASE_ADDRESS      0x1000000000L    /* 64GB */
+  # define     RegionSize              0x1000000000L    /* 64GB */
+  # define     SegmentSize             0x0010000000L    /* 256MB */
+  # define     __SAS_SHMAP_MAX         0x0001000000L    /* 16MB */
+  #endif
+#endif
+
 /* 
  * If the platform is not recognized above, select some resonable default.
  */
