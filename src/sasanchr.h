@@ -27,7 +27,8 @@ typedef struct
 #if defined (__x86_64__) || \
     (defined (__LITTLE_ENDIAN__) && defined (__powerpc64__)) \
     || defined (__aarch64__) || defined (__arm__) \
-    || ((__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__) && defined(__mips64))
+    || ((__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__) && defined(__mips64)) \
+    || defined (__loongarch__)
   unsigned int compactUseList:1;
   unsigned long reserved0:63;
 #else

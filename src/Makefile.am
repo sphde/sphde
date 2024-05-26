@@ -4,6 +4,10 @@ AM_CFLAGS   = -Wall -Werror -Wwrite-strings $(PTHREAD_CFLAGS)
 AM_CXXFLAGS = -Wall -Werror -Wwrite-strings -Woverloaded-virtual \
 	      $(PTHREAD_CFLAGS)
 
+TIMEOUT = 300s
+
+LOG_DRIVER = timeout $(TIMEOUT) $(SHELL) $(top_srcdir)/test-driver
+
 lib_LTLIBRARIES = libsphde.la libsphgtod.la libsphgettime.la
 bin_PROGRAMS    = sasutil
 EXTRA_DIST      =
@@ -52,6 +56,7 @@ libsphdeinclude_HEADERS = \
 	sasstringbtree.h \
 	sasstringbtreeenum.h \
 	sasstringbtreenode.h \
+	sphmultipcqueue.h \
 	sphsinglepcqueue.h \
 	sphdirectpcqueue.h \
 	sphlfentry.h \
@@ -120,14 +125,10 @@ libsphde_la_SOURCES = \
 	sphlockfreeheap.cpp \
 	sphlflogger.cpp \
 	sphlogportal.cpp \
+	sphmultipcqueue.cpp \
 	sphsinglepcqueue.cpp \
 	sasallocpriv.h \
 	sphcontextpriv.h
-
-if HTM
-libsphdeinclude_HEADERS += sphmultipcqueue.h
-libsphde_la_SOURCES += sphmultipcqueue.cpp
-endif
 
 libsphde_la_CFLAGS   = -D__SASSIM__ $(AM_CFLAGS)
 libsphde_la_CXXFLAGS = -D__SASSIM__ $(AM_CXXFLAGS)

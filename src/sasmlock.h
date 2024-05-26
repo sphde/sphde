@@ -61,13 +61,7 @@
 #include "sasulock.h"       
 #include "saslockl.h"       // for sas_userlock_request_t
 
-#define UPPER_BYTES_MASK  0x000000FF 
-#ifdef __WORDSIZE_64
-#define __SAS_LOCK_SHMKEY 0x4c4f434b
-#else
-#define __SAS_LOCK_SHMKEY 0x4c4f324b
-#endif
-
+#define UPPER_BYTES_MASK  0x000000FF
 
 class SasMasterLock {
 public:

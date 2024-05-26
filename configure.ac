@@ -2,10 +2,10 @@
 # Process this file with autoconf to produce a configure script.
 
 # The Automake init of 1.10 requires at least autoconf 2.62
-AC_PREREQ(2.63)
+AC_PREREQ([2.69])
 
 #Autoconf versioning is A:C:B
-AC_INIT([libsphde], [1.4.0], munroesj@us.ibm.com raji@linux.vnet.ibm.com tulioqm@br.ibm.com)
+AC_INIT([libsphde],[1.4.0],[munroesj@us.ibm.com raji@linux.vnet.ibm.com tulioqm@br.ibm.com])
 
 AC_CONFIG_SRCDIR([src/sassim.cpp])
 AC_CONFIG_HEADERS([config.h])
@@ -33,8 +33,8 @@ if test "x$enable_debug" = "xyes" ; then
   CXXFLAGS="$CXXFLAGS -D__SOMDebugPrint__ -Dmylockdebug -DcoherenceCheck -D__SASDebugPrint__"
 fi
 AC_ARG_ENABLE([htm],
-  [AS_HELP_STRING([--disable-htm],
-    [Disable hardware transactional memory])])
+  [AS_HELP_STRING([--enable-htm],
+    [Enable hardware transactional memory])])
 
 # This directive is to avoid buggy libtool that don't add the -Wl,--no-as-needed
 # directive in the correct position of LDFLAGS
@@ -49,7 +49,7 @@ AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
 AC_PROG_RANLIB
-AC_PROG_LIBTOOL
+LT_INIT
 
 # Tools flags
 AC_SUBST([AM_LIBTOOLFLAGS], [--silent])
@@ -100,10 +100,15 @@ AC_HEADER_STDC
 AC_C_VOLATILE
 
 # Checks for library functions.
+AC_FUNC_FORK
 AC_FUNC_MALLOC
 AC_FUNC_MMAP
+AC_FUNC_STRERROR_R
 AC_FUNC_STRTOD
+AC_CHECK_HEADERS([limits.h])
 AC_CHECK_FUNCS([clock_gettime ftruncate getcwd getpagesize gettimeofday memset munmap strerror])
+AC_CHECK_FUNCS([strtol])
+AC_CHECK_FUNCS([strtoul])
 
 # Pthread check (on m4/acx_pthread.m4)
 ACX_PTHREAD
@@ -117,14 +122,20 @@ AC_CHECK_LIB([c], [printf], [],
 LDFLAGS="$SAVE_LDFLAGS"
 fi
 
-if test "$enable_htm" != no ; then
+if test "$enable_htm" == yes ; then
 AX_CHECK_COMPILE_FLAG([-mhtm],[
         CFLAGS="$CFLAGS -mhtm"
         CXXFLAGS="$CXXFLAGS -mhtm"
-        htm=true
-])
+        htm=yes],
+        AC_MSG_ERROR([*** Compiler does not support HTM.])
+)
+else
+AX_CHECK_COMPILE_FLAG([-mno-htm],[
+        CFLAGS="$CFLAGS -mno-htm"
+        CXXFLAGS="$CXXFLAGS -mno-htm"],
+)
 fi
-AM_CONDITIONAL([HTM], [test x$htm = xtrue])
+AM_CONDITIONAL([HTM], [test x$htm = xyes])
 
 # Doxygen support
 DX_HTML_FEATURE(ON)
