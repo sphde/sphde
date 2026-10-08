@@ -423,6 +423,7 @@ SPHSinglePCQueueAllocStrideDirect (SPHSinglePCQueue_t queue)
   SPHPCQueueHeader *headerBlock = (SPHPCQueueHeader *) queue;
   longPtr_t alloc_round = 0;
   longPtr_t head;
+  longPtr_t tail;
   longPtr_t queue_entry = 0;
 
   if (SOMSASCheckBlockSigAndType ((SASBlockHeader *) headerBlock,
@@ -439,7 +440,10 @@ SPHSinglePCQueueAllocStrideDirect (SPHSinglePCQueue_t queue)
       if (head >= headerBlock->endq)
         head = headerBlock->startq;
 
-      if ((head != headerBlock->qtail)
+      tail = headerBlock->qtail;
+      /* See SPHSinglePCQueueAllocStrideEntry.  */
+      sas_read_barrier ();
+      if ((head != tail)
           && !entryPtr->entryID.detail.valid
           && !entryPtr->entryID.detail.allocated)
         {
@@ -903,6 +907,7 @@ SPHSinglePCQueueAllocStrideEntry (SPHSinglePCQueue_t queue,
   SPHLFEntryHandle_t *handlespace = handleorg;
   longPtr_t alloc_round = 0;
   longPtr_t head;
+  longPtr_t tail;
   longPtr_t queue_entry;
 
   if (SOMSASCheckBlockSigAndType ((SASBlockHeader *) headerBlock,
@@ -919,7 +924,13 @@ SPHSinglePCQueueAllocStrideEntry (SPHSinglePCQueue_t queue,
       if (head >= headerBlock->endq)
 	head = headerBlock->startq;
 
-      if ((head != headerBlock->qtail)
+      tail = headerBlock->qtail;
+      /* Order the qtail load before the entry header load, pairing
+       * with the write barrier in SPHSinglePCQueueFreeNextEntry, so we
+       * never see an advanced qtail with a stale (still allocated)
+       * entry header.  */
+      sas_read_barrier ();
+      if ((head != tail)
 	  && !entryPtr->entryID.detail.valid
 	  && !entryPtr->entryID.detail.allocated)
 	{
@@ -975,6 +986,7 @@ SPHSinglePCQueueAllocStrideTimeStamped (SPHSinglePCQueue_t queue,
   SPHLFEntryHandle_t *handlespace = handleorg;
   longPtr_t alloc_round = 0;
   longPtr_t head;
+  longPtr_t tail;
   longPtr_t queue_entry;
 
   if (SOMSASCheckBlockSigAndType ((SASBlockHeader *) headerBlock,
@@ -991,7 +1003,13 @@ SPHSinglePCQueueAllocStrideTimeStamped (SPHSinglePCQueue_t queue,
       if (head >= headerBlock->endq)
 	head = headerBlock->startq;
 
-      if ((head != headerBlock->qtail)
+      tail = headerBlock->qtail;
+      /* Order the qtail load before the entry header load, pairing
+       * with the write barrier in SPHSinglePCQueueFreeNextEntry, so we
+       * never see an advanced qtail with a stale (still allocated)
+       * entry header.  */
+      sas_read_barrier ();
+      if ((head != tail)
 	  && !entryPtr->entryID.detail.valid
 	  && !entryPtr->entryID.detail.allocated)
 	{
@@ -1095,6 +1113,9 @@ SPHSinglePCQueueGetNextComplete (SPHSinglePCQueue_t queue,
       if (headerBlock->qhead != queue_entry
 	  && entrytemp.detail.valid && entrytemp.detail.allocated)
 	{
+	  /* Order the valid flag load before the caller's payload loads,
+	   * pairing with the barrier in SPHSinglePCQueueEntryComplete.  */
+	  sas_read_barrier ();
 	  alloc_round = entrytemp.detail.len * DEFAULT_ALLOC_UNIT;
 	  handlespace->entry = entryPtr;
 	  handlespace->total_size = alloc_round;
