@@ -9,9 +9,16 @@
 #ifndef _SASATOMIC_GENERIC_H
 #define _SASATOMIC_GENERIC_H
 
-#define __arch_sas_write_barrier() __asm ("" ::: "memory")
-#define __arch_sas_read_barrier()  __asm ("" ::: "memory")
-#define __arch_sas_full_barrier()  __asm ("" ::: "memory")
+/* These must be real hardware barriers, not just compiler barriers:
+ * the generic implementation is used on weakly ordered architectures
+ * (e.g. arm, aarch64) where loads and stores to different
+ * locations can be observed out of order by other CPUs.  Use full
+ * fences, as the x86_64 implementation does, since callers do not
+ * consistently use the read/write variants with acquire/release
+ * semantics.  */
+#define __arch_sas_write_barrier() __atomic_thread_fence (__ATOMIC_SEQ_CST)
+#define __arch_sas_read_barrier()  __atomic_thread_fence (__ATOMIC_SEQ_CST)
+#define __arch_sas_full_barrier()  __atomic_thread_fence (__ATOMIC_SEQ_CST)
 
 static inline void
 __arch_pause (void)
