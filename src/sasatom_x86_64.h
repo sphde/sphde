@@ -12,9 +12,15 @@
 #ifndef _SASATOMIC_X86_64_H
 #define _SASATOMIC_X86_64_H
 
+#if GCC_VERSION >= 40700
+#define __arch_sas_write_barrier() __atomic_thread_fence (__ATOMIC_ACQUIRE)
+#define __arch_sas_read_barrier()  __atomic_thread_fence (__ATOMIC_RELEASE)
+#define __arch_sas_full_barrier()  __atomic_thread_fence (__ATOMIC_SEQ_CST)
+#else
 #define __arch_sas_full_barrier()  __sync_synchronize()
 #define __arch_sas_read_barrier()  __sync_synchronize()
 #define __arch_sas_write_barrier() __sync_synchronize()
+#endif
 
 static inline void
 __arch_pause (void)
@@ -111,18 +117,29 @@ __arch_atomic_swap (long int *p, long int replace)
 static inline void
 __arch_atomic_inc (long int *p)
 {
+#if GCC_VERSION >= 40700
+  const long int inc_val = 1L;
+
+  __atomic_fetch_add (p, inc_val, __ATOMIC_RELAXED);
+#else
   __asm__ __volatile__ (
     "  lock;"
     "  incl (%0);"
    :
-   : "p" (p)
+   : "p" (ptr)
    : "memory"
   );
+  #endif
 }
 
 static inline void
 __arch_atomic_dec (long int *p)
 {
+#if GCC_VERSION >= 40700
+  const long int inc_val = 1L;
+
+  __atomic_fetch_sub (p, inc_val, __ATOMIC_RELAXED);
+#else
   __asm__ (
     "  lock;"
     "  decl (%0);"
@@ -130,6 +147,7 @@ __arch_atomic_dec (long int *p)
    : "p" (p)
    : "memory"
   );
+#endif
 }
 
 static inline void

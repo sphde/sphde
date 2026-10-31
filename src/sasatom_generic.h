@@ -16,9 +16,15 @@
  * fences, as the x86_64 implementation does, since callers do not
  * consistently use the read/write variants with acquire/release
  * semantics.  */
-#define __arch_sas_write_barrier() __atomic_thread_fence (__ATOMIC_SEQ_CST)
-#define __arch_sas_read_barrier()  __atomic_thread_fence (__ATOMIC_SEQ_CST)
+#if GCC_VERSION >= 40700
+#define __arch_sas_write_barrier() __atomic_thread_fence (__ATOMIC_ACQUIRE)
+#define __arch_sas_read_barrier()  __atomic_thread_fence (__ATOMIC_RELEASE)
 #define __arch_sas_full_barrier()  __atomic_thread_fence (__ATOMIC_SEQ_CST)
+#else
+#define __arch_sas_write_barrier()  __sync_synchronize ()
+#define __arch_sas_read_barrier()  __sync_synchronize ()
+#define __arch_sas_full_barrier()  __sync_synchronize ()
+#endif
 
 static inline void
 __arch_pause (void)
